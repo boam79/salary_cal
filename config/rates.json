@@ -1,6 +1,6 @@
 {
-  "version": "2.0.0",
-  "lastUpdated": "2025-01-14",
+  "version": "3.0.0",
+  "lastUpdated": "2025-10-15",
   "updateHistory": [
     {
       "date": "2024-10-14",
@@ -9,6 +9,10 @@
     {
       "date": "2025-01-14",
       "changes": "2025년 세율 및 세금 업데이트 - 소득세, 상속세, 증여세, 4대보험, 최저시급 반영"
+    },
+    {
+      "date": "2025-10-15",
+      "changes": "2025년 10월 기준 세율 검토 및 업데이트 - 장기요양보험료율 12.81% → 12.27% 변경"
     }
   ],
   "incomeTax": {
@@ -33,7 +37,7 @@
       "rate": 0.03545
     },
     "longTermCare": {
-      "rateOfHealth": 0.1281
+      "rateOfHealth": 0.1227
     },
     "employment": {
       "rate": 0.009
