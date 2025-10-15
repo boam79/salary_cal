@@ -1,0 +1,101 @@
+{
+  "version": "2.0.0",
+  "lastUpdated": "2025-01-14",
+  "updateHistory": [
+    {
+      "date": "2024-10-14",
+      "changes": "Initial version"
+    },
+    {
+      "date": "2025-01-14",
+      "changes": "2025년 세율 및 세금 업데이트 - 소득세, 상속세, 증여세, 4대보험, 최저시급 반영"
+    }
+  ],
+  "incomeTax": {
+    "brackets": [
+      { "max": 12000000, "rate": 0.06, "deduction": 0 },
+      { "max": 46000000, "rate": 0.15, "deduction": 1080000 },
+      { "max": 88000000, "rate": 0.24, "deduction": 5220000 },
+      { "max": 150000000, "rate": 0.35, "deduction": 14900000 },
+      { "max": 300000000, "rate": 0.38, "deduction": 19400000 },
+      { "max": 500000000, "rate": 0.40, "deduction": 25400000 },
+      { "max": 1000000000, "rate": 0.42, "deduction": 35400000 },
+      { "max": 999999999999, "rate": 0.45, "deduction": 65400000 }
+    ],
+    "localTaxRate": 0.1
+  },
+  "insurance": {
+    "pension": {
+      "rate": 0.045,
+      "maxMonthlyIncome": 5530000
+    },
+    "health": {
+      "rate": 0.03545
+    },
+    "longTermCare": {
+      "rateOfHealth": 0.1281
+    },
+    "employment": {
+      "rate": 0.009
+    }
+  },
+  "inheritanceTax": {
+    "brackets": [
+      { "max": 100000000, "rate": 0.10, "deduction": 0 },
+      { "max": 500000000, "rate": 0.20, "deduction": 10000000 },
+      { "max": 1000000000, "rate": 0.30, "deduction": 60000000 },
+      { "max": 3000000000, "rate": 0.40, "deduction": 160000000 },
+      { "max": 999999999999, "rate": 0.50, "deduction": 460000000 }
+    ],
+    "basicDeduction": 500000000
+  },
+  "giftTax": {
+    "deductions": {
+      "spouse": 600000000,
+      "linealDescendant": 50000000,
+      "otherRelative": 10000000
+    },
+    "brackets": [
+      { "max": 100000000, "rate": 0.10, "deduction": 0 },
+      { "max": 500000000, "rate": 0.20, "deduction": 10000000 },
+      { "max": 1000000000, "rate": 0.30, "deduction": 60000000 },
+      { "max": 3000000000, "rate": 0.40, "deduction": 160000000 },
+      { "max": 999999999999, "rate": 0.50, "deduction": 460000000 }
+    ]
+  },
+  "acquisitionTax": {
+    "house": {
+      "first": 0.01,
+      "second": 0.02,
+      "third": 0.03
+    },
+    "land": 0.04,
+    "farmland": 0.03,
+    "registrationTax": 0.02,
+    "localEducationTax": 0.004
+  },
+  "realEstate": {
+    "note": "부동산 수익률 계산은 세율이 아닌 공식 기반"
+  },
+  "loanInterest": {
+    "general": {
+      "minRate": 3.5,
+      "maxRate": 8.5,
+      "averageRate": 5.0
+    },
+    "housing": {
+      "minRate": 3.0,
+      "maxRate": 6.0,
+      "averageRate": 4.5,
+      "ltv": {
+        "max": 0.7,
+        "recommended": 0.6
+      },
+      "dti": {
+        "max": 0.6,
+        "recommended": 0.4
+      }
+    }
+  }
+}
+
