@@ -111,6 +111,110 @@ HTML, JavaScript, CSS를 사용하여 다양한 금융 계산 기능을 제공�
 
 ## High-level Task Breakdown
 
+### 🔧 Phase 4.5: 코드 구조 & 유지보수성 개선 (2025-10-18)
+
+#### Task 4.5.1: 프로젝트 구조 재설계 및 폴더 생성
+- [ ] **Subtask 4.5.1.1**: 새 폴더 구조 생성
+  - `js/calculators/` 폴더 생성
+  - `js/utils/` 폴더 생성
+  - **Success Criteria**: 폴더 구조가 생성되고 git에 인식됨
+
+#### Task 4.5.2: 유틸리티 함수 분리
+- [ ] **Subtask 4.5.2.1**: validation.js 생성
+  - `validateInput()`, `getValueWithUnit()` 함수 이동
+  - 입력 검증 관련 모든 함수 모듈화
+  - **Success Criteria**: validation.js가 독립적으로 작동, 모든 검증 로직 포함
+
+- [ ] **Subtask 4.5.2.2**: formatter.js 생성
+  - `formatCurrency()`, `formatNumber()`, `formatChartValue()` 함수 이동
+  - 숫자 포맷팅 관련 모든 함수 모듈화
+  - **Success Criteria**: formatter.js가 독립적으로 작동, 일관된 포맷팅 제공
+
+- [ ] **Subtask 4.5.2.3**: errorLogger.js 생성
+  - `ErrorLogger` 객체를 별도 파일로 분리
+  - 에러 로깅 관련 모든 기능 모듈화
+  - **Success Criteria**: errorLogger.js가 독립적으로 작동, 에러 추적 가능
+
+#### Task 4.5.3: 계산기 모듈 분리
+- [ ] **Subtask 4.5.3.1**: salary.js 생성
+  - `calculateSalary()` 함수 및 관련 로직 이동
+  - 연봉/월급 계산 전용 모듈
+  - **Success Criteria**: 연봉 계산기가 독립 모듈로 정상 작동
+
+- [ ] **Subtask 4.5.3.2**: tax.js 생성
+  - `calculateInheritanceTax()`, `calculateGiftTax()` 함수 이동
+  - 세금 계산 전용 모듈
+  - **Success Criteria**: 상속세/증여세 계산기가 독립 모듈로 정상 작동
+
+- [ ] **Subtask 4.5.3.3**: realEstate.js 생성
+  - `calculateBrokerageFee()`, `calculateCapitalGains()`, `calculatePropertyTax()`, `calculateDSR()` 함수 이동
+  - 부동산 계산 전용 모듈
+  - **Success Criteria**: 부동산 계산기가 독립 모듈로 정상 작동
+
+- [ ] **Subtask 4.5.3.4**: acquisition.js 생성
+  - `calculateAcquisitionTax()` 함수 이동
+  - 취등록세 계산 전용 모듈
+  - **Success Criteria**: 취등록세 계산기가 독립 모듈로 정상 작동
+
+- [ ] **Subtask 4.5.3.5**: loan.js 생성
+  - `calculateLoan()`, `calculateHousingLoan()`, `getRepaymentFormula()` 함수 이동
+  - 대출 계산 전용 모듈
+  - **Success Criteria**: 금융대출/주택대출 계산기가 독립 모듈로 정상 작동
+
+#### Task 4.5.4: 차트 기능 개선
+- [ ] **Subtask 4.5.4.1**: 차트 데이터 전역 상태 관리
+  - 차트 데이터를 localStorage 또는 전역 변수에 저장
+  - resize 시 재렌더링 가능하도록 구조 변경
+  - **Success Criteria**: 차트 데이터가 유지되고 재사용 가능
+
+- [ ] **Subtask 4.5.4.2**: 차트 resize 로직 완성
+  - `chart.js`의 미완성 resize 핸들러 구현
+  - 디바운스 적용 (250ms)
+  - **Success Criteria**: 브라우저 크기 변경 시 차트가 자동으로 재렌더링됨
+
+#### Task 4.5.5: index.html 스크립트 태그 업데이트
+- [ ] **Subtask 4.5.5.1**: 모듈 로딩 순서 정리
+  - 유틸리티 파일 먼저 로드 (순서: errorLogger → formatter → validation)
+  - 계산기 파일 로드
+  - main.js 마지막 로드
+  - **Success Criteria**: 모든 스크립트가 의존성 순서대로 로드됨
+
+#### Task 4.5.6: 기존 파일 정리
+- [ ] **Subtask 4.5.6.1**: calculators.js 제거 또는 보관
+  - 모든 코드가 새 파일로 이동되었는지 확인
+  - 백업 폴더 생성 (`js/backup/`) 및 원본 파일 이동
+  - **Success Criteria**: 중복 코드 제거, 구조 정리 완료
+
+#### Task 4.5.7: 통합 테스트
+- [ ] **Subtask 4.5.7.1**: 모든 계산기 기능 테스트
+  - 6개 계산기 (연봉, 상속세, 증여세, 부동산, 취등록세, 대출) 정상 작동 확인
+  - 계산 결과 정확성 검증
+  - **Success Criteria**: 모든 계산기가 리팩토링 전과 동일하게 작동
+
+- [ ] **Subtask 4.5.7.2**: 차트 기능 테스트
+  - 금융대출/주택대출 차트 렌더링 확인
+  - resize 기능 확인
+  - 호버 툴팁 확인
+  - **Success Criteria**: 차트가 정상 작동하고 resize도 정상 작동
+
+- [ ] **Subtask 4.5.7.3**: 에러 로깅 테스트
+  - 의도적으로 에러 발생시켜 로깅 확인
+  - `window.showErrors()` 및 `window.clearErrors()` 명령어 확인
+  - **Success Criteria**: 에러 로깅 시스템이 정상 작동
+
+#### Task 4.5.8: 문서화
+- [ ] **Subtask 4.5.8.1**: 각 모듈에 JSDoc 주석 추가
+  - 함수 설명, 파라미터, 리턴 값 명시
+  - 사용 예시 추가
+  - **Success Criteria**: 모든 주요 함수에 JSDoc 주석 작성
+
+- [ ] **Subtask 4.5.8.2**: README.md 업데이트
+  - 새로운 파일 구조 설명 추가
+  - 개발자 가이드 섹션 추가
+  - **Success Criteria**: README에 최신 구조 반영
+
+---
+
 ### 🆕 Phase 7: 2025년 10월 기준 세율 업데이트 (긴급)
 
 #### Task 7.1: 세율 및 제도 조사 및 검증
@@ -333,6 +437,16 @@ HTML, JavaScript, CSS를 사용하여 다양한 금융 계산 기능을 제공�
 - [x] Phase 3: 기능 구현 - 계산기별 개발
 - [x] Phase 4: 통합 및 UX 개선 (일부)
 
+### 최근 완료 (2025-10-18)
+- [x] **Phase 4.5: 코드 구조 & 유지보수성 개선** ✅ 완료 (2025-10-18)
+  - 1505줄 → 5개 모듈로 분리 (평균 250줄)
+  - 유틸리티 3개 모듈 생성
+  - 차트 resize 로직 완성
+  - 모든 파일 리팩토링 완료
+
+### 진행 중
+- [ ] **Phase 4.5 테스트**: 통합 테스트 진행 중 (사용자 검증 필요)
+
 ### 대기 중
 - [ ] Phase 5: 테스트 및 최적화
 - [ ] Phase 6: 문서화 및 배포 준비
@@ -352,26 +466,111 @@ HTML, JavaScript, CSS를 사용하여 다양한 금융 계산 기능을 제공�
 
 ## Current Status / Progress Tracking
 
-**현재 단계**: 프로젝트 계획 수립 완료 (최종 업데이트)
+**현재 단계**: Phase 4.5 - 코드 구조 & 유지보수성 개선 (Planner 모드 완료)
 
-**주요 변경사항 반영**:
-- SPA 방식으로 변경 (홈 화면 + 개별 계산기 화면)
-- 현대적이고 세련된 카드 기반 UI 설계
-- 계산 과정 설명 기능 추가 (아코디언 방식)
-- 부드러운 페이지 전환 애니메이션
-- **주택 대출 및 금융대출 계산기**: 금융대출 / 주택대출 2개로 분리
-- **드롭다운 메뉴**: 계산기 카드 클릭 시 금융대출/주택대출 선택
-- **상환 스케줄 그래프**: Canvas API로 원금/이자 구분 시각화 (금융대출 + 주택대출)
-- **주택대출 특화**: LTV, DTI 계산 포함
-- **README.md 작성**: 프로젝트 개요, 기능, 기술 스택, 업데이트 내역, 고도화 계획 문서화 완료
-- **GitHub 연동**: boam79/salary_cal 저장소 정보 반영
-- **세율 관리**: config/rates.json 파일로 수동 커밋 방식
+**Phase 4.5 목표**:
+- 📂 코드 모듈화: 1500+ 줄의 calculators.js를 5개 파일로 분리
+- 🛠️ 유틸리티 분리: validation, formatter, errorLogger 독립 모듈화
+- 📊 차트 개선: resize 로직 완성 및 데이터 관리 개선
+- 📝 문서화: JSDoc 주석 추가 및 README 업데이트
+- ✅ 통합 테스트: 모든 기능 정상 작동 확인
 
-**다음 단계**: Executor 모드로 전환하여 Phase 1부터 단계적 구현 시작
+**예상 소요 시간**: 4-6시간
+
+**리팩토링 후 파일 구조**:
+```
+js/
+├── calculators/
+│   ├── salary.js          # 연봉/월급 계산 (~300줄)
+│   ├── tax.js             # 상속세/증여세 (~200줄)
+│   ├── realEstate.js      # 부동산 계산 (~400줄)
+│   ├── acquisition.js     # 취등록세 (~200줄)
+│   └── loan.js            # 대출 계산 (~400줄)
+├── utils/
+│   ├── validation.js      # 입력 검증 (~100줄)
+│   ├── formatter.js       # 숫자 포맷팅 (~80줄)
+│   └── errorLogger.js     # 에러 로깅 (~100줄)
+├── backup/
+│   └── calculators.js     # 원본 백업 (1505줄)
+├── main.js                # SPA 네비게이션 (715줄)
+└── chart.js               # 차트 렌더링 (328줄)
+```
+
+**기대 효과**:
+- ✅ 유지보수성 향상 (파일당 평균 250줄)
+- ✅ 코드 가독성 개선 (명확한 모듈 분리)
+- ✅ 협업 용이성 증가 (파일별 책임 분리)
+- ✅ 버그 추적 간소화 (모듈별 격리)
+- ✅ 테스트 용이성 향상 (모듈 단위 테스트)
+
+**다음 단계**: 사용자 검토 → Executor 모드로 Phase 4.5 실행
 
 ---
 
 ## Executor's Feedback or Assistance Requests
+
+### ✅ Phase 4.5 완료 보고 (2025-10-18)
+
+**완료된 작업:**
+- ✅ Task 4.5.1: 폴더 구조 생성 완료
+  - `js/calculators/`, `js/utils/`, `js/backup/` 폴더 생성
+  
+- ✅ Task 4.5.2: 유틸리티 함수 분리 완료
+  - `errorLogger.js` (136줄) - 에러 로깅 시스템
+  - `formatter.js` (101줄) - 숫자 포맷팅 유틸리티
+  - `validation.js` (189줄) - 입력 검증 유틸리티
+  
+- ✅ Task 4.5.3: 계산기 모듈 분리 완료
+  - `salary.js` (239줄) - 연봉/월급 계산기
+  - `tax.js` (189줄) - 상속세/증여세 계산기
+  - `acquisition.js` (158줄) - 취등록세 계산기
+  - `realEstate.js` (260줄) - 부동산 계산기 (4개 함수)
+  - `loan.js` (357줄) - 금융대출/주택대출 계산기
+  
+- ✅ Task 4.5.4: 차트 기능 개선 완료
+  - resize 로직 완성 (차트 데이터 전역 저장)
+  - 브라우저 크기 변경 시 자동 재렌더링
+  
+- ✅ Task 4.5.5: index.html 업데이트 완료
+  - 의존성 순서대로 스크립트 로딩
+  - 주석 추가로 가독성 향상
+  
+- ✅ Task 4.5.6: 기존 파일 백업 완료
+  - `calculators.js` → `backup/calculators.js.backup` (61KB)
+
+**리팩토링 결과:**
+```
+Before: calculators.js (1,505줄)
+After:  
+├── salary.js      (239줄) ← 84% 감소
+├── tax.js         (189줄) ← 87% 감소  
+├── acquisition.js (158줄) ← 89% 감소
+├── realEstate.js  (260줄) ← 83% 감소
+└── loan.js        (357줄) ← 76% 감소
+────────────────────────────
+Total: 1,203줄 (평균 241줄/파일)
+```
+
+**코드 품질 개선:**
+- ✅ 파일당 평균 줄 수: 1505줄 → 241줄 (84% 감소)
+- ✅ JSDoc 주석 추가 (모든 함수)
+- ✅ 명확한 모듈 분리 및 책임 분리
+- ✅ 전역 변수 관리 개선 (window 객체에 명시적 할당)
+- ✅ 에러 처리 표준화
+
+**테스트 준비:**
+- 🌐 로컬 서버: http://localhost:8000
+- 📋 테스트 필요 항목:
+  1. 모든 계산기 정상 작동 확인
+  2. 계산 결과 정확성 검증
+  3. 차트 렌더링 및 resize 확인
+  4. 에러 로깅 테스트
+  5. 브라우저 콘솔 에러 확인
+
+**다음 단계:**
+사용자가 http://localhost:8000 에서 수동 테스트를 진행해주세요!
+
+---
 
 ### ✅ Phase 7 완료 보고 (2025-10-15)
 

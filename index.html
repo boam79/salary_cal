@@ -9,60 +9,67 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap&subset=korean" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=202412191530">
 </head>
 <body>
     <!-- 헤더 -->
     <header class="header">
         <div class="container">
-            <h1 class="logo" id="logo-home">💰 금융 계산기</h1>
+            <h1 class="logo clickable" id="logo-home">💰 금융 계산기</h1>
             <p class="tagline">간편하고 정확한 금융 계산</p>
         </div>
     </header>
 
     <!-- 메인 컨텐츠 -->
     <main class="main-content">
+        <div class="layout-container">
+            <!-- 좌측 광고 공간 -->
+            <aside class="ad-space ad-left">
+                <div class="ad-placeholder">
+                    <p>광고 공간</p>
+                    <small>Google AdSense</small>
+                </div>
+            </aside>
+            
+            <!-- 메인 컨텐츠 영역 -->
+            <div class="content-main">
         <!-- 홈 화면 -->
         <section id="home-screen" class="screen active">
             <div class="container">
                 <div class="calculator-grid">
                     <!-- 1. 월급 및 연봉 계산기 -->
-                    <div class="calculator-card" data-calculator="salary">
+                    <div class="calculator-card" data-screen="salary-screen">
                         <div class="card-icon">💼</div>
                         <h3 class="card-title">월급 및 연봉 계산기</h3>
                         <p class="card-description">최저시급, 주휴수당, 소득세, 4대보험 공제 후 실수령액 계산</p>
                     </div>
 
                     <!-- 2. 세금 계산기 -->
-                    <div class="calculator-card" data-calculator="tax">
+                    <div class="calculator-card" data-screen="tax-screen">
                         <div class="card-icon">📋</div>
                         <h3 class="card-title">세금 계산기</h3>
                         <p class="card-description">상속세, 증여세 계산</p>
                     </div>
 
                     <!-- 3. 부동산 계산기 -->
-                    <div class="calculator-card" data-calculator="real-estate">
+                    <div class="calculator-card" data-screen="real-estate-screen">
                         <div class="card-icon">🏢</div>
                         <h3 class="card-title">부동산 계산기</h3>
                         <p class="card-description">중개수수료, 양도소득세, 보유세, DSR 계산</p>
                     </div>
 
                     <!-- 4. 취등록세 계산기 -->
-                    <div class="calculator-card" data-calculator="acquisition-tax">
+                    <div class="calculator-card" data-screen="acquisition-tax-screen">
                         <div class="card-icon">🏛️</div>
                         <h3 class="card-title">취등록세 계산기</h3>
                         <p class="card-description">취득세, 등록면허세 계산</p>
                     </div>
 
-                    <!-- 5. 주택 대출 및 금융대출 계산기 (드롭다운) -->
-                    <div class="calculator-card has-dropdown" data-calculator="loan">
+                    <!-- 5. 주택대출 및 금융대출 계산기 -->
+                    <div class="calculator-card" data-screen="loan-screen">
                         <div class="card-icon">🏦</div>
-                        <h3 class="card-title">주택 대출 및 금융대출 계산기</h3>
-                        <p class="card-description">대출 이자 및 상환 스케줄 계산 (클릭하여 선택)</p>
-                        <div class="dropdown-menu">
-                            <button class="dropdown-item" data-sub="financial-loan">💳 금융대출</button>
-                            <button class="dropdown-item" data-sub="housing-loan">🏠 주택대출</button>
-                        </div>
+                        <h3 class="card-title">주택대출 및 금융대출 계산기</h3>
+                        <p class="card-description">대출 이자 및 상환 스케줄 계산</p>
                     </div>
                 </div>
                 
@@ -370,6 +377,27 @@
                                 <label for="interest-rate">연이자율 (%)</label>
                                 <input type="number" id="dsr-interest-rate" placeholder="예: 4.5" min="0" max="30" step="0.1">
                             </div>
+                            <div class="form-group">
+                                <label>상환방식</label>
+                                <div class="tab-menu" id="dsr-repayment-type-tabs">
+                                    <button class="tab-button active" data-value="equalPrincipalInterest">
+                                        <span class="repayment-icon">📊</span>
+                                        <span class="repayment-label">원리금균등상환</span>
+                                    </button>
+                                    <button class="tab-button" data-value="equalPrincipal">
+                                        <span class="repayment-icon">📈</span>
+                                        <span class="repayment-label">원금균등상환</span>
+                                    </button>
+                                    <button class="tab-button" data-value="maturity">
+                                        <span class="repayment-icon">💰</span>
+                                        <span class="repayment-label">만기일시상환</span>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="dsr-repayment-type" value="equalPrincipalInterest">
+                                <div class="repayment-description" id="dsr-repayment-description">
+                                    <small class="text-muted">📊 매월 동일한 금액을 상환하는 방식입니다.</small>
+                                </div>
+                            </div>
                             <div class="button-group">
                                 <button class="btn btn-primary" id="calculate-dsr">계산하기</button>
                                 <button class="btn btn-secondary" id="reset-dsr">초기화</button>
@@ -441,119 +469,164 @@
             </div>
         </section>
 
-        <!-- 5. 금융대출 계산기 화면 -->
-        <section id="financial-loan-screen" class="screen calculator-screen">
+        <!-- 5. 대출 계산기 화면 (통합) -->
+        <section id="loan-screen" class="screen calculator-screen">
             <div class="container">
                 <button class="back-button">← 홈으로</button>
-                <h2 class="screen-title">금융대출 계산기</h2>
+                <h2 class="screen-title">대출 계산기</h2>
                 
                 <div class="calculator-content">
-                    <div class="input-section">
-                        <div class="form-group">
-                            <label for="loan-amount">대출금액</label>
-                            <input type="number" id="loan-amount" placeholder="예: 1 (억원)" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label for="interest-rate">연이자율 (%)</label>
-                            <input type="number" id="interest-rate" placeholder="예: 5.0" min="0" max="30" step="0.1">
-                        </div>
-                        <div class="form-group">
-                            <label for="loan-period">대출기간 (년)</label>
-                            <input type="number" id="loan-period" placeholder="예: 20" min="1" max="50">
-                        </div>
-                        <div class="form-group">
-                            <label for="repayment-type">상환방식</label>
-                            <select id="repayment-type">
-                                <option value="equalPrincipalInterest">원리금균등상환</option>
-                                <option value="equalPrincipal">원금균등상환</option>
-                                <option value="maturity">만기일시상환</option>
-                            </select>
-                        </div>
-                        <div class="button-group">
-                            <button class="btn btn-primary" id="calculate-loan">계산하기</button>
-                            <button class="btn btn-secondary" id="reset-loan">초기화</button>
-                        </div>
+                    <div class="tab-navigation">
+                        <button class="tab-btn active" data-tab="financial-loan">금융대출</button>
+                        <button class="tab-btn" data-tab="housing-loan">주택대출</button>
                     </div>
 
-                    <div class="result-section" id="loan-result" style="display: none;">
-                        <h3 class="result-title">계산 결과</h3>
-                        <div class="result-container">
-                            <div class="result-main" id="loan-summary">
-                                <!-- 계산 결과 요약 및 상세 내역이 여기에 표시됩니다 -->
+                    <!-- 금융대출 탭 -->
+                    <div class="tab-content active" id="financial-loan-tab">
+                        <div class="input-section">
+                            <div class="form-group">
+                                <label for="loan-amount">대출금액</label>
+                                <input type="number" id="loan-amount" placeholder="예: 1 (억원)" min="0">
                             </div>
-                            <div class="result-explanation">
-                                <div class="explanation-section">
-                                    <button class="explanation-toggle">▼ 계산 과정 보기</button>
-                                    <div class="explanation-content" id="loan-explanation"></div>
+                            <div class="form-group">
+                                <label for="interest-rate">연이자율 (%)</label>
+                                <input type="number" id="interest-rate" placeholder="예: 5.0" min="0" max="30" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="loan-period">대출기간 (년)</label>
+                                <input type="number" id="loan-period" placeholder="예: 20" min="1" max="50">
+                            </div>
+                            <div class="form-group">
+                                <label>상환방식</label>
+                                <div class="tab-menu" id="repayment-type-tabs">
+                                    <button class="tab-button active" data-value="equalPrincipalInterest">
+                                        <span class="repayment-icon">📊</span>
+                                        <span class="repayment-label">원리금균등상환</span>
+                                    </button>
+                                    <button class="tab-button" data-value="equalPrincipal">
+                                        <span class="repayment-icon">📈</span>
+                                        <span class="repayment-label">원금균등상환</span>
+                                    </button>
+                                    <button class="tab-button" data-value="maturity">
+                                        <span class="repayment-icon">💰</span>
+                                        <span class="repayment-label">만기일시상환</span>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="repayment-type" value="equalPrincipalInterest">
+                                <div class="repayment-description" id="repayment-description">
+                                    <small class="text-muted">📊 매월 동일한 금액을 상환하는 방식입니다.</small>
+                                </div>
+                            </div>
+                            <div class="button-group">
+                                <button class="btn btn-primary" id="calculate-loan">계산하기</button>
+                                <button class="btn btn-secondary" id="reset-loan">초기화</button>
+                            </div>
+                        </div>
+
+                        <div class="result-section" id="loan-result" style="display: none;">
+                            <h3 class="result-title">계산 결과</h3>
+                            <div class="result-container">
+                                <div class="result-main" id="loan-summary">
+                                    <!-- 계산 결과 요약 및 상세 내역이 여기에 표시됩니다 -->
+                                </div>
+                                <div class="result-explanation">
+                                    <div class="explanation-section">
+                                        <button class="explanation-toggle">▼ 계산 과정 보기</button>
+                                        <div class="explanation-content" id="loan-explanation"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="chart-section" id="loan-chart-section" style="display: none;">
+                            <h3 class="chart-title">상환 스케줄 차트</h3>
+                            <canvas id="loan-chart" width="800" height="400"></canvas>
+                        </div>
                     </div>
-                    
-                    <div class="chart-section" id="loan-chart-section" style="display: none;">
-                        <h3>상환 스케줄 그래프</h3>
-                        <canvas id="loan-chart"></canvas>
+
+                    <!-- 주택대출 탭 -->
+                    <div class="tab-content" id="housing-loan-tab">
+                        <div class="input-section">
+                            <div class="form-group">
+                                <label for="house-price">주택가격</label>
+                                <input type="number" id="house-price" placeholder="예: 5 (억원)" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="own-funds">본인자금</label>
+                                <input type="number" id="own-funds" placeholder="예: 1.5 (억원)" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="housing-annual-income">연소득</label>
+                                <input type="number" id="housing-annual-income" placeholder="예: 8000 (만원)" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="housing-interest-rate">연이자율 (%)</label>
+                                <input type="number" id="housing-interest-rate" placeholder="예: 4.5" min="0" max="30" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="housing-loan-period">대출기간 (년)</label>
+                                <input type="number" id="housing-loan-period" placeholder="예: 30" min="1" max="50">
+                            </div>
+                            <div class="form-group">
+                                <label>상환방식</label>
+                                <div class="tab-menu" id="housing-repayment-type-tabs">
+                                    <button class="tab-button active" data-value="equalPrincipalInterest">
+                                        <span class="repayment-icon">📊</span>
+                                        <span class="repayment-label">원리금균등상환</span>
+                                    </button>
+                                    <button class="tab-button" data-value="equalPrincipal">
+                                        <span class="repayment-icon">📈</span>
+                                        <span class="repayment-label">원금균등상환</span>
+                                    </button>
+                                    <button class="tab-button" data-value="maturity">
+                                        <span class="repayment-icon">💰</span>
+                                        <span class="repayment-label">만기일시상환</span>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="housing-repayment-type" value="equalPrincipalInterest">
+                                <div class="repayment-description" id="housing-repayment-description">
+                                    <small class="text-muted">📊 매월 동일한 금액을 상환하는 방식입니다.</small>
+                                </div>
+                            </div>
+                            <div class="button-group">
+                                <button class="btn btn-primary" id="calculate-housing-loan">계산하기</button>
+                                <button class="btn btn-secondary" id="reset-housing-loan">초기화</button>
+                            </div>
+                        </div>
+
+                        <div class="result-section" id="housing-loan-result" style="display: none;">
+                            <h3 class="result-title">계산 결과</h3>
+                            <div class="result-container">
+                                <div class="result-main" id="housing-loan-summary">
+                                    <!-- 계산 결과 요약 및 상세 내역이 여기에 표시됩니다 -->
+                                </div>
+                                <div class="result-explanation">
+                                    <div class="explanation-section">
+                                        <button class="explanation-toggle">▼ 계산 과정 보기</button>
+                                        <div class="explanation-content" id="housing-loan-explanation"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-section" id="housing-loan-chart-section" style="display: none;">
+                            <h3 class="chart-title">상환 스케줄 차트</h3>
+                            <canvas id="housing-loan-chart" width="800" height="400"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
-
-        <!-- 6. 주택대출 계산기 화면 -->
-        <section id="housing-loan-screen" class="screen calculator-screen">
-            <div class="container">
-                <button class="back-button">← 홈으로</button>
-                <h2 class="screen-title">주택대출 계산기</h2>
-                
-                <div class="calculator-content">
-                    <div class="input-section">
-                        <div class="form-group">
-                            <label for="house-price">주택가격</label>
-                            <input type="number" id="house-price" placeholder="예: 5 (억원)" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label for="own-funds">본인자금</label>
-                            <input type="number" id="own-funds" placeholder="예: 1.5 (억원)" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label for="housing-annual-income">연소득</label>
-                            <input type="number" id="housing-annual-income" placeholder="예: 8000 (만원)" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label for="housing-interest-rate">연이자율 (%)</label>
-                            <input type="number" id="housing-interest-rate" placeholder="예: 4.5" min="0" max="30" step="0.1">
-                        </div>
-                        <div class="form-group">
-                            <label for="housing-loan-period">대출기간 (년)</label>
-                            <input type="number" id="housing-loan-period" placeholder="예: 30" min="1" max="50">
-                        </div>
-                        <div class="button-group">
-                            <button class="btn btn-primary" id="calculate-housing-loan">계산하기</button>
-                            <button class="btn btn-secondary" id="reset-housing-loan">초기화</button>
-                        </div>
-                    </div>
-
-                    <div class="result-section" id="housing-loan-result" style="display: none;">
-                        <h3 class="result-title">계산 결과</h3>
-                        <div class="result-container">
-                            <div class="result-main" id="housing-loan-summary">
-                                <!-- 계산 결과 요약 및 상세 내역이 여기에 표시됩니다 -->
-                            </div>
-                            <div class="result-explanation">
-                                <div class="explanation-section">
-                                    <button class="explanation-toggle">▼ 계산 과정 보기</button>
-                                    <div class="explanation-content" id="housing-loan-explanation"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-section" id="housing-loan-chart-section" style="display: none;">
-                        <h3>상환 스케줄 그래프</h3>
-                        <canvas id="housing-loan-chart"></canvas>
-                    </div>
-                </div>
             </div>
-        </section>
+            
+            <!-- 우측 광고 공간 -->
+            <aside class="ad-space ad-right">
+                <div class="ad-placeholder">
+                    <p>광고 공간</p>
+                    <small>Google AdSense</small>
+                </div>
+            </aside>
+        </div>
     </main>
 
     <!-- 푸터 -->
@@ -566,10 +639,29 @@
         </div>
     </footer>
 
-    <!-- JavaScript -->
-    <script src="js/main.js"></script>
-    <script src="js/calculators.js"></script>
-    <script src="js/chart.js"></script>
+    <!-- JavaScript Modules -->
+    <!-- Utilities (의존성 순서 중요) -->
+    <script type="module" src="js/utils/errorLogger.js?v=202412191530"></script>
+    <script type="module" src="js/utils/formatter.js?v=202412191530"></script>
+    <script type="module" src="js/utils/validation.js?v=202412191530"></script>
+    
+    <!-- Calculators -->
+    <script type="module" src="js/calculators/salary.js?v=202412191530"></script>
+    <script type="module" src="js/calculators/tax.js?v=202412191530"></script>
+    <script type="module" src="js/calculators/acquisition.js?v=202412191530"></script>
+    <script type="module" src="js/calculators/realEstate.js?v=202412191530"></script>
+    <script type="module" src="js/calculators/loan.js?v=202412191530"></script>
+    
+    <!-- Chart -->
+    <script type="module" src="js/chart.js?v=202412191530"></script>
+    
+    <!-- Core Modules -->
+    <script type="module" src="js/core/appState.js?v=202412191530"></script>
+    <script type="module" src="js/core/navigationManager.js?v=202412191530"></script>
+    <script type="module" src="js/core/eventManager.js?v=202412191530"></script>
+    
+    <!-- Main (마지막 로드) -->
+    <script type="module" src="js/main.js?v=202412191530"></script>
 </body>
 </html>
 

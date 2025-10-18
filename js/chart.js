@@ -310,18 +310,28 @@ let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        // Redraw visible charts
+        // Redraw visible charts with stored data
         const loanChartSection = document.getElementById('loan-chart-section');
         const housingLoanChartSection = document.getElementById('housing-loan-chart-section');
         
         if (loanChartSection && loanChartSection.style.display !== 'none') {
-            // Would need to store schedule data to redraw
-            console.log('Resize: loan chart');
+            if (window.loanChartData) {
+                console.log('🔄 금융대출 차트 재렌더링');
+                drawLoanChart('loan-chart', window.loanChartData.schedule, window.loanChartData.principal);
+            }
         }
         
         if (housingLoanChartSection && housingLoanChartSection.style.display !== 'none') {
-            console.log('Resize: housing loan chart');
+            if (window.housingLoanChartData) {
+                console.log('🔄 주택대출 차트 재렌더링');
+                drawLoanChart('housing-loan-chart', window.housingLoanChartData.schedule, window.housingLoanChartData.principal);
+            }
         }
     }, 250);
 });
+
+console.log('✅ Chart 모듈 로드 완료 (resize 로직 포함)');
+
+// 전역 함수로 노출
+window.drawLoanChart = drawLoanChart;
 
