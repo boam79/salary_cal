@@ -1,32 +1,4 @@
 User-agent: *
 Allow: /
 
-# Sitemap (robots.txt 방법만 사용 - Context7 MCP 권장)
 Sitemap: https://salary-cal.vercel.app/sitemap.xml
-
-# Crawl-delay (선택사항 - 서버 부하 방지)
-Crawl-delay: 1
-
-# 특정 파일 제외 (필요시)
-# Disallow: /admin/
-# Disallow: /private/
-
-# Googlebot 특별 설정
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 1
-
-# Bingbot 특별 설정
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
-
-# 네이버 봇 설정
-User-agent: Yeti
-Allow: /
-Crawl-delay: 1
-
-# 다음 봇 설정
-User-agent: Daumoa
-Allow: /
-Crawl-delay: 1
