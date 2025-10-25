@@ -14,7 +14,7 @@
     
     <!-- 연봉 계산기 -->
     <url>
-        <loc>https://salary-cal.vercel.app/#salary-screen</loc>
+        <loc>https://salary-cal.vercel.app/salary</loc>
         <lastmod>2025-10-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
@@ -22,7 +22,7 @@
     
     <!-- 세금 계산기 -->
     <url>
-        <loc>https://salary-cal.vercel.app/#tax-screen</loc>
+        <loc>https://salary-cal.vercel.app/tax</loc>
         <lastmod>2025-10-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
@@ -30,7 +30,7 @@
     
     <!-- 부동산 계산기 -->
     <url>
-        <loc>https://salary-cal.vercel.app/#real-estate-screen</loc>
+        <loc>https://salary-cal.vercel.app/real-estate</loc>
         <lastmod>2025-10-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
@@ -38,7 +38,7 @@
     
     <!-- 취등록세 계산기 -->
     <url>
-        <loc>https://salary-cal.vercel.app/#acquisition-tax-screen</loc>
+        <loc>https://salary-cal.vercel.app/acquisition-tax</loc>
         <lastmod>2025-10-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
@@ -46,7 +46,7 @@
     
     <!-- 대출 계산기 -->
     <url>
-        <loc>https://salary-cal.vercel.app/#loan-screen</loc>
+        <loc>https://salary-cal.vercel.app/loan</loc>
         <lastmod>2025-10-18</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
