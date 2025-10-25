@@ -1,8 +1,8 @@
 User-agent: *
 Allow: /
 
-# Sitemap (Context7 MCP 권장: 소문자 사용)
-sitemap: https://salary-cal.vercel.app/sitemap.xml
+# Sitemap (Context7 MCP 권장: 대문자 사용)
+Sitemap: https://salary-cal.vercel.app/sitemap.xml
 
 # Crawl-delay (선택사항 - 서버 부하 방지)
 Crawl-delay: 1
