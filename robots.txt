@@ -1,10 +1,8 @@
 User-agent: *
 Allow: /
 
-# Sitemap (XML, API, 텍스트 모두 제공)
+# Sitemap (robots.txt 방법만 사용 - Context7 MCP 권장)
 Sitemap: https://salary-cal.vercel.app/sitemap.xml
-Sitemap: https://salary-cal.vercel.app/api/sitemap
-Sitemap: https://salary-cal.vercel.app/sitemap.txt
 
 # Crawl-delay (선택사항 - 서버 부하 방지)
 Crawl-delay: 1
