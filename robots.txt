@@ -1,7 +1,8 @@
 User-agent: *
 Allow: /
 
-# Sitemap (Vercel Serverless Function)
+# Sitemap (정적 파일과 동적 API 모두 제공)
+Sitemap: https://salary-cal.vercel.app/sitemap.xml
 Sitemap: https://salary-cal.vercel.app/api/sitemap
 
 # Crawl-delay (선택사항 - 서버 부하 방지)
