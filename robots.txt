@@ -1,9 +1,10 @@
 User-agent: *
 Allow: /
 
-# Sitemap (정적 파일과 동적 API 모두 제공)
+# Sitemap (XML과 HTML 모두 제공)
 Sitemap: https://salary-cal.vercel.app/sitemap.xml
 Sitemap: https://salary-cal.vercel.app/api/sitemap
+Sitemap: https://salary-cal.vercel.app/sitemap.html
 
 # Crawl-delay (선택사항 - 서버 부하 방지)
 Crawl-delay: 1
