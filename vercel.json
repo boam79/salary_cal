@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/sitemap.xml",
+      "source": "/api/sitemap",
       "headers": [
         {
           "key": "Content-Type",
@@ -17,7 +17,7 @@
   "rewrites": [
     {
       "source": "/sitemap.xml",
-      "destination": "/sitemap.xml"
+      "destination": "/api/sitemap"
     }
   ]
 }
