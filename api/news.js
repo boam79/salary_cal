@@ -1,0 +1,191 @@
+/**
+ * RSS 뉴스 피드 API (Vercel Serverless Function)
+ * 한국 경제 뉴스 RSS를 파싱하여 JSON으로 반환
+ */
+
+export default async function handler(req, res) {
+    // CORS 헤더 설정
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    
+    try {
+        // 여러 RSS 피드 소스 (한국 경제 뉴스)
+        const rssSources = [
+            {
+                name: '연합뉴스 경제',
+                url: 'https://www.yna.co.kr/rss/economy.xml'
+            },
+            {
+                name: '뉴시스 경제',
+                url: 'https://www.newsis.com/rss/cate.xml?cate=ECON'
+            },
+            {
+                name: '매일경제',
+                url: 'https://www.mk.co.kr/rss/30000041/'
+            },
+            {
+                name: '머니투데이',
+                url: 'https://www.mt.co.kr/rss/30000022/'
+            }
+        ];
+        
+        // 여러 RSS에서 뉴스를 수집
+        const allNews = await Promise.all(
+            rssSources.map(source => fetchNewsFromRSS(source))
+        );
+        
+        // 모든 뉴스를 하나의 배열로 합치고 날짜순 정렬
+        const mergedNews = allNews
+            .flat()
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 12); // 최신 12개만 반환
+        
+        // 캐시 제어
+        res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+        
+        return res.status(200).json({
+            success: true,
+            count: mergedNews.length,
+            news: mergedNews
+        });
+        
+    } catch (error) {
+        console.error('❌ RSS 피드 가져오기 실패:', error);
+        
+        return res.status(500).json({
+            success: false,
+            error: '뉴스를 불러올 수 없습니다.',
+            message: error.message
+        });
+    }
+}
+
+// RSS 피드에서 뉴스 가져오기
+async function fetchNewsFromRSS(source) {
+    try {
+        const response = await fetch(source.url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            },
+            next: { revalidate: 300 } // 5분 캐시
+        });
+        
+        if (!response.ok) {
+            console.warn(`⚠️ RSS 피드 로드 실패 (${source.name}):`, response.status);
+            return [];
+        }
+        
+        const xmlText = await response.text();
+        const news = parseRSSFeed(xmlText, source.name);
+        
+        return news;
+        
+    } catch (error) {
+        console.error(`❌ RSS 피드 파싱 오류 (${source.name}):`, error);
+        return [];
+    }
+}
+
+// RSS XML 파싱
+function parseRSSFeed(xmlText, source) {
+    const news = [];
+    
+    try {
+        // 간단한 XML 파싱 (정규식 기반)
+        // 실제로는 XML 파서 라이브러리를 사용하는 것이 좋습니다
+        
+        // item 태그 추출
+        const itemRegex = /<item>(.*?)<\/item>/gs;
+        const items = [...xmlText.matchAll(itemRegex)];
+        
+        for (const match of items) {
+            const itemXml = match[1];
+            
+            try {
+                const title = extractTag(itemXml, 'title');
+                const link = extractTag(itemXml, 'link');
+                const description = extractTag(itemXml, 'description');
+                const pubDate = extractTag(itemXml, 'pubDate');
+                const category = extractTag(itemXml, 'category') || '경제';
+                
+                // 제목과 설명에서 HTML 태그 제거
+                const cleanTitle = removeHtmlTags(title);
+                const cleanDescription = removeHtmlTags(description);
+                
+                // 이미지 추출 시도
+                const imageRegex = /<enclosure[^>]*url="([^"]+)"/i;
+                const imageMatch = itemXml.match(imageRegex);
+                const image = imageMatch ? imageMatch[1] : null;
+                
+                if (title && link && description) {
+                    news.push({
+                        id: generateId(link),
+                        title: cleanTitle,
+                        description: cleanDescription.substring(0, 200), // 200자 제한
+                        source: source,
+                        date: parseDate(pubDate),
+                        category: category,
+                        link: link,
+                        image: image
+                    });
+                }
+            } catch (error) {
+                console.error('뉴스 항목 파싱 오류:', error);
+            }
+        }
+        
+    } catch (error) {
+        console.error('RSS 피드 전체 파싱 오류:', error);
+    }
+    
+    return news;
+}
+
+// XML 태그 내용 추출
+function extractTag(xml, tagName) {
+    const regex = new RegExp(`<${tagName}>([\\s\\S]*?)<\/${tagName}>`, 'i');
+    const match = xml.match(regex);
+    return match ? match[1].trim() : '';
+}
+
+// HTML 태그 제거
+function removeHtmlTags(text) {
+    if (!text) return '';
+    return text
+        .replace(/<[^>]*>/g, '')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&nbsp;/g, ' ')
+        .trim();
+}
+
+// 날짜 파싱
+function parseDate(dateString) {
+    if (!dateString) return new Date().toISOString();
+    
+    try {
+        // RFC 2822 형식 파싱 시도
+        const date = new Date(dateString);
+        if (!isNaN(date.getTime())) {
+            return date.toISOString();
+        }
+    } catch (error) {
+        console.error('날짜 파싱 오류:', error);
+    }
+    
+    return new Date().toISOString();
+}
+
+// ID 생성
+function generateId(link) {
+    return link.split('/').slice(-2).join('-').replace(/[^a-zA-Z0-9-]/g, '');
+}
+
