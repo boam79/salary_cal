@@ -36,15 +36,15 @@ function calculateBrokerageFee() {
         <div class="result-summary">
             <div class="result-item highlight">
                 <span class="result-label">총 중개수수료</span>
-                <span class="result-value">${formatCurrency(totalFee)}</span>
+                <span class="result-value">${window.formatCurrency(totalFee)}</span>
             </div>
             <div class="result-item">
                 <span class="result-label">매수자 부담</span>
-                <span class="result-value">${formatCurrency(buyerFee)}</span>
+                <span class="result-value">${window.formatCurrency(buyerFee)}</span>
             </div>
             <div class="result-item">
                 <span class="result-label">매도자 부담</span>
-                <span class="result-value">${formatCurrency(sellerFee)}</span>
+                <span class="result-value">${window.formatCurrency(sellerFee)}</span>
             </div>
             <div class="result-item">
                 <span class="result-label">적용 수수료율</span>
@@ -56,11 +56,11 @@ function calculateBrokerageFee() {
     document.getElementById('brokerage-fee-explanation').innerHTML = `
         <div class="explanation-step">
             <strong>1단계: 중개수수료율 확인</strong><br>
-            부동산 가격 ${formatCurrency(propertyPrice)}에 따른 중개수수료율: ${(feeRate * 100).toFixed(1)}%
+            부동산 가격 ${window.formatCurrency(propertyPrice)}에 따른 중개수수료율: ${(feeRate * 100).toFixed(1)}%
         </div>
         <div class="explanation-step">
             <strong>2단계: 중개수수료 계산</strong><br>
-            총 중개수수료: ${formatCurrency(propertyPrice)} × ${(feeRate * 100).toFixed(1)}% = ${formatCurrency(totalFee)}
+            총 중개수수료: ${window.formatCurrency(propertyPrice)} × ${(feeRate * 100).toFixed(1)}% = ${window.formatCurrency(totalFee)}
         </div>
     `;
     
@@ -74,9 +74,9 @@ function calculateCapitalGains() {
     const currentScreen = document.querySelector('.screen.active');
     if (!currentScreen || currentScreen.id !== 'real-estate-screen') return;
     
-    const acquisitionPrice = getValueWithUnit('capital-gains-acquisition-price', 100000000);
-    const transferPrice = getValueWithUnit('transfer-price', 100000000);
-    const holdingPeriod = validateInput(
+    const acquisitionPrice = window.getValueWithUnit('capital-gains-acquisition-price', 100000000);
+    const transferPrice = window.getValueWithUnit('transfer-price', 100000000);
+    const holdingPeriod = window.validateInput(
         document.getElementById('capital-gains-holding-period').value,
         '보유기간'
     );
@@ -124,15 +124,15 @@ function calculateCapitalGains() {
         <div class="result-summary">
             <div class="result-item highlight">
                 <span class="result-label">양도소득세</span>
-                <span class="result-value">${formatCurrency(tax)}</span>
+                <span class="result-value">${window.formatCurrency(tax)}</span>
             </div>
             <div class="result-item">
                 <span class="result-label">양도차익</span>
-                <span class="result-value">${formatCurrency(capitalGain)}</span>
+                <span class="result-value">${window.formatCurrency(capitalGain)}</span>
             </div>
             <div class="result-item">
                 <span class="result-label">장기보유특별공제</span>
-                <span class="result-value">${formatCurrency(deduction)} (${(deductionRate * 100).toFixed(0)}%)</span>
+                <span class="result-value">${window.formatCurrency(deduction)} (${(deductionRate * 100).toFixed(0)}%)</span>
             </div>
         </div>
     `;
@@ -140,7 +140,7 @@ function calculateCapitalGains() {
     explanationElement.innerHTML = `
         <div class="explanation-step">
             <strong>1단계: 양도차익 계산</strong><br>
-            ${formatCurrency(transferPrice)} - ${formatCurrency(acquisitionPrice)} = ${formatCurrency(capitalGain)}
+            ${window.formatCurrency(transferPrice)} - ${window.formatCurrency(acquisitionPrice)} = ${window.formatCurrency(capitalGain)}
         </div>
         <div class="explanation-step">
             <strong>2단계: 장기보유특별공제</strong><br>
@@ -158,7 +158,7 @@ function calculatePropertyTax() {
     const currentScreen = document.querySelector('.screen.active');
     if (!currentScreen || currentScreen.id !== 'real-estate-screen') return;
     
-    const propertyValue = getValueWithUnit('property-value', 100000000);
+    const propertyValue = window.getValueWithUnit('property-value', 100000000);
     if (propertyValue === null) return;
     
     let propertyTaxRate = 0;
@@ -186,15 +186,15 @@ function calculatePropertyTax() {
             <div class="result-summary">
                 <div class="result-item highlight">
                     <span class="result-label">연간 보유세 총액</span>
-                    <span class="result-value">${formatCurrency(totalTax)}</span>
+                    <span class="result-value">${window.formatCurrency(totalTax)}</span>
                 </div>
                 <div class="result-item">
                     <span class="result-label">재산세</span>
-                    <span class="result-value">${formatCurrency(propertyTax)}</span>
+                    <span class="result-value">${window.formatCurrency(propertyTax)}</span>
                 </div>
                 <div class="result-item">
                     <span class="result-label">종합부동산세</span>
-                    <span class="result-value">${formatCurrency(comprehensiveTax)}</span>
+                    <span class="result-value">${window.formatCurrency(comprehensiveTax)}</span>
                 </div>
             </div>
         `;
@@ -205,24 +205,24 @@ function calculatePropertyTax() {
         explanationElement.innerHTML = `
             <div class="explanation-step">
                 <strong>1단계: 부동산 가치 확인</strong><br>
-                부동산 가치: ${formatCurrency(propertyValue)}
+                부동산 가치: ${window.formatCurrency(propertyValue)}
             </div>
             <div class="explanation-step">
                 <strong>2단계: 재산세 계산</strong><br>
                 재산세율: ${(propertyTaxRate * 100)}%<br>
-                재산세: ${formatCurrency(propertyValue)} × ${(propertyTaxRate * 100)}% = ${formatCurrency(propertyTax)}
+                재산세: ${window.formatCurrency(propertyValue)} × ${(propertyTaxRate * 100)}% = ${window.formatCurrency(propertyTax)}
             </div>
             <div class="explanation-step">
                 <strong>3단계: 종합부동산세 계산</strong><br>
-                ${comprehensiveTax > 0 ? 
-                    `과세표준: ${formatCurrency(propertyValue - 600000000)}<br>
-                    종합부동산세: ${formatCurrency(propertyValue - 600000000)} × 0.6% = ${formatCurrency(comprehensiveTax)}` :
+                ${comprehensiveTax > 0 ?
+                    `과세표준: ${window.formatCurrency(propertyValue - 600000000)}<br>
+                    종합부동산세: ${window.formatCurrency(propertyValue - 600000000)} × 0.6% = ${window.formatCurrency(comprehensiveTax)}` :
                     '종합부동산세 과세대상 아님 (6억원 이하)'
                 }
             </div>
             <div class="explanation-step">
                 <strong>4단계: 총 보유세</strong><br>
-                재산세 + 종합부동산세 = <strong>${formatCurrency(totalTax)}</strong>
+                재산세 + 종합부동산세 = <strong>${window.formatCurrency(totalTax)}</strong>
             </div>
         `;
     }
