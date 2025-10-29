@@ -157,15 +157,15 @@ function calculateLoan() {
         <div class="result-summary">
             <div class="result-item highlight">
                 <span class="result-label">월 상환액</span>
-                <span class="result-value">${formatCurrency(monthlyPayment)}</span>
+                <span class="result-value">${window.formatCurrency(monthlyPayment)}</span>
             </div>
             <div class="result-item">
                 <span class="result-label">총 이자</span>
-                <span class="result-value">${formatCurrency(totalInterest)}</span>
+                <span class="result-value">${window.formatCurrency(totalInterest)}</span>
             </div>
             <div class="result-item">
                 <span class="result-label">총 상환액</span>
-                <span class="result-value">${formatCurrency(totalPayment)}</span>
+                <span class="result-value">${window.formatCurrency(totalPayment)}</span>
             </div>
         </div>
         <div class="result-details">
@@ -185,10 +185,10 @@ function calculateLoan() {
                         ${schedule.map(s => `
                             <tr>
                                 <td>${s.month}개월</td>
-                                <td>${formatCurrency(s.principal)}</td>
-                                <td>${formatCurrency(s.interest)}</td>
-                                <td>${formatCurrency(s.payment)}</td>
-                                <td>${formatCurrency(s.balance)}</td>
+                                <td>${window.formatCurrency(s.principal)}</td>
+                                <td>${window.formatCurrency(s.interest)}</td>
+                                <td>${window.formatCurrency(s.payment)}</td>
+                                <td>${window.formatCurrency(s.balance)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -208,11 +208,11 @@ function calculateLoan() {
         </div>
         <div class="explanation-step">
             <strong>계산 결과</strong><br>
-            • 대출원금: ${formatCurrency(principal)}<br>
-            • 연이자율: ${annualRate}% (월 ${formatNumber(monthlyRate * 100)}%)<br>
+            • 대출원금: ${window.formatCurrency(principal)}<br>
+            • 연이자율: ${annualRate}% (월 ${window.formatNumber(monthlyRate * 100)}%)<br>
             • 대출기간: ${years}년 (${months}개월)<br>
-            • 월 상환액: <strong>${formatCurrency(monthlyPayment)}</strong><br>
-            • 총 이자: <strong>${formatCurrency(totalInterest)}</strong>
+            • 월 상환액: <strong>${window.formatCurrency(monthlyPayment)}</strong><br>
+            • 총 이자: <strong>${window.formatCurrency(totalInterest)}</strong>
         </div>
     `;
     
@@ -372,15 +372,15 @@ function calculateHousingLoan() {
         <div class="result-summary">
             <div class="result-item highlight">
                 <span class="result-label">대출가능액</span>
-                <span class="result-value">${formatCurrency(maxLoan)}</span>
+                <span class="result-value">${window.formatCurrency(maxLoan)}</span>
             </div>
             <div class="result-item">
                 <span class="result-label">월 상환액</span>
-                <span class="result-value">${formatCurrency(monthlyPayment)}</span>
+                <span class="result-value">${window.formatCurrency(monthlyPayment)}</span>
             </div>
             <div class="result-item">
                 <span class="result-label">총 이자</span>
-                <span class="result-value">${formatCurrency(totalInterest)}</span>
+                <span class="result-value">${window.formatCurrency(totalInterest)}</span>
             </div>
         </div>
         <div class="result-details">
@@ -390,19 +390,19 @@ function calculateHousingLoan() {
                     <tbody>
                         <tr>
                             <td>LTV 기준 (${ltvRate * 100}%)</td>
-                            <td>${formatCurrency(maxLoanByLTV)}</td>
+                            <td>${window.formatCurrency(maxLoanByLTV)}</td>
                         </tr>
                         <tr>
                             <td>DTI 기준 (${dtiRate * 100}%)</td>
-                            <td>${formatCurrency(maxLoanByDTI)}</td>
+                            <td>${window.formatCurrency(maxLoanByDTI)}</td>
                         </tr>
                         <tr>
                             <td>필요 대출액</td>
-                            <td>${formatCurrency(requiredLoan)}</td>
+                            <td>${window.formatCurrency(requiredLoan)}</td>
                         </tr>
                         <tr style="font-weight: 700; background-color: var(--color-surface);">
                             <td>최종 대출가능액</td>
-                            <td>${formatCurrency(maxLoan)}</td>
+                            <td>${window.formatCurrency(maxLoan)}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -413,16 +413,16 @@ function calculateHousingLoan() {
     explanationElement.innerHTML = `
         <div class="explanation-step">
             <strong>1단계: LTV 한도 계산</strong><br>
-            주택가격 ${formatCurrency(housePrice)} × ${ltvRate * 100}% = ${formatCurrency(maxLoanByLTV)}
+            주택가격 ${window.formatCurrency(housePrice)} × ${ltvRate * 100}% = ${window.formatCurrency(maxLoanByLTV)}
         </div>
         <div class="explanation-step">
             <strong>2단계: DTI 한도 계산</strong><br>
-            연소득 ${formatCurrency(annualIncome)} × ${dtiRate * 100}% = ${formatCurrency(annualIncome * dtiRate)}<br>
-            이를 기반으로 최대 대출액: ${formatCurrency(maxLoanByDTI)}
+            연소득 ${window.formatCurrency(annualIncome)} × ${dtiRate * 100}% = ${window.formatCurrency(annualIncome * dtiRate)}<br>
+            이를 기반으로 최대 대출액: ${window.formatCurrency(maxLoanByDTI)}
         </div>
         <div class="explanation-step">
             <strong>3단계: 최종 대출액 결정</strong><br>
-            최종 대출가능액: <strong>${formatCurrency(maxLoan)}</strong>
+            최종 대출가능액: <strong>${window.formatCurrency(maxLoan)}</strong>
         </div>
     `;
     
