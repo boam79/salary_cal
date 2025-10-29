@@ -70,7 +70,7 @@ function calculateAcquisitionTax() {
         <div class="result-summary">
             <div class="result-item highlight">
                 <span class="result-label">총 세금</span>
-                <span class="result-value">${formatCurrency(totalTax)}</span>
+                <span class="result-value">${window.formatCurrency(totalTax)}</span>
             </div>
         </div>
         <div class="result-details">
@@ -88,22 +88,22 @@ function calculateAcquisitionTax() {
                         <tr>
                             <td>취득세</td>
                             <td>${(acquisitionRate * 100)}%</td>
-                            <td>${formatCurrency(acquisitionTax)}</td>
+                            <td>${window.formatCurrency(acquisitionTax)}</td>
                         </tr>
                         <tr>
                             <td>등록면허세</td>
                             <td>2%</td>
-                            <td>${formatCurrency(registrationTax)}</td>
+                            <td>${window.formatCurrency(registrationTax)}</td>
                         </tr>
                         <tr>
                             <td>지방교육세</td>
                             <td>0.4%</td>
-                            <td>${formatCurrency(localEducationTax)}</td>
+                            <td>${window.formatCurrency(localEducationTax)}</td>
                         </tr>
                         <tr style="font-weight: 700; background-color: var(--color-surface);">
                             <td>합계</td>
                             <td></td>
-                            <td>${formatCurrency(totalTax)}</td>
+                            <td>${window.formatCurrency(totalTax)}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -115,18 +115,18 @@ function calculateAcquisitionTax() {
                 <div class="explanation-step">
                     <strong>1단계: 부동산 유형 확인</strong><br>
                     유형: ${typeName}<br>
-                    취득가액: ${formatCurrency(price)}
+                    취득가액: ${window.formatCurrency(price)}
                 </div>
                 <div class="explanation-step">
                     <strong>2단계: 각 세금 계산</strong><br>
-                    • 취득세: ${formatCurrency(price)} × ${(acquisitionRate * 100)}% = ${formatCurrency(acquisitionTax)}<br>
-                    • 등록면허세: ${formatCurrency(price)} × 2% = ${formatCurrency(registrationTax)}<br>
-                    • 지방교육세: ${formatCurrency(price)} × 0.4% = ${formatCurrency(localEducationTax)}
+                    • 취득세: ${window.formatCurrency(price)} × ${(acquisitionRate * 100)}% = ${window.formatCurrency(acquisitionTax)}<br>
+                    • 등록면허세: ${window.formatCurrency(price)} × 2% = ${window.formatCurrency(registrationTax)}<br>
+                    • 지방교육세: ${window.formatCurrency(price)} × 0.4% = ${window.formatCurrency(localEducationTax)}
                 </div>
                 <div class="explanation-step">
                     <strong>3단계: 총 세금</strong><br>
-                    ${formatCurrency(acquisitionTax)} + ${formatCurrency(registrationTax)} + ${formatCurrency(localEducationTax)} = 
-                    <strong>${formatCurrency(totalTax)}</strong>
+                    ${window.formatCurrency(acquisitionTax)} + ${window.formatCurrency(registrationTax)} + ${window.formatCurrency(localEducationTax)} =
+                    <strong>${window.formatCurrency(totalTax)}</strong>
                 </div>
             </div>
         </div>

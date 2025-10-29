@@ -37,10 +37,10 @@ function calculateSalary() {
         monthlySalary = annualSalary / 12;
     } else {
         // 월급 계산 (최저시급 기준)
-        const workHours = validateInput(document.getElementById('work-hours').value, '주간 근무시간');
+        const workHours = window.validateInput(document.getElementById('work-hours').value, '주간 근무시간');
         if (workHours === null) return;
-        
-        const hourlyWage = validateInput(document.getElementById('hourly-wage').value, '시급');
+
+        const hourlyWage = window.validateInput(document.getElementById('hourly-wage').value, '시급');
         if (hourlyWage === null) return;
         
         // 2025년 최저시급 확인
@@ -130,35 +130,35 @@ function calculateSalary() {
     deductionTable.innerHTML = `
         <tr>
             <td>월 급여</td>
-            <td>${formatCurrency(monthlySalary)}</td>
+            <td>${window.formatCurrency(monthlySalary)}</td>
         </tr>
         <tr>
             <td>국민연금 (4.5%)</td>
-            <td>${formatCurrency(pension)}</td>
+            <td>${window.formatCurrency(pension)}</td>
         </tr>
         <tr>
             <td>건강보험 (3.545%)</td>
-            <td>${formatCurrency(health)}</td>
+            <td>${window.formatCurrency(health)}</td>
         </tr>
         <tr>
             <td>장기요양보험 (건강보험의 12.27%)</td>
-            <td>${formatCurrency(longTermCare)}</td>
+            <td>${window.formatCurrency(longTermCare)}</td>
         </tr>
         <tr>
             <td>고용보험 (0.9%)</td>
-            <td>${formatCurrency(employment)}</td>
+            <td>${window.formatCurrency(employment)}</td>
         </tr>
         <tr>
             <td>소득세</td>
-            <td>${formatCurrency(monthlyIncomeTax)}</td>
+            <td>${window.formatCurrency(monthlyIncomeTax)}</td>
         </tr>
         <tr>
             <td>지방소득세 (소득세의 10%)</td>
-            <td>${formatCurrency(localTax)}</td>
+            <td>${window.formatCurrency(localTax)}</td>
         </tr>
         <tr style="font-weight: 700; background-color: var(--color-surface);">
             <td>총 공제액</td>
-            <td>${formatCurrency(totalDeduction)}</td>
+            <td>${window.formatCurrency(totalDeduction)}</td>
         </tr>
     `;
     
@@ -175,56 +175,56 @@ function calculateSalary() {
         explanationHTML = `
             <div class="explanation-step">
                 <strong>1단계: 월급 계산</strong><br>
-                • 주급: ${workHours}시간 × ${formatCurrency(hourlyWage)} = ${formatCurrency(weeklySalary)}<br>
-                • 주휴수당: ${formatCurrency(weeklySalary)} × 12.5% = ${formatCurrency(weeklyHolidayPay)}<br>
-                • 월급: (${formatCurrency(weeklySalary)} + ${formatCurrency(weeklyHolidayPay)}) × 4.33주 = ${formatCurrency(monthlySalary)}
+                • 주급: ${workHours}시간 × ${window.formatCurrency(hourlyWage)} = ${window.formatCurrency(weeklySalary)}<br>
+                • 주휴수당: ${window.formatCurrency(weeklySalary)} × 12.5% = ${window.formatCurrency(weeklyHolidayPay)}<br>
+                • 월급: (${window.formatCurrency(weeklySalary)} + ${window.formatCurrency(weeklyHolidayPay)}) × 4.33주 = ${window.formatCurrency(monthlySalary)}
             </div>
             <div class="explanation-step">
                 <strong>2단계: 근로소득공제</strong><br>
-                연봉 ${formatCurrency(yearlyIncome)} → 근로소득공제 ${formatCurrency(incomeDeduction)} → 
-                과세표준 ${formatCurrency(taxBase)}
+                연봉 ${window.formatCurrency(yearlyIncome)} → 근로소득공제 ${window.formatCurrency(incomeDeduction)} →
+                과세표준 ${window.formatCurrency(taxBase)}
             </div>
             <div class="explanation-step">
                 <strong>3단계: 소득세 계산</strong><br>
-                과세표준 ${formatCurrency(taxBase)}에 대해 누진세율 적용<br>
-                연 소득세: ${formatCurrency(incomeTax)} (월 ${formatCurrency(monthlyIncomeTax)})
+                과세표준 ${window.formatCurrency(taxBase)}에 대해 누진세율 적용<br>
+                연 소득세: ${window.formatCurrency(incomeTax)} (월 ${window.formatCurrency(monthlyIncomeTax)})
             </div>
             <div class="explanation-step">
                 <strong>4단계: 4대보험 계산</strong><br>
-                • 국민연금: ${formatCurrency(monthlySalary)} × 4.5% = ${formatCurrency(pension)}<br>
-                • 건강보험: ${formatCurrency(monthlySalary)} × 3.545% = ${formatCurrency(health)}<br>
-                • 장기요양: ${formatCurrency(health)} × 12.27% = ${formatCurrency(longTermCare)}<br>
-                • 고용보험: ${formatCurrency(monthlySalary)} × 0.9% = ${formatCurrency(employment)}
+                • 국민연금: ${window.formatCurrency(monthlySalary)} × 4.5% = ${window.formatCurrency(pension)}<br>
+                • 건강보험: ${window.formatCurrency(monthlySalary)} × 3.545% = ${window.formatCurrency(health)}<br>
+                • 장기요양: ${window.formatCurrency(health)} × 12.27% = ${window.formatCurrency(longTermCare)}<br>
+                • 고용보험: ${window.formatCurrency(monthlySalary)} × 0.9% = ${window.formatCurrency(employment)}
             </div>
             <div class="explanation-step">
                 <strong>5단계: 실수령액 계산</strong><br>
-                월 급여 ${formatCurrency(monthlySalary)} - 총 공제 ${formatCurrency(totalDeduction)} = 
-                <strong style="color: var(--color-primary);">${formatCurrency(monthlyNet)}</strong>
+                월 급여 ${window.formatCurrency(monthlySalary)} - 총 공제 ${window.formatCurrency(totalDeduction)} =
+                <strong style="color: var(--color-primary);">${window.formatCurrency(monthlyNet)}</strong>
             </div>
         `;
     } else {
         explanationHTML = `
             <div class="explanation-step">
                 <strong>1단계: 근로소득공제</strong><br>
-                연봉 ${formatCurrency(yearlyIncome)} → 근로소득공제 ${formatCurrency(incomeDeduction)} → 
-                과세표준 ${formatCurrency(taxBase)}
+                연봉 ${window.formatCurrency(yearlyIncome)} → 근로소득공제 ${window.formatCurrency(incomeDeduction)} →
+                과세표준 ${window.formatCurrency(taxBase)}
             </div>
             <div class="explanation-step">
                 <strong>2단계: 소득세 계산</strong><br>
-                과세표준 ${formatCurrency(taxBase)}에 대해 누진세율 적용<br>
-                연 소득세: ${formatCurrency(incomeTax)} (월 ${formatCurrency(monthlyIncomeTax)})
+                과세표준 ${window.formatCurrency(taxBase)}에 대해 누진세율 적용<br>
+                연 소득세: ${window.formatCurrency(incomeTax)} (월 ${window.formatCurrency(monthlyIncomeTax)})
             </div>
             <div class="explanation-step">
                 <strong>3단계: 4대보험 계산</strong><br>
-                • 국민연금: ${formatCurrency(monthlySalary)} × 4.5% = ${formatCurrency(pension)}<br>
-                • 건강보험: ${formatCurrency(monthlySalary)} × 3.545% = ${formatCurrency(health)}<br>
-                • 장기요양: ${formatCurrency(health)} × 12.27% = ${formatCurrency(longTermCare)}<br>
-                • 고용보험: ${formatCurrency(monthlySalary)} × 0.9% = ${formatCurrency(employment)}
+                • 국민연금: ${window.formatCurrency(monthlySalary)} × 4.5% = ${window.formatCurrency(pension)}<br>
+                • 건강보험: ${window.formatCurrency(monthlySalary)} × 3.545% = ${window.formatCurrency(health)}<br>
+                • 장기요양: ${window.formatCurrency(health)} × 12.27% = ${window.formatCurrency(longTermCare)}<br>
+                • 고용보험: ${window.formatCurrency(monthlySalary)} × 0.9% = ${window.formatCurrency(employment)}
             </div>
             <div class="explanation-step">
                 <strong>4단계: 실수령액 계산</strong><br>
-                월 급여 ${formatCurrency(monthlySalary)} - 총 공제 ${formatCurrency(totalDeduction)} = 
-                <strong style="color: var(--color-primary);">${formatCurrency(monthlyNet)}</strong>
+                월 급여 ${window.formatCurrency(monthlySalary)} - 총 공제 ${window.formatCurrency(totalDeduction)} =
+                <strong style="color: var(--color-primary);">${window.formatCurrency(monthlyNet)}</strong>
             </div>
         `;
     }
