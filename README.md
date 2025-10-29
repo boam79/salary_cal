@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA 금융 계산기
 
-[![Version](https://img.shields.io/badge/version-4.0.0-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.0.0)
+[![Version](https://img.shields.io/badge/version-4.0.3-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.0.3)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
@@ -480,6 +480,67 @@ P: 대출원금, r: 월 이자율, n: 총 상환개월 수
 
 ## 📝 업데이트 내역
 
+### v4.0.3 (2025-10-29) - Critical Bug Fix 🐛
+
+#### 🐛 버그 수정
+**심각도: CRITICAL** - 4개 계산기 모듈에서 70+ 개의 함수 호출 오류 수정
+
+1. **문제 상황**
+   - `formatCurrency()`, `getValueWithUnit()`, `validateInput()` 함수 호출 시 `window.` 접두사 누락
+   - 유틸리티 함수가 IIFE 패턴으로 window 객체에 export되어 있음에도 불구하고 직접 호출
+   - ReferenceError 발생으로 계산기 기능 완전 마비
+
+2. **수정된 파일 (4개)**
+   - `js/calculators/realEstate.js`: 25개 함수 호출 수정
+     - calculateBrokerageFee() - 중개수수료 계산
+     - calculateCapitalGains() - 양도소득세 계산
+     - calculatePropertyTax() - 보유세 계산
+   - `js/calculators/acquisition.js`: 13개 함수 호출 수정
+     - calculateAcquisitionTax() - 취득세 계산
+   - `js/calculators/salary.js`: 30+ 개 함수 호출 수정
+     - calculateSalary() - 시급 입력 모드 및 결과 표시
+   - `js/calculators/loan.js`: 20+ 개 함수 호출 수정
+     - calculateLoan() - 대출 계산 결과 표시
+     - calculateHousingLoan() - 주택대출 계산 결과 표시
+
+3. **수정 내용**
+   ```javascript
+   // ❌ 수정 전 (ReferenceError 발생)
+   formatCurrency(totalFee)
+   getValueWithUnit('property-price', 100000000)
+   validateInput(document.getElementById('hours').value, '시간')
+
+   // ✅ 수정 후 (정상 동작)
+   window.formatCurrency(totalFee)
+   window.getValueWithUnit('property-price', 100000000)
+   window.validateInput(document.getElementById('hours').value, '시간')
+   ```
+
+4. **복구된 기능**
+   - ✅ 중개수수료 계산
+   - ✅ 양도소득세 계산
+   - ✅ 보유세 계산
+   - ✅ 취득세 계산
+   - ✅ 급여 계산 (시급 모드)
+   - ✅ 대출 계산 (결과 표시)
+
+5. **근본 원인**
+   - `js/utils/formatter.js`와 `js/utils/validation.js`가 IIFE 패턴으로 함수를 `window` 객체에 export
+   - 다른 모듈에서 이 함수들을 호출할 때 `window.` 접두사 필수
+   - 일부 파일에서는 올바르게 `window.`를 사용했으나, 일관성 없는 패턴 사용
+
+#### 📊 통계
+- **수정된 함수 호출**: 70+ 개
+- **영향받은 파일**: 4개
+- **코드 변경**: 89줄 (삽입), 89줄 (삭제)
+- **테스트 상태**: ✅ 모든 계산기 정상 동작 확인
+
+#### 🎯 영향도
+- **심각도**: 🔴 CRITICAL (사용자 경험 완전 손상)
+- **영향 범위**: 8개 계산 함수 중 6개 영향
+- **데이터 손실**: 없음
+- **보안 영향**: 없음
+
 ### v4.0.2 (2025-10-18) - Google Search Console 연동 완료 ✅
 
 #### 🔍 Google Search Console 연동
@@ -790,6 +851,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참조
 
 | 버전 | 날짜 | 주요 변경사항 | 상태 |
 |------|------|--------------|------|
+| v4.0.3 | 2025-10-29 | 🐛 Critical Bug Fix - window 접두사 70+ 개 수정 | ✅ 완료 |
 | v4.0.2 | 2025-10-18 | Google Search Console 연동 완료 | ✅ 완료 |
 | v4.0.1 | 2025-10-18 | SEO 최적화, 메타태그, 구조화된 데이터 | ✅ 완료 |
 | v4.0.0 | 2025-10-18 | 코드 리팩토링, 광고 레이아웃, 로고 클릭 | ✅ 완료 |
@@ -799,8 +861,8 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참조
 
 ---
 
-**Last Updated**: 2025-10-18  
-**Version**: 4.0.2  
+**Last Updated**: 2025-10-29
+**Version**: 4.0.3
 **Status**: ✅ Production Ready
 
 ---
