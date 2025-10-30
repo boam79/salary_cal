@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA 금융 계산기
 
-[![Version](https://img.shields.io/badge/version-4.3.2-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.3.2)
+[![Version](https://img.shields.io/badge/version-4.4.0-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.4.0)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
@@ -121,22 +121,37 @@
 
 ---
 
-## 🔧 추가 구현 예정 기능
+## 🎲 로또번호 생성기 (구현 완료) — 즉시 계산형 + 캐싱 + 용지 UI
 
-### 🎲 로또번호 생성기 (즉시 계산형 + 캐싱, 용지 UI)
-- 백엔드(Render)
-  - `/lotto/sync`: 전기간 수집·증분 병합·무결성 검사 (일 00:10 재검증, Cron)
-  - `/lotto/stats`: 전기간 빈도/파생 통계 캐시(ETag, max-age=300, stale-while-revalidate=3600)
-  - `/lotto/generate`: 모드(최빈/가중/균형), 포함/제외/세트/시드 파라미터 → 즉시 생성
-- 프런트(UI)
-  - 실제 로또 용지 레이아웃(A~E 5줄 × 6칸 원형 칩), 인쇄용 CSS
-  - 옵션: 세트 수(1~5), 모드, 포함/제외, 시드(선택)
-  - 통계 패널: 창 기준(전기간/최근N), 홀짝·고저 분포, 합계 범위
-- 알고리즘/데이터
-  - 수집 소스 2종(주·백업), 전기간 최초 수집 → 이후 증분 병합
-  - 가중 샘플링: p(i) ∝ frequency(i)^α(기본 1.0), 최빈/균형 모드 지원
-  - 캐시 워밍 및 실패 시 stale 캐시 제공
-- 고지/정책: 오락 목적, 당첨 보장 없음. 공식 출처 표기
+### 백엔드(Render)
+- 엔드포인트
+  - `POST /lotto/sync`: 동행복권 최신 회차 수집(공식 JSON + HTML 크롤링 폴백, cheerio) → 전기간 이력 병합 → 통계 스냅샷 저장
+  - `GET  /lotto/stats`: 전기간 통계 제공 `{ topCombos, numberFreq, updatedAt, meta }`
+  - `GET  /lotto/generate`: 숫자 출현빈도(`numberFreq`)를 가중치로 6개 번호 무작위 샘플링, 과거 당첨 조합은 제외하여 10세트 반환
+- 데이터 파일
+  - `server/data/lotto-history.json`: 회차별 당첨 번호 이력
+  - `server/data/lotto-stats.json`: 통계 캐시(빈도·최상위 조합)
+- CORS: `https://salary-cal.vercel.app` 명시 허용
+
+### 크론(Cron) 설정
+- Render Cron Job 스케줄: 매주 일요일 00:10 KST (UTC: 토요일 15:10)
+- Command 예시
+  - 보호키 사용: `curl -X POST -H "X-ADMIN-KEY: <ADMIN_KEY>" https://salary-cal.onrender.com/lotto/sync && curl -s https://salary-cal.onrender.com/lotto/stats > /dev/null`
+  - 미사용: `curl -X POST https://salary-cal.onrender.com/lotto/sync && curl -s https://salary-cal.onrender.com/lotto/stats > /dev/null`
+
+### 프런트(UI)
+- 실제 로또 용지 형태 A~J(10세트) 슬롯 표시, 생성/초기화 버튼
+- 생성 시 `/lotto/generate` 우선 호출 → 실패 시 `/lotto/stats`/로컬 스냅샷 폴백
+- 에러/진단: `window.ErrorLogger` 연동, 빈 데이터/예외 로깅
+
+### 알고리즘
+- 가중 샘플링: 각 숫자 1~45의 출현 빈도를 가중치로 사용하여 6개 번호 추출
+- 중복/제외: 하나의 세트 내 중복 금지, 과거 당첨 조합(`lotto-history.json`)과 일치하면 폐기 후 재생성
+- 세트 수: 기본 10세트
+
+### 주의 및 고지
+- 오락 목적의 기능이며, 당첨을 보장하지 않습니다.
+- 공식 데이터 출처: 동행복권(웹 페이지/JSON)
 
 ## ⭐ v4.0.0 주요 변경사항
 
@@ -510,6 +525,21 @@ P: 대출원금, r: 월 이자율, n: 총 상환개월 수
 ---
 
 ## 📝 업데이트 내역
+
+### v4.4.0 (2025-10-30) - 🎲 로또번호 생성기 구현(백엔드+프런트)
+
+#### ✨ 새로운 기능
+- Render 백엔드 구축: `/lotto/sync`, `/lotto/stats`, `/lotto/generate`
+- 동행복권 수집: 공식 JSON + HTML 크롤링(cheerio) 폴백, 최신회차 역순 증분 수집
+- 통계 스냅샷: 조합 빈도, 숫자 빈도(numberFreq) 캐싱
+- 번호 생성: 숫자 빈도 가중치 기반 샘플링, 과거 당첨 조합 제외, 10세트 반환
+- Cron Job 가이드: 매주 일요일 00:10 KST 자동 동기화
+
+#### 📁 파일
+- `server/index.js`, `server/package.json`, `server/cronSync.js`
+- `js/lotto/lotto.js`
+
+---
 
 ### v4.3.2 (2025-10-30) - 🧾 부가세 계산기 추가
 
@@ -1023,7 +1053,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참조
 ---
 
 **Last Updated**: 2025-10-30
-**Version**: 4.3.2
+**Version**: 4.4.0
 **Status**: ✅ Production Ready
 
 ---
