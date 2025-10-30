@@ -140,8 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
   restoreLast();
   const genBtn = document.getElementById('lotto-generate');
   if (genBtn) genBtn.addEventListener('click', onGenerate);
-  const printBtn = document.getElementById('lotto-print');
-  if (printBtn) printBtn.addEventListener('click', () => window.print());
   const resetBtn = document.getElementById('lotto-reset');
   if (resetBtn) resetBtn.addEventListener('click', resetLotto);
 });

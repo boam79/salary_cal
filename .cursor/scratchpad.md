@@ -1068,6 +1068,11 @@ Total: 1,203줄 (평균 241줄/파일)
   - [ ] Task 8.4 UX/저장
   - [ ] Task 8.5 문서/표기
 
+### 진행 업데이트 (Executor)
+- [x] Task 8.1 UI/레이아웃: `#lotto-screen`(A~J 10세트), 생성/인쇄/초기화 버튼 추가
+- [x] 프런트 로직: `js/lotto/lotto.js` 렌더/저장/복구/초기화 구현, `/lotto/stats` 우선 호출
+- [ ] 백엔드 스캐폴딩(Render): `/lotto/sync`, `/lotto/stats`, `/lotto/generate`
+
 ---
 
 ## Current Status / Progress Tracking – Lotto
