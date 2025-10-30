@@ -144,6 +144,10 @@
                         <span class="nav-icon">🏦</span>
                         <span class="nav-label">대출</span>
                     </div>
+                    <div class="nav-item" data-screen="retirement-screen">
+                        <span class="nav-icon">🎯</span>
+                        <span class="nav-label">퇴직금</span>
+                    </div>
                 </nav>
                 
                 <!-- Google AdSense 광고 -->
@@ -568,6 +572,85 @@
             </div>
         </section>
 
+        <!-- 6. 퇴직금 계산기 화면 -->
+        <section id="retirement-screen" class="screen calculator-screen">
+            <div class="container">
+                <button class="back-button">← 홈으로</button>
+                <h2 class="screen-title">🏦 퇴직금 계산기</h2>
+                
+                <div class="calculator-content">
+                    <div class="input-section">
+                        <form id="retirement-form">
+                            <div class="form-group">
+                                <label for="join-date">입사일</label>
+                                <input type="date" id="join-date" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="current-date-check"> 현재 날짜를 퇴사일로 설정
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="retirement-date">퇴사일</label>
+                                <input type="date" id="retirement-date" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="avg-salary">평균임금 (만원)</label>
+                                <input type="number" id="avg-salary" placeholder="예: 350" min="0" step="10" required>
+                                <small>최근 3개월 평균임금 기준</small>
+                            </div>
+                            
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-primary">계산하기</button>
+                                <button type="button" class="btn btn-secondary" id="reset-retirement">초기화</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="result-section" id="retirement-result" style="display: none;">
+                        <h3 class="result-title">계산 결과</h3>
+                        <div class="result-container">
+                            <div class="result-summary">
+                                <div class="result-item">
+                                    <span class="result-label">근속년수</span>
+                                    <span class="result-value" id="result-tenure">-</span>
+                                </div>
+                                <div class="result-item highlight">
+                                    <span class="result-label">퇴직금 총액</span>
+                                    <span class="result-value" id="result-total">-</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">퇴직소득세</span>
+                                    <span class="result-value" id="result-tax">-</span>
+                                </div>
+                                <div class="result-item highlight">
+                                    <span class="result-label">실수령액</span>
+                                    <span class="result-value" id="result-net">-</span>
+                                </div>
+                            </div>
+
+                            <div class="chart-container">
+                                <h4>근속년수별 퇴직금 변화</h4>
+                                <canvas id="retirement-chart" width="800" height="400"></canvas>
+                            </div>
+
+                            <div class="calculation-steps">
+                                <button class="toggle-steps" onclick="toggleCalculationSteps(this, 'retirement')">
+                                    ▼ 계산 과정 보기
+                                </button>
+                                <div class="steps-content" id="retirement-steps" style="display: none;">
+                                    <!-- 계산 과정이 여기에 동적으로 추가됩니다 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- 5. 대출 계산기 화면 (통합) -->
         <section id="loan-screen" class="screen calculator-screen">
             <div class="container">
@@ -759,6 +842,7 @@
     <script type="module" src="js/calculators/acquisition.js?v=202412191530"></script>
     <script type="module" src="js/calculators/realEstate.js?v=202412191530"></script>
     <script type="module" src="js/calculators/loan.js?v=202412191530"></script>
+    <script type="module" src="js/calculators/retirement.js?v=202412191530"></script>
     
     <!-- Chart -->
     <script type="module" src="js/chart.js?v=202412191530"></script>
