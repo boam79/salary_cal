@@ -173,8 +173,9 @@ function resetLotto() {
 }
 
 function init() {
+  // 새로고침 시에는 항상 빈 용지로 시작(자동 복구 제거)
+  try { localStorage.removeItem('lotto:last'); } catch (_) {}
   renderEmptyTickets();
-  restoreLast();
   const genBtn = document.getElementById('lotto-generate');
   if (genBtn) genBtn.addEventListener('click', onGenerate);
   const resetBtn = document.getElementById('lotto-reset');
