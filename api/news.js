@@ -113,14 +113,39 @@ function parseRSSFeed(xmlText, source) {
                 const pubDate = extractTag(itemXml, 'pubDate');
                 const category = extractTag(itemXml, 'category') || '경제';
                 
+                // 이미지 추출 시도 (여러 패턴 시도)
+                let image = null;
+                
+                // 1. enclosure 태그에서 추출
+                const enclosureRegex = /<enclosure[^>]*url="([^"]+)"/i;
+                const enclosureMatch = itemXml.match(enclosureRegex);
+                if (enclosureMatch) image = enclosureMatch[1];
+                
+                // 2. media:content 태그에서 추출
+                if (!image) {
+                    const mediaContentRegex = /<media:content[^>]*url="([^"]+)"/i;
+                    const mediaMatch = itemXml.match(mediaContentRegex);
+                    if (mediaMatch) image = mediaMatch[1];
+                }
+                
+                // 3. description 내 img 태그에서 추출
+                if (!image && description) {
+                    const imgRegex = /<img[^>]*src="([^"]+)"/i;
+                    const imgMatch = description.match(imgRegex);
+                    if (imgMatch) image = imgMatch[1];
+                }
+                
+                // 4. thumbnail 태그에서 추출
+                if (!image) {
+                    const thumbnailRegex = /<thumbnail[^>]*url="([^"]+)"/i;
+                    const thumbnailMatch = itemXml.match(thumbnailRegex);
+                    if (thumbnailMatch) image = thumbnailMatch[1];
+                }
+                
                 // 제목과 설명에서 HTML 태그 제거
                 const cleanTitle = removeHtmlTags(title);
-                const cleanDescription = removeHtmlTags(description);
-                
-                // 이미지 추출 시도
-                const imageRegex = /<enclosure[^>]*url="([^"]+)"/i;
-                const imageMatch = itemXml.match(imageRegex);
-                const image = imageMatch ? imageMatch[1] : null;
+                // description에서 이미지를 제거한 순수 텍스트만 가져오기
+                const cleanDescription = removeHtmlTags(description.replace(/<img[^>]*>/gi, ''));
                 
                 if (title && link && description) {
                     news.push({
