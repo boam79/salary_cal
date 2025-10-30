@@ -97,10 +97,19 @@ function renderTicketsWithCombos(combos, meta) {
   if (metaEl) metaEl.textContent = meta || '';
 }
 
+function setLoading(isLoading) {
+  const btn = document.getElementById('lotto-generate');
+  if (btn) {
+    btn.disabled = isLoading;
+    btn.textContent = isLoading ? '생성 중...' : '생성 (최신 동기화 포함)';
+  }
+}
+
 async function onGenerate() {
   try {
-    // 옵션: 사전 동기화 시도
-    try { await fetch(`${API_BASE}/lotto/sync`, { method: 'POST' }); } catch (_) {}
+    setLoading(true);
+    // 사전 동기화: 지연을 막기 위해 대기하지 않고 백그라운드 요청
+    try { fetch(`${API_BASE}/lotto/sync`, { method: 'POST' }); } catch (_) {}
     const { type, data } = await fetchStatsOrHistory();
     let combos = [];
     let metaText = '';
@@ -114,10 +123,11 @@ async function onGenerate() {
       metaText = '데이터를 불러오지 못했습니다.';
     }
     renderTicketsWithCombos(combos, metaText);
-    // 저장
     try { localStorage.setItem('lotto:last', JSON.stringify({ combos, meta: metaText, at: Date.now() })); } catch (_) {}
   } catch (e) {
-    console.error(e);
+    console.error('[lotto] generate error', e);
+  } finally {
+    setLoading(false);
   }
 }
 
@@ -137,14 +147,20 @@ function resetLotto() {
   if (metaEl) metaEl.textContent = '';
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
   renderEmptyTickets();
   restoreLast();
   const genBtn = document.getElementById('lotto-generate');
   if (genBtn) genBtn.addEventListener('click', onGenerate);
   const resetBtn = document.getElementById('lotto-reset');
   if (resetBtn) resetBtn.addEventListener('click', resetLotto);
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 export {};
 
