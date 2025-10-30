@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA 금융 계산기
 
-[![Version](https://img.shields.io/badge/version-4.1.0-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.1.0)
+[![Version](https://img.shields.io/badge/version-4.2.0-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.2.0)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
@@ -489,6 +489,27 @@ P: 대출원금, r: 월 이자율, n: 총 상환개월 수
 
 ## 📝 업데이트 내역
 
+### v4.2.0 (2025-01-20) - UI 개선 및 주식지수 제거 🎨
+
+#### ✨ 새로운 기능
+1. **메인 타이틀 변경**
+   - "💰 금융 계산기" → "📰 종합 생활 정보지"
+   - 태그라인: "실시간 주식정보 · 금융계산기 · 경제뉴스"
+
+2. **로고 클릭 시 전체 새로고침**
+   - 메인 타이틀 클릭 시 `window.location.reload()` 실행
+   - 페이지 전체 리로드로 최신 데이터 반영
+
+#### 🔧 변경사항
+- **주식 지수 섹션 제거**
+  - 사이드바에서 코스피/코스닥 지수 표시 제거
+  - `stockIndices` 모듈 제거
+  - API 파일 유지 (향후 재활용 가능)
+
+#### 📊 영향 범위
+- 파일 변경: `index.html`, `js/main.js`
+- 제거된 요소: 주식 지수 HTML, stockIndices import 및 초기화
+
 ### v4.1.0 (2025-01-20) - 경제 뉴스 섹션 추가 📰
 
 #### ✨ 새로운 기능
@@ -906,6 +927,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참조
 
 | 버전 | 날짜 | 주요 변경사항 | 상태 |
 |------|------|--------------|------|
+| v4.2.0 | 2025-01-20 | 🎨 메인 타이틀 변경, 로고 새로고침, 주식지수 제거 | ✅ 완료 |
 | v4.1.0 | 2025-01-20 | 📰 경제 뉴스 섹션 추가, RSS 피드 연동 | ✅ 완료 |
 | v4.0.3 | 2025-10-29 | 🐛 Critical Bug Fix - window 접두사 70+ 개 수정 | ✅ 완료 |
 | v4.0.2 | 2025-10-18 | Google Search Console 연동 완료 | ✅ 완료 |
@@ -918,7 +940,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참조
 ---
 
 **Last Updated**: 2025-01-20
-**Version**: 4.1.0
+**Version**: 4.2.0
 **Status**: ✅ Production Ready
 
 ---
