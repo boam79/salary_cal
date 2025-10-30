@@ -946,6 +946,60 @@ a:hover {
 }
 
 /* ===================================
+   Lotto Tickets
+   =================================== */
+.lotto-tickets {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+}
+
+.lotto-ticket {
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: var(--spacing-sm);
+}
+
+.lotto-ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.lotto-balls {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+}
+
+.lotto-ball {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-background);
+    border: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.lotto-ball.marked {
+    border-color: var(--color-primary);
+    background: var(--color-accent);
+}
+
+@media (max-width: 768px) {
+    .lotto-tickets { grid-template-columns: 1fr; }
+}
+
+/* ===================================
    Explanation (아코디언)
    =================================== */
 .explanation-section {

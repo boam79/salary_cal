@@ -160,6 +160,10 @@
                         <span class="nav-icon">🚗</span>
                         <span class="nav-label">자동차 취등록세</span>
                     </div>
+                    <div class="nav-item" data-screen="lotto-screen">
+                        <span class="nav-icon">🎲</span>
+                        <span class="nav-label">로또 생성기</span>
+                    </div>
                 </nav>
                 
                 <!-- Google AdSense 광고 -->
@@ -885,6 +889,25 @@
             </div>
         </section>
 
+        <!-- 10. 로또 번호 생성기 -->
+        <section id="lotto-screen" class="screen calculator-screen">
+            <div class="container">
+                <button class="back-button">← 홈으로</button>
+                <h2 class="screen-title">🎲 로또 번호 생성기</h2>
+                <div class="calculator-content">
+                    <div class="input-section">
+                        <div class="button-group">
+                            <button class="btn btn-primary" id="lotto-generate">생성 (최신 동기화 포함)</button>
+                            <button class="btn btn-secondary" id="lotto-print">인쇄</button>
+                        </div>
+                    </div>
+                    <div class="result-section">
+                        <div id="lotto-tickets" class="lotto-tickets"></div>
+                        <div class="mt-sm text-center" id="lotto-meta"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
         <!-- 8. 자동차 취등록세 계산기 화면 -->
         <section id="car-acq-screen" class="screen calculator-screen">
             <div class="container">
@@ -1134,6 +1157,7 @@
     <script type="module" src="js/calculators/retirement.js?v=202412191530"></script>
     <script type="module" src="js/calculators/savings.js?v=202412191530"></script>
     <script type="module" src="js/calculators/carAcquisition.js?v=202412191530"></script>
+    <script type="module" src="js/lotto/lotto.js?v=202412191530"></script>
     <script type="module" src="js/calculators/vat.js?v=202412191530"></script>
     
     <!-- Chart -->
