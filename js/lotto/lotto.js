@@ -117,7 +117,7 @@ async function onGenerate() {
     let combos = [];
     let metaText = '';
     try {
-      const res = await fetch(`${API_BASE}/lotto/generate`, { cache: 'no-store' });
+      const res = await fetch(`${API_BASE}/lotto/generate?t=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.generated)) {
