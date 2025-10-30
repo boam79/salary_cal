@@ -7,6 +7,7 @@ import AppState from './core/appState.js';
 import navigationManager from './core/navigationManager.js';
 import eventManager from './core/eventManager.js';
 import newsManager from './news/newsManager.js';
+import stockIndices from './utils/stockIndices.js';
 
 class FinancialCalculatorApp {
     constructor() {
@@ -36,6 +37,9 @@ class FinancialCalculatorApp {
             
             // 뉴스 매니저 초기화
             await newsManager.init();
+            
+            // 주식 지수 매니저 초기화
+            await stockIndices.init();
             
             // 애플리케이션 완전 초기화 완료
             this.isInitialized = true;
@@ -130,6 +134,7 @@ class FinancialCalculatorApp {
     cleanup() {
         eventManager.cleanup();
         newsManager.cleanup();
+        stockIndices.cleanup();
         AppState.reset();
         this.isInitialized = false;
         console.log('🧹 애플리케이션 정리 완료');

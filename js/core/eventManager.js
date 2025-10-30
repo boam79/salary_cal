@@ -48,6 +48,11 @@ class EventManager {
         this.addDelegatedEvent('click', '.logo.clickable', (e) => {
             this.handleLogoClick(e);
         });
+        
+        // 사이드바 네비게이션 아이템 클릭 이벤트 위임
+        this.addDelegatedEvent('click', '.nav-item', (e) => {
+            this.handleNavItemClick(e);
+        });
     }
     
     // 이벤트 위임 추가
@@ -215,6 +220,30 @@ class EventManager {
                 homeScreen.classList.add('active');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
+        }
+    }
+    
+    // 사이드바 네비게이션 아이템 클릭 처리
+    handleNavItemClick(event) {
+        const navItem = event.currentTarget;
+        const targetScreen = navItem.getAttribute('data-screen');
+        
+        if (!targetScreen) {
+            console.warn('⚠️ target screen이 지정되지 않음');
+            return;
+        }
+        
+        console.log(`🔗 네비게이션 클릭: ${targetScreen}로 이동`);
+        
+        // 활성화 상태 변경
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        navItem.classList.add('active');
+        
+        // 화면 이동
+        if (window.navigationManager) {
+            window.navigationManager.navigateTo(targetScreen);
         }
     }
     

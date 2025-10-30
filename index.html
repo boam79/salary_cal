@@ -119,17 +119,65 @@
     <!-- 메인 컨텐츠 -->
     <main class="main-content">
         <div class="layout-container">
-            <!-- 좌측 광고 공간 -->
-            <aside class="ad-space ad-left">
-                <!-- Google AdSense 광고 단위 - 좌측 -->
-                <ins class="adsbygoogle"
-                     style="display:block"
-                     data-ad-client="ca-pub-4380654945809546"
-                     data-ad-format="auto"
-                     data-full-width-responsive="true"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
+            <!-- 좌측 사이드바 -->
+            <aside class="sidebar-left">
+                <!-- 주식 지수 -->
+                <div class="stock-indices">
+                    <h3 class="sidebar-title">📈 주식 지수</h3>
+                    <div class="stock-item">
+                        <span class="stock-name">코스피</span>
+                        <span class="stock-value" id="kospi-value">-</span>
+                        <span class="stock-change" id="kospi-change">-</span>
+                    </div>
+                    <div class="stock-item">
+                        <span class="stock-name">코스닥</span>
+                        <span class="stock-value" id="kosdaq-value">-</span>
+                        <span class="stock-change" id="kosdaq-change">-</span>
+                    </div>
+                    <div class="stock-item">
+                        <span class="stock-name">나스닥</span>
+                        <span class="stock-value" id="nasdaq-value">-</span>
+                        <span class="stock-change" id="nasdaq-change">-</span>
+                    </div>
+                    <div class="stock-update-time" id="stock-update-time">최근 업데이트: -</div>
+                </div>
+                
+                <!-- 계산기 네비게이션 -->
+                <nav class="calculator-nav">
+                    <h3 class="sidebar-title">💰 계산기</h3>
+                    <div class="nav-item" data-screen="salary-screen">
+                        <span class="nav-icon">💼</span>
+                        <span class="nav-label">월급/연봉</span>
+                    </div>
+                    <div class="nav-item" data-screen="tax-screen">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">세금</span>
+                    </div>
+                    <div class="nav-item" data-screen="real-estate-screen">
+                        <span class="nav-icon">🏢</span>
+                        <span class="nav-label">부동산</span>
+                    </div>
+                    <div class="nav-item" data-screen="acquisition-tax-screen">
+                        <span class="nav-icon">🏛️</span>
+                        <span class="nav-label">취등록세</span>
+                    </div>
+                    <div class="nav-item" data-screen="loan-screen">
+                        <span class="nav-icon">🏦</span>
+                        <span class="nav-label">대출</span>
+                    </div>
+                </nav>
+                
+                <!-- Google AdSense 광고 -->
+                <div class="sidebar-ad">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-4380654945809546"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
             </aside>
             
             <!-- 메인 컨텐츠 영역 -->
@@ -137,49 +185,6 @@
         <!-- 홈 화면 -->
         <section id="home-screen" class="screen active">
             <div class="container">
-                <div class="calculator-grid">
-                    <!-- 1. 월급 및 연봉 계산기 -->
-                    <div class="calculator-card" data-screen="salary-screen">
-                        <div class="card-icon">💼</div>
-                        <h3 class="card-title">월급 및 연봉 계산기</h3>
-                        <p class="card-description">최저시급, 주휴수당, 소득세, 4대보험 공제 후 실수령액 계산</p>
-                    </div>
-
-                    <!-- 2. 세금 계산기 -->
-                    <div class="calculator-card" data-screen="tax-screen">
-                        <div class="card-icon">📋</div>
-                        <h3 class="card-title">세금 계산기</h3>
-                        <p class="card-description">상속세, 증여세 계산</p>
-                    </div>
-
-                    <!-- 3. 부동산 계산기 -->
-                    <div class="calculator-card" data-screen="real-estate-screen">
-                        <div class="card-icon">🏢</div>
-                        <h3 class="card-title">부동산 계산기</h3>
-                        <p class="card-description">중개수수료, 양도소득세, 보유세, DSR 계산</p>
-                    </div>
-
-                    <!-- 4. 취등록세 계산기 -->
-                    <div class="calculator-card" data-screen="acquisition-tax-screen">
-                        <div class="card-icon">🏛️</div>
-                        <h3 class="card-title">취등록세 계산기</h3>
-                        <p class="card-description">취득세, 등록면허세 계산</p>
-                    </div>
-
-                    <!-- 5. 주택대출 및 금융대출 계산기 -->
-                    <div class="calculator-card" data-screen="loan-screen">
-                        <div class="card-icon">🏦</div>
-                        <h3 class="card-title">주택대출 및 금융대출 계산기</h3>
-                        <p class="card-description">대출 이자 및 상환 스케줄 계산</p>
-                    </div>
-                </div>
-                
-                <div class="home-description">
-                    <p class="text-center" style="color: var(--color-text-secondary); margin-top: var(--spacing-lg);">
-                        필요한 계산기를 클릭하세요. 정확한 계산과 상세한 설명을 제공합니다.
-                    </p>
-                </div>
-                
                 <!-- 경제 뉴스 섹션 -->
                 <div class="news-section" style="margin-top: var(--spacing-xl);">
                     <h2 class="section-title">📰 최신 경제 뉴스</h2>
@@ -768,6 +773,9 @@
     
     <!-- News -->
     <script type="module" src="js/news/newsManager.js?v=202412191530"></script>
+    
+    <!-- Stock Indices -->
+    <script type="module" src="js/utils/stockIndices.js?v=202412191530"></script>
     
     <!-- Calculators -->
     <script type="module" src="js/calculators/salary.js?v=202412191530"></script>
