@@ -54,13 +54,13 @@ const topNewsManager = (() => {
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
 
-    if (hasImage(news?.image)) {
-      const img = document.createElement('img');
-      img.className = 'news-card-image';
-      img.src = news.image;
-      img.alt = news.title || 'thumbnail';
-      a.appendChild(img);
-    }
+    // 썸네일 (없으면 도메인 파비콘 또는 플레이스홀더)
+    const img = document.createElement('img');
+    img.className = 'news-card-image';
+    const fallbackFavicon = news?.link ? `https://www.google.com/s2/favicons?sz=128&domain_url=${encodeURIComponent(news.link)}` : '';
+    img.src = hasImage(news?.image) ? news.image : fallbackFavicon;
+    img.alt = news.title || 'thumbnail';
+    a.appendChild(img);
 
     const header = document.createElement('div');
     header.className = 'news-card-header';
