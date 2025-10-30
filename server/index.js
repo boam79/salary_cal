@@ -217,7 +217,8 @@ function generateUniqueSet(numberFreq, existingComboKeys) {
   const chosen = new Set();
   let guard = 0;
   while (chosen.size < 6 && guard < 200) {
-    const w = base.slice();
+    // 매 호출마다 약간의 난수(jitter)로 다양성 확보
+    const w = base.slice().map((v, idx) => idx === 0 ? 0 : v + Math.random()*0.5);
     for (const n of chosen) w[n] = 0;
     const pick = weightedPickOne(w);
     if (pick && pick>=1 && pick<=45) chosen.add(pick);
@@ -245,7 +246,8 @@ app.get('/lotto/generate', (req,res) => {
       }
       tries++;
     }
-    res.json({ generated: result, updatedAt: stats.updatedAt, total: history.length });
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    res.json({ generated: result, updatedAt: stats.updatedAt, total: history.length, seed: Date.now() });
   } catch (e) {
     console.error('[lotto-backend] generate error', e);
     res.status(500).json({ error: 'generate_error' });
