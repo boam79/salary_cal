@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     }
     
     try {
-        // 여러 RSS 피드 소스 (증권, 경제, AI, 반도체 중점)
+        // 카테고리 매핑 포함 종합뉴스 소스
         const rssSources = [
             // 증권 뉴스
             {
@@ -55,27 +55,39 @@ export default async function handler(req, res) {
             {
                 name: '디지털타임스 IT',
                 url: 'https://www.dt.co.kr/rss/all.xml'
-            }
+            },
+            // 종합뉴스(정치/사회/국제 등)
+            { name: '연합뉴스 전체', url: 'https://www.yna.co.kr/feed/' },
+            { name: 'KBS 최신뉴스', url: 'https://news.kbs.co.kr/rss/news/justIn.xml' },
+            { name: 'MBC 뉴스', url: 'https://imnews.imbc.com/rss/news/news_00.xml' },
+            { name: 'SBS 뉴스', url: 'https://news.sbs.co.kr/news/SectionRssFeed.do?sectionId=01' },
+            { name: 'JTBC 뉴스', url: 'https://fs.jtbc.co.kr/RSS/newsflash.xml' },
+            { name: '한겨레', url: 'https://www.hani.co.kr/rss/' },
+            { name: '경향신문', url: 'https://www.khan.co.kr/rss/rssdata/kh_total.xml' },
+            { name: '조선일보', url: 'https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml' },
+            { name: '중앙일보', url: 'https://www.joongang.co.kr/rss' },
+            { name: '동아일보', url: 'https://www.donga.com/news/rss' },
+            { name: '한국일보', url: 'https://www.hankookilbo.com/rss/all.xml' },
         ];
         
-        // 여러 RSS에서 뉴스를 수집
-        const allNews = await Promise.all(
-            rssSources.map(source => fetchNewsFromRSS(source))
-        );
-        
-        // 모든 뉴스를 하나의 배열로 합치고 날짜순 정렬
-        const mergedNews = allNews
-            .flat()
-            .sort((a, b) => new Date(b.date) - new Date(a.date))
-            .slice(0, 12); // 최신 12개만 반환
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const top = Math.min(parseInt(url.searchParams.get('top') || '12', 10), 50);
+        const category = url.searchParams.get('category') || 'economy';
+
+        // 수집
+        const allNews = await Promise.all(rssSources.map(source => fetchNewsFromRSS(source)));
+        const merged = allNews.flat();
+
+        // 랭킹(신선도+소스 가중), 중복 제거
+        const ranked = rankAndSelect(merged, top);
         
         // 캐시 제어
         res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
         
         return res.status(200).json({
             success: true,
-            count: mergedNews.length,
-            news: mergedNews
+            count: ranked.length,
+            news: ranked
         });
         
     } catch (error) {
@@ -87,6 +99,30 @@ export default async function handler(req, res) {
             message: error.message
         });
     }
+}
+
+// 간단 랭킹 + 중복 제거
+function rankAndSelect(items, top) {
+    const now = Date.now();
+    const tau = 2 * 60 * 60 * 1000; // 2h
+    const srcW = {
+        '연합뉴스 전체': 1.08, '연합뉴스 경제': 1.07, 'KBS 최신뉴스': 1.06, 'MBC 뉴스': 1.05,
+        'SBS 뉴스': 1.05, 'JTBC 뉴스': 1.04, '뉴시스': 1.03
+    };
+    const seen = new Set();
+    const scored = [];
+    for (const it of items) {
+        const key = ((it.link||'').replace(/[#?].*$/, '') + '|' + (it.title||'').trim());
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const t = new Date(it.date || it.pubDate || Date.now()).getTime();
+        const rec = Math.exp(-(now - t) / tau);
+        const sw = srcW[it.source] || 1.0;
+        const score = 0.7 * rec + 0.3 * (sw / 1.1);
+        scored.push({ ...it, score });
+    }
+    scored.sort((a,b) => b.score - a.score);
+    return scored.slice(0, top);
 }
 
 // RSS 피드에서 뉴스 가져오기
@@ -180,12 +216,7 @@ function parseRSSFeed(xmlText, source) {
                 const cleanDescription = removeHtmlTags((description || '').replace(/<img[^>]*>/gi, ''));
                 
                 // 디버깅: 실제 데이터 확인
-                console.log('News item:', {
-                    title: cleanTitle,
-                    description: cleanDescription.substring(0, 50),
-                    link: link,
-                    source: source
-                });
+                // console.log('News item:', { title: cleanTitle, link, source });
                 
                 if (title && link && description) {
                     news.push({

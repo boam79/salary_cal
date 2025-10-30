@@ -189,6 +189,16 @@
                         <p>뉴스를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.</p>
                     </div>
                 </div>
+
+                <!-- 종합뉴스 TOP 30 -->
+                <div class="news-section" style="margin-top: var(--spacing-xl);">
+                    <h2 class="section-title">🗞️ 종합뉴스 TOP 30</h2>
+                    <div class="news-loading" id="topnews-loading" style="text-align: center; padding: 20px;">
+                        <p>뉴스 로딩 중...</p>
+                    </div>
+                    <div class="news-grid" id="topnews-grid" style="display: none;"></div>
+                    <div class="news-error" id="topnews-error" style="display: none;"></div>
+                </div>
             </div>
         </section>
 
@@ -1009,6 +1019,7 @@
     
     <!-- News -->
     <script type="module" src="js/news/newsManager.js?v=202412191530"></script>
+    <script type="module" src="js/news/topNewsManager.js?v=202412191530"></script>
     
     <!-- Calculators -->
     <script type="module" src="js/calculators/salary.js?v=202412191530"></script>
