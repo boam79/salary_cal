@@ -20,17 +20,26 @@ class RetirementCalculator {
         
         if (currentDateCheck) {
             currentDateCheck.addEventListener('change', (e) => {
+                const today = new Date();
+                const dateStr = today.toISOString().split('T')[0];
                 if (e.target.checked) {
-                    // 현재 날짜로 설정
-                    const today = new Date();
-                    const dateStr = today.toISOString().split('T')[0];
                     retirementDateInput.value = dateStr;
                     retirementDateInput.disabled = true;
                 } else {
                     retirementDateInput.disabled = false;
                 }
+                // min/max 동기화
+                this.syncDateConstraints();
             });
         }
+
+        // 날짜 입력 min/max 제약 동기화
+        ['join-date','retirement-date'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('change', () => this.syncDateConstraints());
+            }
+        });
 
         // 폼 제출
         const form = document.getElementById('retirement-form');
@@ -117,11 +126,11 @@ class RetirementCalculator {
     }
 
     calculateRetirementPay(avgSalary, tenureYears) {
-        // 평균임금(만원)을 원 단위로 변환
-        const avgSalaryWon = avgSalary * 10000;
+        // 평균임금(만원)을 원 단위로 변환 (월 평균임금 입력)
+        const avgMonthlySalaryWon = avgSalary * 10000;
         
-        // 퇴직금 = 평균임금 × 30일 × 근속년수
-        const retirementPay = avgSalaryWon * 30 * tenureYears;
+        // 퇴직금 = 평균 월임금 × 근속년수
+        const retirementPay = avgMonthlySalaryWon * tenureYears;
         
         return retirementPay;
     }
@@ -183,10 +192,10 @@ class RetirementCalculator {
         // 차트 데이터: 0년부터 현재까지
         const maxYears = 30;
         const data = [];
-        const avgSalaryWon = avgSalary * 10000;
+        const avgMonthlySalaryWon = avgSalary * 10000;
 
         for (let year = 0; year <= maxYears; year++) {
-            const retirementPay = avgSalaryWon * 30 * year;
+            const retirementPay = avgMonthlySalaryWon * year;
             data.push({ year, retirementPay });
         }
 
@@ -251,7 +260,7 @@ class RetirementCalculator {
 
         // 현재 값 강조
         const currentYear = Math.floor(data[data.length - 1].year);
-        const currentRetirementPay = avgSalary * 30 * currentYear;
+        const currentRetirementPay = (avgSalary * 10000) * currentYear;
         const currentX = padding + (chartWidth / maxYears) * currentYear;
         const currentY = height - padding - currentRetirementPay * scaleY;
 
@@ -277,7 +286,7 @@ class RetirementCalculator {
         const stepsContainer = document.getElementById('retirement-steps');
         if (!stepsContainer) return;
 
-        const avgSalaryWon = avgSalary * 10000;
+        const avgMonthlySalaryWon = avgSalary * 10000;
         const years = Math.floor(tenureYears);
         const months = Math.floor((tenureYears - years) * 12);
 
@@ -291,9 +300,9 @@ class RetirementCalculator {
             
             <div class="step-item">
                 <h4>2. 퇴직금 계산</h4>
-                <p>평균임금: ${window.formatCurrency(avgSalaryWon)}</p>
-                <p>계산식: 평균임금 × 30일 × 근속년수</p>
-                <p>계산: ${window.formatCurrency(avgSalaryWon)} × 30 × ${tenureYears.toFixed(4)}</p>
+                <p>평균 월임금: ${window.formatCurrency(avgMonthlySalaryWon)}</p>
+                <p>계산식: 평균 월임금 × 근속년수</p>
+                <p>계산: ${window.formatCurrency(avgMonthlySalaryWon)} × ${tenureYears.toFixed(4)}</p>
                 <p><strong>퇴직금 = ${window.formatCurrency(retirementPay)}</strong></p>
             </div>
             
