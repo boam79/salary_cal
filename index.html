@@ -148,6 +148,10 @@
                         <span class="nav-icon">🎯</span>
                         <span class="nav-label">퇴직금</span>
                     </div>
+                    <div class="nav-item" data-screen="savings-screen">
+                        <span class="nav-icon">💰</span>
+                        <span class="nav-label">적금/예금</span>
+                    </div>
                 </nav>
                 
                 <!-- Google AdSense 광고 -->
@@ -650,6 +654,83 @@
             </div>
         </section>
 
+        <!-- 7. 적금/예금 계산기 화면 -->
+        <section id="savings-screen" class="screen calculator-screen">
+            <div class="container">
+                <button class="back-button">← 홈으로</button>
+                <h2 class="screen-title">💰 적금/예금 계산기</h2>
+
+                <div class="calculator-content">
+                    <div class="input-section">
+                        <div class="tab-navigation">
+                            <button class="tab-btn active" data-tab="simple">단리</button>
+                            <button class="tab-btn" data-tab="compound">복리</button>
+                        </div>
+
+                        <!-- 단리 입력 -->
+                        <form id="simple-interest-form">
+                            <div class="form-group">
+                                <label for="simple-principal">원금 (만원)</label>
+                                <input type="number" id="simple-principal" min="0" step="10" placeholder="예: 1000">
+                            </div>
+                            <div class="form-group">
+                                <label for="simple-rate">연 이자율 (%)</label>
+                                <input type="number" id="simple-rate" min="0" step="0.1" placeholder="예: 3.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="simple-months">기간 (개월)</label>
+                                <input type="number" id="simple-months" min="1" step="1" placeholder="예: 36">
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-primary">계산하기</button>
+                                <button type="button" class="btn btn-secondary" id="reset-simple">초기화</button>
+                            </div>
+                        </form>
+
+                        <!-- 복리 입력 -->
+                        <form id="compound-interest-form" style="display:none;">
+                            <div class="form-group">
+                                <label for="compound-principal">원금 (만원)</label>
+                                <input type="number" id="compound-principal" min="0" step="10" placeholder="예: 1000">
+                            </div>
+                            <div class="form-group">
+                                <label for="compound-rate">연 이자율 (%)</label>
+                                <input type="number" id="compound-rate" min="0" step="0.1" placeholder="예: 3.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="compound-months">기간 (개월)</label>
+                                <input type="number" id="compound-months" min="1" step="1" placeholder="예: 36">
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-primary">계산하기</button>
+                                <button type="button" class="btn btn-secondary" id="reset-compound">초기화</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="result-section" id="savings-result" style="display:none;">
+                        <h3 class="result-title">계산 결과</h3>
+                        <div class="result-container">
+                            <div class="result-summary">
+                                <div class="result-item">
+                                    <span class="result-label">이자 총액</span>
+                                    <span class="result-value" id="savings-interest">-</span>
+                                </div>
+                                <div class="result-item highlight">
+                                    <span class="result-label">원리금 합계</span>
+                                    <span class="result-value" id="savings-total">-</span>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <h4>월별 원리금 변화</h4>
+                                <canvas id="savings-chart" width="800" height="400"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- 5. 대출 계산기 화면 (통합) -->
         <section id="loan-screen" class="screen calculator-screen">
             <div class="container">
@@ -842,6 +923,7 @@
     <script type="module" src="js/calculators/realEstate.js?v=202412191530"></script>
     <script type="module" src="js/calculators/loan.js?v=202412191530"></script>
     <script type="module" src="js/calculators/retirement.js?v=202412191530"></script>
+    <script type="module" src="js/calculators/savings.js?v=202412191530"></script>
     
     <!-- Chart -->
     <script type="module" src="js/chart.js?v=202412191530"></script>
