@@ -5,9 +5,11 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "sync": "node cronSync.js"
   },
   "dependencies": {
+    "node-fetch": "^3.3.2",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "morgan": "^1.10.0"
