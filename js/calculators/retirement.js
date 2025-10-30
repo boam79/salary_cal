@@ -416,5 +416,11 @@ document.addEventListener('DOMContentLoaded', () => {
     new RetirementCalculator();
 });
 
+// ES 모듈에서 onclick 핸들러가 동작하도록 전역에 노출
+// 안전하게 중복 할당을 피하면서 설정
+if (typeof window !== 'undefined') {
+    window.toggleCalculationSteps = window.toggleCalculationSteps || toggleCalculationSteps;
+}
+
 export default RetirementCalculator;
 
