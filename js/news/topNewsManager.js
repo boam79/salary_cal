@@ -9,6 +9,8 @@ const topNewsManager = (() => {
   };
 
   function qs(id) { return document.getElementById(id); }
+  function show(el) { if (el) el.style.display = 'block'; }
+  function hide(el) { if (el) el.style.display = 'none'; }
 
   async function init() {
     await load();
