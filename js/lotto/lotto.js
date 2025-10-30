@@ -24,6 +24,21 @@ function renderEmptyTickets() {
 
 const API_BASE = typeof window !== 'undefined' && window.LOTTO_API ? window.LOTTO_API : '';
 
+async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 600) {
+  let lastErr;
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url, options);
+      if (res.ok) return res;
+      lastErr = new Error(`http ${res.status}`);
+    } catch (e) {
+      lastErr = e;
+    }
+    await new Promise(r => setTimeout(r, delayMs * (i + 1)));
+  }
+  throw lastErr;
+}
+
 async function fetchStatsOrHistory() {
   // 1순위: 백엔드 통계
   try {
@@ -119,7 +134,7 @@ async function onGenerate() {
     try {
       const url = `${API_BASE}/lotto/generate?t=${Date.now()}`;
       console.log('[lotto] call /lotto/generate →', url);
-      const res = await fetch(url, { cache: 'no-store', mode: 'cors' });
+      const res = await fetchWithRetry(url, { cache: 'no-store', mode: 'cors' }, 3, 700);
       if (res.ok) {
         const data = await res.json();
         console.log('[lotto] /lotto/generate ok', data);
@@ -178,6 +193,8 @@ function resetLotto() {
 }
 
 function init() {
+  // 웜업: 백엔드 깨우기(무시 가능)
+  try { fetch(`${API_BASE}/health`, { cache: 'no-store' }); } catch (_) {}
   // 새로고침 시에는 항상 빈 용지로 시작(자동 복구 제거)
   try { localStorage.removeItem('lotto:last'); } catch (_) {}
   renderEmptyTickets();

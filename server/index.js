@@ -184,6 +184,24 @@ app.get('/lotto/stats', (req,res) => {
   }
 });
 
+// 헬스체크/웜업 엔드포인트
+app.get('/', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.json({ ok: true, service: 'lotto-backend', time: Date.now() });
+});
+
+app.get('/health', (req, res) => {
+  try {
+    ensureDataDir();
+    const stat = fs.existsSync(statsPath);
+    const hist = fs.existsSync(historyPath);
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({ ok: true, stats: stat, history: hist, time: Date.now() });
+  } catch (e) {
+    res.status(500).json({ ok: false });
+  }
+});
+
 app.post('/lotto/sync', (req,res) => {
   (async () => {
     if (ADMIN_KEY && req.header('X-ADMIN-KEY') !== ADMIN_KEY) {
