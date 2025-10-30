@@ -43,6 +43,7 @@ class NavigationManager {
         // 대상 화면 표시
         const targetScreen = this.screens.get(screenId);
         targetScreen.classList.add('active');
+        console.log(`✅ ${screenId} active 클래스 추가됨`);
         
         // 상태 업데이트
         AppState.setScreen(screenId);
@@ -59,9 +60,13 @@ class NavigationManager {
     
     // 모든 화면 숨기기
     hideAllScreens() {
-        this.screens.forEach(screen => {
+        console.log('🔄 모든 화면 숨기기 시작');
+        this.screens.forEach((screen, id) => {
+            const wasActive = screen.classList.contains('active');
             screen.classList.remove('active');
+            console.log(`  - ${id}: active=${wasActive} → false`);
         });
+        console.log('✅ 모든 화면 숨기기 완료');
     }
     
     // 화면별 초기화 작업
