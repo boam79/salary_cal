@@ -74,9 +74,9 @@ class StockIndices {
     getDummyIndices() {
         return {
             kospi: {
-                value: '2,850.23',
-                change: '+12.34',
-                changeRate: '+0.43%',
+                value: '4,100.52',
+                change: '+45.23',
+                changeRate: '+1.12%',
                 direction: 'up'
             },
             kosdaq: {
@@ -84,12 +84,6 @@ class StockIndices {
                 change: '-8.92',
                 changeRate: '-1.01%',
                 direction: 'down'
-            },
-            nasdaq: {
-                value: '15,863.45',
-                change: '+123.45',
-                changeRate: '+0.78%',
-                direction: 'up'
             }
         };
     }
@@ -108,19 +102,10 @@ class StockIndices {
         // 코스닥
         const kosdaqValue = document.getElementById('kosdaq-value');
         const kosdaqChange = document.getElementById('kosdaq-change');
-        if (kosdaqValue) kosdaqValue.textContent = indices.kosdaq.value;
-        if (kosdaqChange) {
+        if (kosdaqValue && indices.kosdaq) kosdaqValue.textContent = indices.kosdaq.value;
+        if (kosdaqChange && indices.kosdaq) {
             kosdaqChange.textContent = `${indices.kosdaq.change} (${indices.kosdaq.changeRate})`;
             kosdaqChange.className = `stock-change ${indices.kosdaq.direction}`;
-        }
-        
-        // 나스닥
-        const nasdaqValue = document.getElementById('nasdaq-value');
-        const nasdaqChange = document.getElementById('nasdaq-change');
-        if (nasdaqValue) nasdaqValue.textContent = indices.nasdaq.value;
-        if (nasdaqChange) {
-            nasdaqChange.textContent = `${indices.nasdaq.change} (${indices.nasdaq.changeRate})`;
-            nasdaqChange.className = `stock-change ${indices.nasdaq.direction}`;
         }
         
         // 업데이트 시간

@@ -111,9 +111,9 @@ async function getStockIndices() {
             
             if (!indices.kospi) {
                 indices.kospi = {
-                    value: (2800 + Math.sin(timeOffset / 100) * 50).toFixed(2),
-                    change: (Math.random() > 0.5 ? '+' : '-') + (Math.random() * 20).toFixed(2),
-                    changeRate: (Math.random() > 0.5 ? '+' : '-') + (Math.random() * 1).toFixed(2) + '%',
+                    value: (4100 + Math.sin(timeOffset / 100) * 50).toFixed(2),
+                    change: (Math.random() > 0.5 ? '+' : '-') + (Math.random() * 50).toFixed(2),
+                    changeRate: (Math.random() > 0.5 ? '+' : '-') + (Math.random() * 1.5).toFixed(2) + '%',
                     direction: Math.random() > 0.5 ? 'up' : 'down'
                 };
             }
@@ -127,17 +127,6 @@ async function getStockIndices() {
                 };
             }
         }
-        
-        // 나스닥은 더미 데이터 (KRX에 없음)
-        const now = new Date();
-        const timeOffset = now.getHours() * 60 + now.getMinutes();
-        
-        indices.nasdaq = {
-            value: (15800 + Math.sin(timeOffset / 80) * 200).toFixed(2),
-            change: (Math.random() > 0.5 ? '+' : '-') + (Math.random() * 150).toFixed(2),
-            changeRate: (Math.random() > 0.5 ? '+' : '-') + (Math.random() * 2).toFixed(2) + '%',
-            direction: Math.random() > 0.5 ? 'up' : 'down'
-        };
         
         return indices;
         
