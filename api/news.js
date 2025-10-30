@@ -71,7 +71,7 @@ export default async function handler(req, res) {
         ];
         
         const url = new URL(req.url, `http://${req.headers.host}`);
-        const top = Math.min(parseInt(url.searchParams.get('top') || '12', 10), 50);
+        const top = Math.min(parseInt(url.searchParams.get('top') || '30', 10), 50);
         const category = url.searchParams.get('category') || 'economy';
 
         // 수집
