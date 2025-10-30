@@ -248,6 +248,18 @@ function generateUniqueSet(numberFreq, existingComboKeys) {
   return arr;
 }
 
+function generateUniformUniqueSet(existingComboKeys) {
+  const chosen = new Set();
+  while (chosen.size < 6) {
+    const n = 1 + Math.floor(Math.random() * 45);
+    chosen.add(n);
+  }
+  const arr = Array.from(chosen).sort((a,b)=>a-b);
+  const key = buildComboKey(arr);
+  if (existingComboKeys.has(key)) return null;
+  return arr;
+}
+
 app.get('/lotto/generate', (req,res) => {
   try {
     ensureDataDir();
@@ -278,7 +290,8 @@ app.get('/lotto/generate', (req,res) => {
     }
     const result = [];
     let tries = 0;
-    while (result.length < 10 && tries < 1000) {
+    // 1차: 가중치 기반
+    while (result.length < 10 && tries < 2000) {
       const set = generateUniqueSet(numberFreq || [], existing);
       if (set) {
         result.push(set);
@@ -286,8 +299,18 @@ app.get('/lotto/generate', (req,res) => {
       }
       tries++;
     }
+    // 2차 보완: 부족하면 균등 무작위로 채움(여전히 과거 조합 제외)
+    let tries2 = 0;
+    while (result.length < 10 && tries2 < 2000) {
+      const set = generateUniformUniqueSet(existing);
+      if (set) {
+        result.push(set);
+        existing.add(buildComboKey(set));
+      }
+      tries2++;
+    }
     res.setHeader('Cache-Control', 'no-store, max-age=0');
-    res.json({ generated: result, updatedAt: stats.updatedAt, total: history.length, seed: Date.now() });
+    res.json({ generated: result, count: result.length, updatedAt: stats.updatedAt, total: history.length, seed: Date.now() });
   } catch (e) {
     console.error('[lotto-backend] generate error', e);
     res.status(500).json({ error: 'generate_error' });
