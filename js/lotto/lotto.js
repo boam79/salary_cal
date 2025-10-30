@@ -22,10 +22,12 @@ function renderEmptyTickets() {
   }
 }
 
+const API_BASE = typeof window !== 'undefined' && window.LOTTO_API ? window.LOTTO_API : '';
+
 async function fetchStatsOrHistory() {
   // 1순위: 백엔드 통계
   try {
-    const res = await fetch('/lotto/stats', { cache: 'no-cache' });
+    const res = await fetch(`${API_BASE}/lotto/stats`, { cache: 'no-cache' });
     if (res.ok) {
       const data = await res.json();
       return { type: 'stats', data };
@@ -98,7 +100,7 @@ function renderTicketsWithCombos(combos, meta) {
 async function onGenerate() {
   try {
     // 옵션: 사전 동기화 시도
-    try { await fetch('/lotto/sync', { method: 'POST' }); } catch (_) {}
+    try { await fetch(`${API_BASE}/lotto/sync`, { method: 'POST' }); } catch (_) {}
     const { type, data } = await fetchStatsOrHistory();
     let combos = [];
     let metaText = '';
