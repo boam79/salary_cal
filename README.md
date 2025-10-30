@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA 금융 계산기
 
-[![Version](https://img.shields.io/badge/version-4.2.0-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.2.0)
+[![Version](https://img.shields.io/badge/version-4.3.0-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.3.0)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
@@ -489,6 +489,30 @@ P: 대출원금, r: 월 이자율, n: 총 상환개월 수
 
 ## 📝 업데이트 내역
 
+### v4.3.0 (2025-10-30) - 적금/예금 고도화 · 자동차 취득세 계산기 🚗
+
+#### ✨ 새로운 기능
+1. **적금/예금 계산기 고도화**
+   - 월 적립식(말기불) 추가: 월 납입액·이자율·개월 입력 → 미래가치 계산
+   - 이자소득세 15.4% 반영, 세후 실수령액 표시
+   - 계산 과정 상세 표시(수식/단계), 월별 원리금 그래프
+   - 탭 전환·입력 검증·접근성(A11y) 개선
+
+2. **자동차 취득세 계산기**
+   - 차량 유형별 세율 적용(승용/영업용/이륜/하이브리드/전기)
+   - 취득세 + 지방교육세(취득세의 30%) 산출, 합계 및 계산 과정 표시
+   - 세율은 `config/rates.json`의 `vehicleAcquisition`을 참조하여 관리
+
+#### 🛠 변경사항
+- 푸터: `config/rates.json`의 `lastUpdated`를 자동 표기
+- 안내 문구 정리(자동 반영 문구 제거)
+
+#### 📁 파일
+- `index.html` - 화면/네비게이션/스크립트 참조 추가
+- `js/calculators/savings.js` - 적금/예금 계산기 고도화
+- `js/calculators/carAcquisition.js` - 자동차 취득세 계산기 (신규)
+- `config/rates.json` - `vehicleAcquisition` 세율 섹션 추가
+
 ### v4.2.0 (2025-10-30) - UI 개선 및 주식지수 제거 🎨
 
 #### ✨ 새로운 기능
@@ -927,6 +951,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참조
 
 | 버전 | 날짜 | 주요 변경사항 | 상태 |
 |------|------|--------------|------|
+| v4.3.0 | 2025-10-30 | 💰 적금/예금 고도화, 🚗 자동차 취득세 계산기 | ✅ 완료 |
 | v4.2.0 | 2025-10-30 | 🎨 메인 타이틀 변경, 로고 새로고침, 주식지수 제거 | ✅ 완료 |
 | v4.1.0 | 2025-10-30 | 📰 경제 뉴스 섹션 추가, RSS 피드 연동 | ✅ 완료 |
 | v4.0.3 | 2025-10-29 | 🐛 Critical Bug Fix - window 접두사 70+ 개 수정 | ✅ 완료 |
@@ -940,7 +965,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참조
 ---
 
 **Last Updated**: 2025-10-30
-**Version**: 4.2.0
+**Version**: 4.3.0
 **Status**: ✅ Production Ready
 
 ---
