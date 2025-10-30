@@ -4,6 +4,7 @@
 
 class SavingsCalculator {
   constructor() {
+    this.taxRate = 0.154; // 이자소득세 15.4%
     this.init();
   }
 
@@ -49,8 +50,11 @@ class SavingsCalculator {
         if (!this.validate(principal, rate, months)) return;
         const interest = principal * rate * (months / 12);
         const total = principal + interest;
-        this.showResult(interest, total);
+        const tax = interest * this.taxRate;
+        const net = total - tax;
+        this.showResult(interest, total, tax, net);
         this.drawChart(principal, rate, months, false);
+        this.showSteps({ principal, rate, months, interest, total, tax, net, isCompound: false });
       });
       const reset = document.getElementById('reset-simple');
       if (reset) reset.addEventListener('click', () => this.reset());
@@ -65,8 +69,11 @@ class SavingsCalculator {
         if (!this.validate(principal, rate, months)) return;
         const total = principal * Math.pow(1 + rate / 12, months);
         const interest = total - principal;
-        this.showResult(interest, total);
+        const tax = interest * this.taxRate;
+        const net = total - tax;
+        this.showResult(interest, total, tax, net);
         this.drawChart(principal, rate, months, true);
+        this.showSteps({ principal, rate, months, interest, total, tax, net, isCompound: true });
       });
       const reset = document.getElementById('reset-compound');
       if (reset) reset.addEventListener('click', () => this.reset());
@@ -81,10 +88,12 @@ class SavingsCalculator {
     return true;
   }
 
-  showResult(interest, total) {
+  showResult(interest, total, tax, net) {
     const result = document.getElementById('savings-result');
     document.getElementById('savings-interest').textContent = window.formatCurrency(interest);
     document.getElementById('savings-total').textContent = window.formatCurrency(total);
+    document.getElementById('savings-tax').textContent = window.formatCurrency(tax);
+    document.getElementById('savings-net').textContent = window.formatCurrency(net);
     if (result) {
       result.style.display = 'block';
       result.scrollIntoView({ behavior: 'smooth' });
@@ -144,6 +153,52 @@ class SavingsCalculator {
       else ctx.lineTo(x, y);
     });
     ctx.stroke();
+  }
+
+  showSteps({ principal, rate, months, interest, total, tax, net, isCompound }) {
+    const steps = document.getElementById('savings-steps');
+    if (!steps) return;
+    const principalStr = window.formatCurrency(principal);
+    const rateStr = (rate * 100).toFixed(2) + '%';
+
+    const formula = isCompound
+      ? `${principalStr} × (1 + ${rateStr} / 12)^${months}`
+      : `${principalStr} + ${principalStr} × ${rateStr} × (${months}/12)`;
+
+    steps.innerHTML = `
+      <div class="step-item">
+        <h4>1. 입력값</h4>
+        <p>원금: ${principalStr}</p>
+        <p>연 이자율: ${rateStr}</p>
+        <p>기간: ${months}개월</p>
+      </div>
+      <div class="step-item">
+        <h4>2. 원리금 계산</h4>
+        <p>계산식: ${formula}</p>
+        <p><strong>원리금 합계 = ${window.formatCurrency(total)}</strong></p>
+      </div>
+      <div class="step-item">
+        <h4>3. 이자 계산</h4>
+        <p><strong>이자 = ${window.formatCurrency(interest)}</strong></p>
+      </div>
+      <div class="step-item">
+        <h4>4. 이자소득세</h4>
+        <p>세율: 15.4%</p>
+        <p><strong>세액 = ${window.formatCurrency(tax)}</strong></p>
+      </div>
+      <div class="step-item">
+        <h4>5. 실수령액</h4>
+        <p>계산식: 원리금 합계 - 세액</p>
+        <p><strong>실수령액 = ${window.formatCurrency(net)}</strong></p>
+      </div>
+    `;
+  }
+
+  reset() {
+    const result = document.getElementById('savings-result');
+    if (result) result.style.display = 'none';
+    const canvas = document.getElementById('savings-chart');
+    if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
   }
 }
 
