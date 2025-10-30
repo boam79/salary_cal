@@ -9,7 +9,14 @@ const PORT = process.env.PORT || 8080;
 const ADMIN_KEY = process.env.ADMIN_KEY || '';
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-app.use(cors());
+const corsOptions = {
+  origin: ['https://salary-cal.vercel.app', 'http://localhost:3000'],
+  methods: ['GET','POST','OPTIONS'],
+  allowedHeaders: ['Content-Type','X-ADMIN-KEY'],
+  credentials: false
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
 
