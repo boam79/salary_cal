@@ -122,7 +122,19 @@ function rankAndSelect(items, top) {
         scored.push({ ...it, score });
     }
     scored.sort((a,b) => b.score - a.score);
-    return scored.slice(0, top);
+    // 소스 다양성 보정: 소스당 최대 5개
+    const cap = 5;
+    const perSource = Object.create(null);
+    const out = [];
+    for (const it of scored) {
+        const src = it.source || 'unknown';
+        perSource[src] = (perSource[src] || 0) + 1;
+        if (perSource[src] <= cap) {
+            out.push(it);
+            if (out.length >= top) break;
+        }
+    }
+    return out;
 }
 
 // RSS 피드에서 뉴스 가져오기
@@ -179,7 +191,7 @@ function parseRSSFeed(xmlText, source) {
                 const link = extractTag(itemXml, 'link') || extractTag(itemXml, 'atom:link');
                 const description = extractTag(itemXml, 'description') || extractTag(itemXml, 'atom:summary') || extractTag(itemXml, 'atom:content');
                 const pubDate = extractTag(itemXml, 'pubDate') || extractTag(itemXml, 'atom:published') || extractTag(itemXml, 'atom:updated');
-                const category = extractTag(itemXml, 'category') || extractTag(itemXml, 'atom:category') || '경제';
+                const category = extractTag(itemXml, 'category') || extractTag(itemXml, 'atom:category') || '종합';
                 
                 // 이미지 추출 시도 (여러 패턴 시도)
                 let image = null;
