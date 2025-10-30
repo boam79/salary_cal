@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import fs from 'fs';
 import path from 'path';
+import cheerio from 'cheerio';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -72,6 +73,51 @@ async function fetchRound(round) {
   return { round: j.drwNo, date: j.drwNoDate, numbers };
 }
 
+async function fetchRoundHtml(round) {
+  // round=0 또는 undefined이면 최신 회차 페이지에서 추출
+  const url = round
+    ? `https://www.dhlottery.co.kr/gameResult.do?method=byWin&drwNo=${round}`
+    : `https://www.dhlottery.co.kr/gameResult.do?method=byWin`;
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Referer': 'https://www.dhlottery.co.kr/common.do?method=main',
+      'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
+    }
+  });
+  if (!res.ok) return null;
+  const html = await res.text();
+  const $ = cheerio.load(html);
+  // 회차 파싱: 페이지 내 "제 xxxx회" 또는 input[name=drwNo]
+  let parsedRound = round;
+  const titleText = $('div.win_result h4 strong').text() || $('h4').text() || $('title').text();
+  const m = titleText.match(/([0-9]{3,5})\s*회/);
+  if ((!parsedRound || parsedRound === 0) && m) parsedRound = parseInt(m[1], 10);
+  const inputVal = $('input[name="drwNo"]').val();
+  if ((!parsedRound || parsedRound === 0) && inputVal) parsedRound = parseInt(inputVal, 10);
+  // 번호 파싱: 공통 클래스(ball) 기반 선택자들 시도
+  let nums = [];
+  $('span.ball_645, .win_result .num .ball, .lotto_win_number .ball').each((_, el) => {
+    const t = $(el).text().trim();
+    const n = parseInt(t, 10);
+    if (!isNaN(n)) nums.push(n);
+  });
+  if (nums.length < 6) {
+    // fallback: 모든 숫자 추출 후 1~45 범위 6개만 선택
+    const texts = $('body').text();
+    const all = (texts.match(/\b([1-9]|[1-3][0-9]|4[0-5])\b/g) || []).map(s=>parseInt(s,10));
+    nums = all.slice(0,6);
+  }
+  nums = nums.slice(0,6);
+  if (!parsedRound || nums.length !== 6) return null;
+  return { round: parsedRound, date: '', numbers: nums };
+}
+
+async function fetchLatestRoundHtml() {
+  const item = await fetchRoundHtml(0);
+  return item?.round || 0;
+}
+
 function readHistory() {
   try {
     const raw = fs.readFileSync(historyPath, 'utf8');
@@ -91,20 +137,23 @@ async function syncHistory() {
   const seen = new Set(history.map(h => h.round));
   let maxRound = 0;
   history.forEach(h => { if (h.round > maxRound) maxRound = h.round; });
-  let round = maxRound + 1;
   let added = 0;
-  // 선형 증가로 최신 회차까지 수집(주 1회라 비용 낮음)
-  while (true) {
-    const item = await fetchRound(round);
-    if (!item) break;
-    if (!seen.has(item.round)) {
-      history.push(item);
-      seen.add(item.round);
-      added++;
+  // 최신 회차 파악(HTML 기준)
+  const latest = await fetchLatestRoundHtml();
+  if (latest && latest > maxRound) {
+    for (let r = latest; r > maxRound; r--) {
+      let item = await fetchRound(r);
+      if (!item) {
+        item = await fetchRoundHtml(r);
+      }
+      if (item && !seen.has(item.round)) {
+        history.push(item);
+        seen.add(item.round);
+        added++;
+      }
+      if (added > 1000) break; // 안전 가드
+      await new Promise(res=>setTimeout(res, 300 + Math.random()*300));
     }
-    round++;
-    // 안전 가드: 과도한 루프 방지
-    if (added > 3000) break;
   }
   if (added > 0) {
     // 라운드 정렬
