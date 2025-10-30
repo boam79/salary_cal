@@ -117,13 +117,18 @@ async function onGenerate() {
     let combos = [];
     let metaText = '';
     try {
-      const res = await fetch(`${API_BASE}/lotto/generate?t=${Date.now()}`, { cache: 'no-store' });
+      const url = `${API_BASE}/lotto/generate?t=${Date.now()}`;
+      console.log('[lotto] call /lotto/generate →', url);
+      const res = await fetch(url, { cache: 'no-store', mode: 'cors' });
       if (res.ok) {
         const data = await res.json();
+        console.log('[lotto] /lotto/generate ok', data);
         if (Array.isArray(data.generated)) {
           combos = data.generated;
           metaText = `total=${data.total}`;
         }
+      } else {
+        console.warn('[lotto] /lotto/generate http', res.status);
       }
     } catch (e) {
       console.warn('[lotto] /lotto/generate error', e);
@@ -133,10 +138,10 @@ async function onGenerate() {
       const { type, data } = await fetchStatsOrHistory();
       if (type === 'stats' && data && Array.isArray(data.topCombos)) {
         combos = data.topCombos.slice(0, LOTTO_SETS).map(k => k.split('-').map(n=>parseInt(n,10)));
-        metaText = data.meta || '';
+        metaText = (data.meta || '') + ' · 백엔드 생성 실패 폴백';
       } else if (type === 'history' && Array.isArray(data)) {
         combos = getTopCombosFromHistory(data, LOTTO_SETS);
-        metaText = '로컬 스냅샷 기준';
+        metaText = '로컬 스냅샷 기준(백엔드 생성 실패)';
       } else {
         metaText = '데이터를 불러오지 못했습니다.';
         if (window.ErrorLogger?.log) {
