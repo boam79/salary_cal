@@ -151,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 전역 접근을 위한 window 객체에 할당
 window.FinancialCalculatorApp = app;
+window.navigationManager = navigationManager;
 
 // 모듈 내보내기
 export default app;
