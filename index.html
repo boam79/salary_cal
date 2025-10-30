@@ -132,6 +132,10 @@
                         <span class="nav-icon">📋</span>
                         <span class="nav-label">세금</span>
                     </div>
+                    <div class="nav-item" data-screen="vat-screen">
+                        <span class="nav-icon">🧾</span>
+                        <span class="nav-label">부가세</span>
+                    </div>
                     <div class="nav-item" data-screen="real-estate-screen">
                         <span class="nav-icon">🏢</span>
                         <span class="nav-label">부동산</span>
@@ -766,6 +770,66 @@
             </div>
         </section>
 
+        <!-- 9. 부가세 계산기 화면 -->
+        <section id="vat-screen" class="screen calculator-screen">
+            <div class="container">
+                <button class="back-button">← 홈으로</button>
+                <h2 class="screen-title">🧾 부가세 계산기</h2>
+                <div class="calculator-content">
+                    <div class="input-section">
+                        <form id="vat-form">
+                            <div class="form-group">
+                                <label for="vat-direction">계산 방향</label>
+                                <select id="vat-direction" required>
+                                    <option value="supplyToTotal">공급가액 → 총액(부가세 포함)</option>
+                                    <option value="totalToSupply">총액(부가세 포함) → 공급가액</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vat-type">과세 유형</label>
+                                <select id="vat-type" required>
+                                    <option value="standard">표준과세 (10%)</option>
+                                    <option value="zero">영세율 (0%)</option>
+                                    <option value="exempt">면세 (0%)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vat-amount">금액 (만원)</label>
+                                <input type="number" id="vat-amount" min="0" step="1" placeholder="예: 100" required>
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-primary">계산하기</button>
+                                <button type="button" class="btn btn-secondary" id="reset-vat">초기화</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="result-section" id="vat-result" style="display:none;">
+                        <h3 class="result-title">계산 결과</h3>
+                        <div class="result-container">
+                            <div class="result-summary">
+                                <div class="result-item">
+                                    <span class="result-label">공급가액</span>
+                                    <span class="result-value" id="vat-supply">-</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">부가가치세</span>
+                                    <span class="result-value" id="vat-tax">-</span>
+                                </div>
+                                <div class="result-item highlight">
+                                    <span class="result-label">총액(부가세포함)</span>
+                                    <span class="result-value" id="vat-total">-</span>
+                                </div>
+                            </div>
+                            <div class="calculation-steps">
+                                <button class="toggle-steps" onclick="toggleCalculationSteps(this, 'vat')">▼ 계산 과정 보기</button>
+                                <div class="steps-content" id="vat-steps" style="display:none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- 8. 자동차 취등록세 계산기 화면 -->
         <section id="car-acq-screen" class="screen calculator-screen">
             <div class="container">
@@ -1015,6 +1079,7 @@
     <script type="module" src="js/calculators/retirement.js?v=202412191530"></script>
     <script type="module" src="js/calculators/savings.js?v=202412191530"></script>
     <script type="module" src="js/calculators/carAcquisition.js?v=202412191530"></script>
+    <script type="module" src="js/calculators/vat.js?v=202412191530"></script>
     
     <!-- Chart -->
     <script type="module" src="js/chart.js?v=202412191530"></script>

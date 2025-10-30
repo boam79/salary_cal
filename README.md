@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA 금융 계산기
 
-[![Version](https://img.shields.io/badge/version-4.3.1-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.3.1)
+[![Version](https://img.shields.io/badge/version-4.3.2-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.3.2)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
@@ -505,6 +505,22 @@ P: 대출원금, r: 월 이자율, n: 총 상환개월 수
 
 ## 📝 업데이트 내역
 
+### v4.3.2 (2025-10-30) - 🧾 부가세 계산기 추가
+
+#### ✨ 새로운 기능
+- 별도 화면 `부가세 계산기` 추가 (사이드바 네비게이션 포함)
+- 계산 방향 지원: 공급가액 → 총액, 총액(부가세 포함) → 공급가액
+- 과세 유형: 표준과세(10%), 영세율(0%), 면세(0%)
+- 계산 과정 단계별 설명 표시
+- 세율은 `config/rates.json`의 `vat` 섹션에서 로드 (최신 기준)
+
+#### 📁 파일
+- `index.html` - 부가세 화면/네비 추가, 스크립트 로드
+- `js/calculators/vat.js` - 신규 모듈
+- `config/rates.json` - `vat` 섹션 추가, `lastUpdated` 2025-10-30로 갱신
+
+---
+
 ### v4.3.1 (2025-10-30) - 종합뉴스 UI/로직 업데이트 🗞️
 
 #### ✨ 변경사항
@@ -984,6 +1000,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참조
 
 | 버전 | 날짜 | 주요 변경사항 | 상태 |
 |------|------|--------------|------|
+| v4.3.2 | 2025-10-30 | 🧾 부가세 계산기 추가, 세율 설정 갱신 | ✅ 완료 |
 | v4.3.1 | 2025-10-30 | 🗞️ 종합뉴스(카드·5열·30개·랭킹) 업데이트 | ✅ 완료 |
 | v4.3.0 | 2025-10-30 | 💰 적금/예금 고도화, 🚗 자동차 취득세 계산기 | ✅ 완료 |
 | v4.2.0 | 2025-10-30 | 🎨 메인 타이틀 변경, 로고 새로고침, 주식지수 제거 | ✅ 완료 |
@@ -999,7 +1016,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참조
 ---
 
 **Last Updated**: 2025-10-30
-**Version**: 4.3.1
+**Version**: 4.3.2
 **Status**: ✅ Production Ready
 
 ---

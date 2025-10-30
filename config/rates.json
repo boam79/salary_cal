@@ -1,6 +1,6 @@
 {
   "version": "3.0.0",
-  "lastUpdated": "2025-10-15",
+  "lastUpdated": "2025-10-30",
   "updateHistory": [
     {
       "date": "2024-10-14",
@@ -15,6 +15,11 @@
       "changes": "2025년 10월 기준 세율 검토 및 업데이트 - 장기요양보험료율 12.81% → 12.27% 변경"
     }
   ],
+  "vat": {
+    "standard": 0.10,
+    "zero": 0.0,
+    "note": "대한민국 일반 부가가치세율은 10%. 영세율/면세는 0% 적용."
+  },
   "incomeTax": {
     "brackets": [
       { "max": 12000000, "rate": 0.06, "deduction": 0 },
