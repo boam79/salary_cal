@@ -69,7 +69,12 @@ class NewsManager {
             }
             
         } catch (error) {
-            console.error('❌ API에서 뉴스 가져오기 실패:', error);
+            // 에러 로깅
+            if (window.ErrorLogger) {
+                window.ErrorLogger.log(error, '뉴스 API 호출 실패');
+            } else {
+                console.error('❌ API에서 뉴스 가져오기 실패:', error);
+            }
             
             // API 실패 시 더미 데이터 반환
             console.log('⚠️ 더미 데이터 사용');
@@ -170,11 +175,12 @@ class NewsManager {
     
     // 뉴스 카드 생성
     createNewsCard(news) {
-        const card = document.createElement('div');
+        // 링크 태그로 전체 카드를 감싸기
+        const card = document.createElement('a');
         card.className = 'news-card';
-        card.addEventListener('click', () => {
-            window.open(news.link, '_blank');
-        });
+        card.href = news.link || '#';
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
         
         const categoryMap = {
             '경제': '💼',
@@ -182,20 +188,23 @@ class NewsManager {
             '금융': '🏦',
             '세금': '📋',
             '연금': '👴',
-            '정책': '📜'
+            '정책': '📜',
+            '증권': '📈',
+            'AI': '🤖',
+            '반도체': '🔌',
+            'IT': '💻'
         };
         
         // 이미지가 있으면 썸네일 추가
         const imageHtml = this.hasImage(news) 
             ? `<div class="news-card-image">
-                <img src="${news.image}" alt="${news.title}" loading="lazy" onerror="this.style.display='none'">
+                <img src="${news.image}" alt="${news.title || '뉴스 이미지'}" loading="lazy" onerror="this.style.display='none'">
                </div>`
             : '';
         
         // 디버깅: 실제 렌더링 데이터 확인
         console.log('Rendering news card:', {
             title: news.title,
-            description: news.description ? news.description.substring(0, 30) : 'NO DESCRIPTION',
             source: news.source,
             link: news.link
         });
@@ -207,12 +216,9 @@ class NewsManager {
             </div>
             ${imageHtml}
             <h3 class="news-card-title">${news.title || '제목 없음'}</h3>
-            <p class="news-card-description">${news.description || '설명 없음'}</p>
             <div class="news-card-footer">
                 <span class="news-card-tag">${categoryMap[news.category] || '📰'} ${news.category || '기타'}</span>
-                <span class="news-card-link">
-                    전체보기 →
-                </span>
+                <span class="news-card-link">전체보기 →</span>
             </div>
         `;
         
