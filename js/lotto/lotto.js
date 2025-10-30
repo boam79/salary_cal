@@ -128,6 +128,13 @@ function restoreLast() {
   } catch (_) {}
 }
 
+function resetLotto() {
+  try { localStorage.removeItem('lotto:last'); } catch (_) {}
+  renderEmptyTickets();
+  const metaEl = document.getElementById('lotto-meta');
+  if (metaEl) metaEl.textContent = '';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderEmptyTickets();
   restoreLast();
@@ -135,6 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (genBtn) genBtn.addEventListener('click', onGenerate);
   const printBtn = document.getElementById('lotto-print');
   if (printBtn) printBtn.addEventListener('click', () => window.print());
+  const resetBtn = document.getElementById('lotto-reset');
+  if (resetBtn) resetBtn.addEventListener('click', resetLotto);
 });
 
 export {};
