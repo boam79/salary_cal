@@ -293,13 +293,14 @@ class RetirementCalculator {
                 <h4>2. 퇴직금 계산</h4>
                 <p>평균임금: ${window.formatCurrency(avgSalaryWon)}</p>
                 <p>계산식: 평균임금 × 30일 × 근속년수</p>
-                <p>계산: ${window.formatCurrency(avgSalaryWon)} × 30 × ${years.toFixed(2)}</p>
+                <p>계산: ${window.formatCurrency(avgSalaryWon)} × 30 × ${tenureYears.toFixed(4)}</p>
                 <p><strong>퇴직금 = ${window.formatCurrency(retirementPay)}</strong></p>
             </div>
             
             <div class="step-item">
                 <h4>3. 퇴직소득세 계산</h4>
                 <p>퇴직금 구간: ${this.getTaxBracket(retirementPay)}</p>
+                <p>세율 적용: ${window.formatCurrency(retirementPay)} × ${this.getTaxRate(retirementPay)}% - ${window.formatCurrency(this.getTaxDeduction(retirementPay))}</p>
                 <p><strong>퇴직소득세 = ${window.formatCurrency(retirementTax)}</strong></p>
             </div>
             
@@ -313,14 +314,57 @@ class RetirementCalculator {
     }
 
     getTaxBracket(retirementPay) {
-        if (retirementPay <= 12000000) return '1,200만원 이하 (세율: 0%)';
-        if (retirementPay <= 46000000) return '1,200만원 ~ 4,600만원 (세율: 15%)';
-        if (retirementPay <= 88000000) return '4,600만원 ~ 8,800만원 (세율: 24%)';
-        if (retirementPay <= 150000000) return '8,800만원 ~ 1.5억 (세율: 35%)';
-        if (retirementPay <= 300000000) return '1.5억 ~ 3억 (세율: 38%)';
-        if (retirementPay <= 500000000) return '3억 ~ 5억 (세율: 40%)';
-        if (retirementPay <= 1000000000) return '5억 ~ 10억 (세율: 42%)';
+        // 퇴직금을 천원 단위로 변환 (매 단위당)
+        const payInThousand = retirementPay / 1000;
+        
+        if (payInThousand <= 12000) return '1,200만원 이하 (세율: 0%)';
+        if (payInThousand <= 46000) return '1,200만원 ~ 4,600만원 (세율: 15%)';
+        if (payInThousand <= 88000) return '4,600만원 ~ 8,800만원 (세율: 24%)';
+        if (payInThousand <= 150000) return '8,800만원 ~ 1.5억 (세율: 35%)';
+        if (payInThousand <= 300000) return '1.5억 ~ 3억 (세율: 38%)';
+        if (payInThousand <= 500000) return '3억 ~ 5억 (세율: 40%)';
+        if (payInThousand <= 1000000) return '5억 ~ 10억 (세율: 42%)';
         return '10억 초과 (세율: 45%)';
+    }
+
+    getTaxRate(retirementPay) {
+        const taxBrackets = [
+            { min: 0, max: 12000000, rate: 0 },
+            { min: 12000000, max: 46000000, rate: 15 },
+            { min: 46000000, max: 88000000, rate: 24 },
+            { min: 88000000, max: 150000000, rate: 35 },
+            { min: 150000000, max: 300000000, rate: 38 },
+            { min: 300000000, max: 500000000, rate: 40 },
+            { min: 500000000, max: 1000000000, rate: 42 },
+            { min: 1000000000, max: Infinity, rate: 45 }
+        ];
+
+        for (const bracket of taxBrackets) {
+            if (retirementPay > bracket.min && retirementPay <= bracket.max) {
+                return bracket.rate;
+            }
+        }
+        return 0;
+    }
+
+    getTaxDeduction(retirementPay) {
+        const taxBrackets = [
+            { min: 0, max: 12000000, deduction: 0 },
+            { min: 12000000, max: 46000000, deduction: 1080000 },
+            { min: 46000000, max: 88000000, deduction: 5220000 },
+            { min: 88000000, max: 150000000, deduction: 14900000 },
+            { min: 150000000, max: 300000000, deduction: 19400000 },
+            { min: 300000000, max: 500000000, deduction: 25400000 },
+            { min: 500000000, max: 1000000000, deduction: 35400000 },
+            { min: 1000000000, max: Infinity, deduction: 65400000 }
+        ];
+
+        for (const bracket of taxBrackets) {
+            if (retirementPay > bracket.min && retirementPay <= bracket.max) {
+                return bracket.deduction;
+            }
+        }
+        return 0;
     }
 
     reset() {
