@@ -127,15 +127,23 @@ function parseRSSFeed(xmlText, source) {
         const itemRegex = /<item>(.*?)<\/item>/gs;
         const items = [...xmlText.matchAll(itemRegex)];
         
+        console.log(`📰 RSS 피드 파싱: ${items.length}개 항목 발견 (${source.name})`);
+        
+        // 디버깅: 첫 번째 item 샘플
+        if (items.length > 0) {
+            console.log('📰 첫 번째 item 샘플:', items[0][1].substring(0, 500));
+        }
+        
         for (const match of items) {
             const itemXml = match[1];
             
             try {
-                const title = extractTag(itemXml, 'title');
-                const link = extractTag(itemXml, 'link');
-                const description = extractTag(itemXml, 'description');
-                const pubDate = extractTag(itemXml, 'pubDate');
-                const category = extractTag(itemXml, 'category') || '경제';
+                // RSS 2.0과 Atom 피드 모두 지원
+                const title = extractTag(itemXml, 'title') || extractTag(itemXml, 'atom:title');
+                const link = extractTag(itemXml, 'link') || extractTag(itemXml, 'atom:link');
+                const description = extractTag(itemXml, 'description') || extractTag(itemXml, 'atom:summary') || extractTag(itemXml, 'atom:content');
+                const pubDate = extractTag(itemXml, 'pubDate') || extractTag(itemXml, 'atom:published') || extractTag(itemXml, 'atom:updated');
+                const category = extractTag(itemXml, 'category') || extractTag(itemXml, 'atom:category') || '경제';
                 
                 // 이미지 추출 시도 (여러 패턴 시도)
                 let image = null;
@@ -205,9 +213,24 @@ function parseRSSFeed(xmlText, source) {
 
 // XML 태그 내용 추출
 function extractTag(xml, tagName) {
+    // 1. CDATA 섹션이 있는 경우
+    const cdataRegex = new RegExp(`<${tagName}>\\s*<!\\[CDATA\\[(.*?)\\]\\]>\\s*<\/${tagName}>`, 'i');
+    const cdataMatch = xml.match(cdataRegex);
+    if (cdataMatch) {
+        return cdataMatch[1].trim();
+    }
+    
+    // 2. 일반 태그
     const regex = new RegExp(`<${tagName}>([\\s\\S]*?)<\/${tagName}>`, 'i');
     const match = xml.match(regex);
-    return match ? match[1].trim() : '';
+    const content = match ? match[1].trim() : '';
+    
+    // 3. 디버깅: 빈 값인 경우 로그
+    if (tagName === 'title' && !content) {
+        console.warn('⚠️ title이 빈 값입니다. XML 샘플:', xml.substring(0, 500));
+    }
+    
+    return content;
 }
 
 // HTML 태그 제거
