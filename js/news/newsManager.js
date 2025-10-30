@@ -205,22 +205,45 @@ class NewsManager {
         // 디버깅: 실제 렌더링 데이터 확인
         console.log('Rendering news card:', {
             title: news.title,
+            titleLength: news.title ? news.title.length : 0,
+            hasTitle: !!news.title,
             source: news.source,
             link: news.link
         });
         
+        // title이 없으면 에러 로깅
+        if (!news.title) {
+            console.error('⚠️ 제목이 없는 뉴스:', news);
+            if (window.ErrorLogger) {
+                window.ErrorLogger.log(new Error('제목 없음'), `뉴스 제목 누락: ${JSON.stringify(news)}`);
+            }
+        }
+        
+        const title = news.title || '제목 없음';
+        const source = news.source || 'Unknown';
+        const category = news.category || '기타';
+        const date = this.formatDate(news.date);
+        
         card.innerHTML = `
             <div class="news-card-header">
-                <span class="news-card-source">${news.source || 'Unknown'}</span>
-                <span class="news-card-date">${this.formatDate(news.date)}</span>
+                <span class="news-card-source">${source}</span>
+                <span class="news-card-date">${date}</span>
             </div>
             ${imageHtml}
-            <h3 class="news-card-title">${news.title || '제목 없음'}</h3>
+            <h3 class="news-card-title">${title}</h3>
             <div class="news-card-footer">
-                <span class="news-card-tag">${categoryMap[news.category] || '📰'} ${news.category || '기타'}</span>
+                <span class="news-card-tag">${categoryMap[category] || '📰'} ${category}</span>
                 <span class="news-card-link">전체보기 →</span>
             </div>
         `;
+        
+        // 렌더링 후 확인
+        const titleElement = card.querySelector('.news-card-title');
+        console.log('Title element:', {
+            exists: !!titleElement,
+            innerHTML: titleElement ? titleElement.innerHTML : 'null',
+            computedStyle: titleElement ? window.getComputedStyle(titleElement).display : 'null'
+        });
         
         return card;
     }
