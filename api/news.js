@@ -14,23 +14,47 @@ export default async function handler(req, res) {
     }
     
     try {
-        // 여러 RSS 피드 소스 (한국 경제 뉴스)
+        // 여러 RSS 피드 소스 (증권, 경제, AI, 반도체 중점)
         const rssSources = [
+            // 증권 뉴스
+            {
+                name: '한국경제 증권',
+                url: 'https://www.hankyung.com/rss/stock.xml'
+            },
+            {
+                name: '매일경제 증권',
+                url: 'https://www.mk.co.kr/rss/30000001/'
+            },
+            {
+                name: '머니투데이 증권',
+                url: 'https://www.mt.co.kr/rss/50000001/'
+            },
+            // 경제 뉴스
             {
                 name: '연합뉴스 경제',
                 url: 'https://www.yna.co.kr/rss/economy.xml'
             },
             {
-                name: '뉴시스 경제',
-                url: 'https://www.newsis.com/rss/cate.xml?cate=ECON'
+                name: '한국경제 경제',
+                url: 'https://www.hankyung.com/rss/economy.xml'
+            },
+            // IT/AI 뉴스
+            {
+                name: 'ZDNet AI',
+                url: 'https://www.zdnet.co.kr/rss/all.xml'
             },
             {
-                name: '매일경제',
-                url: 'https://www.mk.co.kr/rss/30000041/'
+                name: 'ITWorld AI',
+                url: 'https://www.itworld.co.kr/rss/ai'
+            },
+            // 반도체 뉴스
+            {
+                name: '전자신문 반도체',
+                url: 'https://www.etnews.com/rss/section.html?id1=06'
             },
             {
-                name: '머니투데이',
-                url: 'https://www.mt.co.kr/rss/30000022/'
+                name: '디지털타임스 IT',
+                url: 'https://www.dt.co.kr/rss/all.xml'
             }
         ];
         
