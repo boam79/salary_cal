@@ -7,6 +7,7 @@ class StockIndices {
     constructor() {
         this.updateInterval = 60 * 1000; // 1분마다 업데이트
         this.updateTimer = null;
+        this.isLoaded = false; // 로드 여부 추적
     }
     
     // 초기화
@@ -20,10 +21,20 @@ class StockIndices {
     // 지수 데이터 업데이트
     async updateIndices() {
         try {
-            // 실제 API는 주식 시장 API를 사용해야 합니다.
-            // 현재는 더미 데이터 사용
-            const indices = this.getDummyIndices();
+            // 페이지 로드 시 한 번만 실제 데이터 가져오기
+            if (!this.isLoaded) {
+                const indices = await this.fetchRealIndices();
+                if (indices) {
+                    this.renderIndices(indices);
+                    this.isLoaded = true;
+                    return;
+                }
+                // API 실패 시 더미 데이터 사용
+                console.log('⚠️ API 실패, 더미 데이터 사용');
+            }
             
+            // 이후에는 더미 데이터 사용 (자동 업데이트)
+            const indices = this.getDummyIndices();
             this.renderIndices(indices);
             
         } catch (error) {
@@ -31,6 +42,31 @@ class StockIndices {
             if (window.ErrorLogger) {
                 window.ErrorLogger.log(error, '주식 지수 업데이트 실패');
             }
+            // 에러 시 더미 데이터 사용
+            const indices = this.getDummyIndices();
+            this.renderIndices(indices);
+        }
+    }
+    
+    // 실제 주식 지수 데이터 가져오기 (무료 API)
+    async fetchRealIndices() {
+        try {
+            // 무료 주식 API (Alpha Vantage 대신 다른 무료 API 시도)
+            // 실시간 데이터는 제한이 있으므로 가격 정보만 가져오기
+            
+            // 방법 1: Yahoo Finance 비공식 API
+            const response = await fetch('/api/stock-indices');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.indices;
+            
+        } catch (error) {
+            console.warn('⚠️ 주식 API 호출 실패:', error.message);
+            return null;
         }
     }
     
