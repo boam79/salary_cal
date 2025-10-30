@@ -113,25 +113,35 @@ async function onGenerate() {
     setLoading(true);
     // 사전 동기화: 지연을 막기 위해 대기하지 않고 백그라운드 요청
     try { fetch(`${API_BASE}/lotto/sync`, { method: 'POST' }); } catch (e) { console.warn('[lotto] sync error (ignored)', e); }
-    const { type, data } = await fetchStatsOrHistory();
+    // 새로운 생성 API 사용(가중치 기반, 과거 조합 제외)
     let combos = [];
     let metaText = '';
-    if (type === 'stats' && data && Array.isArray(data.topCombos)) {
-      combos = data.topCombos.slice(0, LOTTO_SETS).map(k => k.split('-').map(n=>parseInt(n,10)));
-      metaText = data.meta || '';
-      if (combos.length === 0) {
-        metaText = (metaText ? metaText + ' · ' : '') + '데이터 없음: 관리자 동기화 필요';
-        if (window.ErrorLogger?.log) {
-          window.ErrorLogger.log('Lotto Empty Stats', { meta: data.meta, topCombos: data.topCombos });
+    try {
+      const res = await fetch(`${API_BASE}/lotto/generate`, { cache: 'no-cache' });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.generated)) {
+          combos = data.generated;
+          metaText = `total=${data.total}`;
         }
       }
-    } else if (type === 'history' && Array.isArray(data)) {
-      combos = getTopCombosFromHistory(data, LOTTO_SETS);
-      metaText = '로컬 스냅샷 기준';
-    } else {
-      metaText = '데이터를 불러오지 못했습니다.';
-      if (window.ErrorLogger?.log) {
-        window.ErrorLogger.log('Lotto Fetch Failed', { apiBase: API_BASE });
+    } catch (e) {
+      console.warn('[lotto] /lotto/generate error', e);
+    }
+    if (!combos.length) {
+      // 백업 경로: 기존 통계/히스토리 활용
+      const { type, data } = await fetchStatsOrHistory();
+      if (type === 'stats' && data && Array.isArray(data.topCombos)) {
+        combos = data.topCombos.slice(0, LOTTO_SETS).map(k => k.split('-').map(n=>parseInt(n,10)));
+        metaText = data.meta || '';
+      } else if (type === 'history' && Array.isArray(data)) {
+        combos = getTopCombosFromHistory(data, LOTTO_SETS);
+        metaText = '로컬 스냅샷 기준';
+      } else {
+        metaText = '데이터를 불러오지 못했습니다.';
+        if (window.ErrorLogger?.log) {
+          window.ErrorLogger.log('Lotto Fetch Failed', { apiBase: API_BASE });
+        }
       }
     }
     renderTicketsWithCombos(combos, metaText);

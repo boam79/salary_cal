@@ -39,16 +39,21 @@ function calculateStats() {
   const raw = fs.readFileSync(historyPath, 'utf8');
   const history = JSON.parse(raw);
   const freq = new Map();
+  const numberFreq = Array(46).fill(0);
   for (const row of history) {
     if (!row || !Array.isArray(row.numbers) || row.numbers.length !== 6) continue;
     const key = buildComboKey(row.numbers);
     freq.set(key, (freq.get(key) || 0) + 1);
+    for (const n of row.numbers) {
+      if (Number.isInteger(n) && n>=1 && n<=45) numberFreq[n]++;
+    }
   }
   const topCombos = Array.from(freq.entries()).sort((a,b)=>b[1]-a[1]).slice(0, 50).map(([k])=>k);
   const payload = {
     version: 1,
     updatedAt: new Date().toISOString(),
     topCombos,
+    numberFreq,
     meta: `total=${history.length}`
   };
   fs.writeFileSync(statsPath, JSON.stringify(payload));
@@ -195,13 +200,54 @@ app.post('/lotto/sync', (req,res) => {
   })();
 });
 
+function weightedPickOne(weight) {
+  const sum = weight.reduce((a,b)=>a+b, 0);
+  if (sum <= 0) return null;
+  let r = Math.random() * sum;
+  for (let i=1;i<weight.length;i++) {
+    r -= weight[i];
+    if (r <= 0) return i;
+  }
+  return 45;
+}
+
+function generateUniqueSet(numberFreq, existingComboKeys) {
+  const base = numberFreq.slice();
+  for (let i=1;i<=45;i++) base[i] = Math.max(1, base[i] || 1);
+  const chosen = new Set();
+  let guard = 0;
+  while (chosen.size < 6 && guard < 200) {
+    const w = base.slice();
+    for (const n of chosen) w[n] = 0;
+    const pick = weightedPickOne(w);
+    if (pick && pick>=1 && pick<=45) chosen.add(pick);
+    guard++;
+  }
+  const arr = Array.from(chosen).sort((a,b)=>a-b);
+  const key = buildComboKey(arr);
+  if (arr.length !== 6 || existingComboKeys.has(key)) return null;
+  return arr;
+}
+
 app.get('/lotto/generate', (req,res) => {
   try {
     ensureDataDir();
-    const payload = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
-    const top = (payload.topCombos || []).slice(0, 10);
-    res.json({ combos: top });
+    const stats = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
+    const history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
+    const existing = new Set(history.map(h => buildComboKey(h.numbers)));
+    const result = [];
+    let tries = 0;
+    while (result.length < 10 && tries < 1000) {
+      const set = generateUniqueSet(stats.numberFreq || [], existing);
+      if (set) {
+        result.push(set);
+        existing.add(buildComboKey(set));
+      }
+      tries++;
+    }
+    res.json({ generated: result, updatedAt: stats.updatedAt, total: history.length });
   } catch (e) {
+    console.error('[lotto-backend] generate error', e);
     res.status(500).json({ error: 'generate_error' });
   }
 });
