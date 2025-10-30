@@ -1507,8 +1507,9 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: var(--font-size-small);
+    font-size: 11px;
     color: var(--color-text-secondary);
+    margin-bottom: 4px;
 }
 
 .news-card-source {
@@ -1521,51 +1522,53 @@ a:hover {
 }
 
 .news-card-title {
-    font-size: var(--font-size-base);
+    font-size: 13px;
     font-weight: 500;
     color: var(--color-text);
-    line-height: 1.5;
-    margin: var(--spacing-xs) 0;
+    line-height: 1.4;
+    margin: 6px 0 4px 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    min-height: 36px;
 }
 
 .news-card-description {
-    font-size: var(--font-size-small);
+    font-size: 11px;
     color: var(--color-text-secondary);
-    line-height: 1.6;
+    line-height: 1.5;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     flex-grow: 1;
+    min-height: 33px;
 }
 
 .news-card-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: var(--spacing-sm);
-    padding-top: var(--spacing-sm);
+    margin-top: 6px;
+    padding-top: 8px;
     border-top: 1px solid var(--color-border-light);
 }
 
 .news-card-tag {
-    font-size: var(--font-size-small);
-    padding: 4px 8px;
+    font-size: 10px;
+    padding: 3px 6px;
     background: var(--color-accent);
     color: var(--color-primary);
-    border-radius: 4px;
+    border-radius: 3px;
     font-weight: 500;
 }
 
 .news-card-link {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: var(--font-size-small);
+    gap: 2px;
+    font-size: 10px;
     color: var(--color-primary);
     text-decoration: none;
 }
@@ -1576,10 +1579,10 @@ a:hover {
 
 .news-card-image {
     width: 100%;
-    height: 160px;
+    height: 120px;
     overflow: hidden;
-    border-radius: 8px;
-    margin-bottom: var(--spacing-sm);
+    border-radius: 6px;
+    margin-bottom: 8px;
 }
 
 .news-card-image img {
