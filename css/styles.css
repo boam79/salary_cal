@@ -1769,13 +1769,7 @@ a:hover {
     min-width: 0;
 }
 
-/* 모바일 반응형 - 사이드바 */
-@media (max-width: 1200px) {
-    .sidebar-left {
-        display: none;
-    }
-}
-
+/* 모바일 반응형 - 뉴스 카드만 */
 @media (max-width: 768px) {
     .news-card {
         padding: 10px;
