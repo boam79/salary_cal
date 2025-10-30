@@ -205,27 +205,10 @@ class EventManager {
     // 로고 클릭 처리
     handleLogoClick(event) {
         event.preventDefault();
-        console.log('🏠 로고 클릭: 홈 화면으로 이동');
+        console.log('🔄 로고 클릭: 전체 화면 새로고침');
         
-        // 네비게이션 활성화 상태 초기화
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        
-        // 홈 화면으로 이동
-        if (window.navigationManager) {
-            window.navigationManager.navigateTo('home-screen');
-        } else {
-            // navigationManager가 없는 경우 직접 이동
-            const homeScreen = document.getElementById('home-screen');
-            if (homeScreen) {
-                document.querySelectorAll('.screen').forEach(screen => {
-                    screen.classList.remove('active');
-                });
-                homeScreen.classList.add('active');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
+        // 전체 화면 새로고침
+        window.location.reload();
     }
     
     // 사이드바 네비게이션 아이템 클릭 처리
