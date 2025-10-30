@@ -167,9 +167,17 @@ function parseRSSFeed(xmlText, source) {
                 }
                 
                 // 제목과 설명에서 HTML 태그 제거
-                const cleanTitle = removeHtmlTags(title);
+                const cleanTitle = removeHtmlTags(title || '');
                 // description에서 이미지를 제거한 순수 텍스트만 가져오기
-                const cleanDescription = removeHtmlTags(description.replace(/<img[^>]*>/gi, ''));
+                const cleanDescription = removeHtmlTags((description || '').replace(/<img[^>]*>/gi, ''));
+                
+                // 디버깅: 실제 데이터 확인
+                console.log('News item:', {
+                    title: cleanTitle,
+                    description: cleanDescription.substring(0, 50),
+                    link: link,
+                    source: source
+                });
                 
                 if (title && link && description) {
                     news.push({

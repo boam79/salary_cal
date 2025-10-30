@@ -62,6 +62,7 @@ class NewsManager {
             
             if (data.success && data.news) {
                 console.log(`📰 뉴스 수신: ${data.count}개`);
+                console.log('📰 뉴스 데이터 샘플:', data.news[0]);
                 return data.news;
             } else {
                 throw new Error('뉴스 데이터 형식 오류');
@@ -191,16 +192,24 @@ class NewsManager {
                </div>`
             : '';
         
+        // 디버깅: 실제 렌더링 데이터 확인
+        console.log('Rendering news card:', {
+            title: news.title,
+            description: news.description ? news.description.substring(0, 30) : 'NO DESCRIPTION',
+            source: news.source,
+            link: news.link
+        });
+        
         card.innerHTML = `
             <div class="news-card-header">
-                <span class="news-card-source">${news.source}</span>
+                <span class="news-card-source">${news.source || 'Unknown'}</span>
                 <span class="news-card-date">${this.formatDate(news.date)}</span>
             </div>
             ${imageHtml}
-            <h3 class="news-card-title">${news.title}</h3>
-            <p class="news-card-description">${news.description}</p>
+            <h3 class="news-card-title">${news.title || '제목 없음'}</h3>
+            <p class="news-card-description">${news.description || '설명 없음'}</p>
             <div class="news-card-footer">
-                <span class="news-card-tag">${categoryMap[news.category] || '📰'} ${news.category}</span>
+                <span class="news-card-tag">${categoryMap[news.category] || '📰'} ${news.category || '기타'}</span>
                 <span class="news-card-link">
                     전체보기 →
                 </span>
