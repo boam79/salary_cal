@@ -236,10 +236,32 @@ app.get('/lotto/generate', (req,res) => {
     const stats = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
     const history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
     const existing = new Set(history.map(h => buildComboKey(h.numbers)));
+
+    // numberFreq 보정: 없거나 짧으면 history로부터 즉시 재계산(또는 균등 분포)
+    let numberFreq = Array.isArray(stats.numberFreq) && stats.numberFreq.length >= 46
+      ? stats.numberFreq
+      : null;
+    if (!numberFreq) {
+      const freq = Array(46).fill(0);
+      if (Array.isArray(history) && history.length) {
+        for (const row of history) {
+          if (!row || !Array.isArray(row.numbers)) continue;
+          for (const n of row.numbers) {
+            if (Number.isInteger(n) && n>=1 && n<=45) freq[n]++;
+          }
+        }
+      }
+      // history 비거나 모두 0이면 균등 분포(1)로 설정
+      const sum = freq.reduce((a,b)=>a+b,0);
+      if (sum === 0) {
+        for (let i=1;i<=45;i++) freq[i] = 1;
+      }
+      numberFreq = freq;
+    }
     const result = [];
     let tries = 0;
     while (result.length < 10 && tries < 1000) {
-      const set = generateUniqueSet(stats.numberFreq || [], existing);
+      const set = generateUniqueSet(numberFreq || [], existing);
       if (set) {
         result.push(set);
         existing.add(buildComboKey(set));
