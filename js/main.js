@@ -6,7 +6,7 @@
 import AppState from './core/appState.js';
 import navigationManager from './core/navigationManager.js';
 import eventManager from './core/eventManager.js';
-import newsManager from './news/newsManager.js';
+// import newsManager from './news/newsManager.js';
 import topNewsManager from './news/topNewsManager.js';
 
 class FinancialCalculatorApp {
@@ -35,8 +35,7 @@ class FinancialCalculatorApp {
             // 전역 에러 핸들러 설정
             this.setupGlobalErrorHandlers();
             
-            // 뉴스 매니저 초기화
-            await newsManager.init();
+            // 경제 뉴스 섹션 제거됨
             await topNewsManager.init();
             
             // 애플리케이션 완전 초기화 완료
@@ -136,7 +135,7 @@ class FinancialCalculatorApp {
     // 애플리케이션 정리
     cleanup() {
         eventManager.cleanup();
-        newsManager.cleanup();
+        // 경제 뉴스 섹션 제거됨
         topNewsManager.cleanup();
         AppState.reset();
         this.isInitialized = false;
