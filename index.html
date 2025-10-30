@@ -152,6 +152,10 @@
                         <span class="nav-icon">💰</span>
                         <span class="nav-label">적금/예금</span>
                     </div>
+                    <div class="nav-item" data-screen="car-acq-screen">
+                        <span class="nav-icon">🚗</span>
+                        <span class="nav-label">자동차 취등록세</span>
+                    </div>
                 </nav>
                 
                 <!-- Google AdSense 광고 -->
@@ -766,6 +770,62 @@
             </div>
         </section>
 
+        <!-- 8. 자동차 취등록세 계산기 화면 -->
+        <section id="car-acq-screen" class="screen calculator-screen">
+            <div class="container">
+                <button class="back-button">← 홈으로</button>
+                <h2 class="screen-title">🚗 자동차 취득세 계산기</h2>
+                <div class="calculator-content">
+                    <div class="input-section">
+                        <form id="car-acq-form">
+                            <div class="form-group">
+                                <label for="car-type">차량 유형</label>
+                                <select id="car-type" required>
+                                    <option value="passenger">승용</option>
+                                    <option value="commercial">영업용/상용</option>
+                                    <option value="motorcycle">이륜차</option>
+                                    <option value="hybrid">하이브리드</option>
+                                    <option value="electric">전기</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="car-price">차량 취득가액 (만원)</label>
+                                <input type="number" id="car-price" min="0" step="10" placeholder="예: 3500" required>
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-primary">계산하기</button>
+                                <button type="button" class="btn btn-secondary" id="reset-car-acq">초기화</button>
+                            </div>
+                        </form>
+                        <p class="text-muted" style="margin-top:8px;">세율은 최신 `config/rates.json` 기준으로 자동 반영됩니다.</p>
+                    </div>
+                    <div class="result-section" id="car-acq-result" style="display:none;">
+                        <h3 class="result-title">계산 결과</h3>
+                        <div class="result-container">
+                            <div class="result-summary">
+                                <div class="result-item">
+                                    <span class="result-label">취득세</span>
+                                    <span class="result-value" id="car-tax-acq">-</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">지방교육세</span>
+                                    <span class="result-value" id="car-tax-edu">-</span>
+                                </div>
+                                <div class="result-item highlight">
+                                    <span class="result-label">합계</span>
+                                    <span class="result-value" id="car-tax-total">-</span>
+                                </div>
+                            </div>
+                            <div class="calculation-steps">
+                                <button class="toggle-steps" onclick="toggleCalculationSteps(this, 'car-acq')">▼ 계산 과정 보기</button>
+                                <div class="steps-content" id="car-acq-steps" style="display:none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- 5. 대출 계산기 화면 (통합) -->
         <section id="loan-screen" class="screen calculator-screen">
             <div class="container">
@@ -959,6 +1019,7 @@
     <script type="module" src="js/calculators/loan.js?v=202412191530"></script>
     <script type="module" src="js/calculators/retirement.js?v=202412191530"></script>
     <script type="module" src="js/calculators/savings.js?v=202412191530"></script>
+    <script type="module" src="js/calculators/carAcquisition.js?v=202412191530"></script>
     
     <!-- Chart -->
     <script type="module" src="js/chart.js?v=202412191530"></script>
