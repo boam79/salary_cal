@@ -230,7 +230,13 @@ class EventManager {
     
     // 사이드바 네비게이션 아이템 클릭 처리
     handleNavItemClick(event) {
-        const navItem = event.currentTarget;
+        // 이벤트 타겟 찾기
+        let navItem = event.target.closest('.nav-item');
+        if (!navItem) {
+            console.error('❌ nav-item 요소를 찾을 수 없음:', event.target);
+            return;
+        }
+        
         const targetScreen = navItem.getAttribute('data-screen');
         
         if (!targetScreen) {
