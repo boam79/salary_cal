@@ -776,53 +776,108 @@
                 <button class="back-button">← 홈으로</button>
                 <h2 class="screen-title">🧾 부가세 계산기</h2>
                 <div class="calculator-content">
-                    <div class="input-section">
-                        <form id="vat-form">
-                            <div class="form-group">
-                                <label for="vat-direction">계산 방향</label>
-                                <select id="vat-direction" required>
-                                    <option value="supplyToTotal">공급가액 → 총액(부가세 포함)</option>
-                                    <option value="totalToSupply">총액(부가세 포함) → 공급가액</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="vat-type">과세 유형</label>
-                                <select id="vat-type" required>
-                                    <option value="standard">표준과세 (10%)</option>
-                                    <option value="zero">영세율 (0%)</option>
-                                    <option value="exempt">면세 (0%)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="vat-amount">금액 (만원)</label>
-                                <input type="number" id="vat-amount" min="0" step="1" placeholder="예: 100" required>
-                            </div>
-                            <div class="button-group">
-                                <button type="submit" class="btn btn-primary">계산하기</button>
-                                <button type="button" class="btn btn-secondary" id="reset-vat">초기화</button>
-                            </div>
-                        </form>
+                    <div class="tab-navigation">
+                        <button class="tab-btn active" data-tab="vat-calc">일반 계산</button>
+                        <button class="tab-btn" data-tab="vat-refund">사업자 환급</button>
                     </div>
-                    <div class="result-section" id="vat-result" style="display:none;">
-                        <h3 class="result-title">계산 결과</h3>
-                        <div class="result-container">
-                            <div class="result-summary">
-                                <div class="result-item">
-                                    <span class="result-label">공급가액</span>
-                                    <span class="result-value" id="vat-supply">-</span>
+
+                    <!-- 일반 계산 탭 -->
+                    <div class="tab-content active" id="vat-calc-tab">
+                        <div class="input-section">
+                            <form id="vat-form">
+                                <div class="form-group">
+                                    <label for="vat-direction">계산 방향</label>
+                                    <select id="vat-direction" required>
+                                        <option value="supplyToTotal">공급가액 → 총액(부가세 포함)</option>
+                                        <option value="totalToSupply">총액(부가세 포함) → 공급가액</option>
+                                    </select>
                                 </div>
-                                <div class="result-item">
-                                    <span class="result-label">부가가치세</span>
-                                    <span class="result-value" id="vat-tax">-</span>
+                                <div class="form-group">
+                                    <label for="vat-type">과세 유형</label>
+                                    <select id="vat-type" required>
+                                        <option value="standard">표준과세 (10%)</option>
+                                        <option value="zero">영세율 (0%)</option>
+                                        <option value="exempt">면세 (0%)</option>
+                                    </select>
                                 </div>
-                                <div class="result-item highlight">
-                                    <span class="result-label">총액(부가세포함)</span>
-                                    <span class="result-value" id="vat-total">-</span>
+                                <div class="form-group">
+                                    <label for="vat-amount">금액 (만원)</label>
+                                    <input type="number" id="vat-amount" min="0" step="1" placeholder="예: 100" required>
+                                </div>
+                                <div class="button-group">
+                                    <button type="submit" class="btn btn-primary">계산하기</button>
+                                    <button type="button" class="btn btn-secondary" id="reset-vat">초기화</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="result-section" id="vat-result" style="display:none;">
+                            <h3 class="result-title">계산 결과</h3>
+                            <div class="result-container">
+                                <div class="result-summary">
+                                    <div class="result-item">
+                                        <span class="result-label">공급가액</span>
+                                        <span class="result-value" id="vat-supply">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">부가가치세</span>
+                                        <span class="result-value" id="vat-tax">-</span>
+                                    </div>
+                                    <div class="result-item highlight">
+                                        <span class="result-label">총액(부가세포함)</span>
+                                        <span class="result-value" id="vat-total">-</span>
+                                    </div>
+                                </div>
+                                <div class="calculation-steps">
+                                    <button class="toggle-steps" onclick="toggleCalculationSteps(this, 'vat')">▼ 계산 과정 보기</button>
+                                    <div class="steps-content" id="vat-steps" style="display:none;"></div>
                                 </div>
                             </div>
-                            <div class="calculation-steps">
-                                <button class="toggle-steps" onclick="toggleCalculationSteps(this, 'vat')">▼ 계산 과정 보기</button>
-                                <div class="steps-content" id="vat-steps" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- 사업자 환급 탭 -->
+                    <div class="tab-content" id="vat-refund-tab">
+                        <div class="input-section">
+                            <form id="vat-refund-form">
+                                <div class="form-group">
+                                    <label for="sales-tax">매출세액 (원)</label>
+                                    <input type="number" id="sales-tax" min="0" step="1" placeholder="예: 1000000" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="purchase-tax-deductible">공제가능 매입세액 (원)</label>
+                                    <input type="number" id="purchase-tax-deductible" min="0" step="1" placeholder="예: 700000" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="purchase-tax-nondeductible">공제불가 매입세액 (원)</label>
+                                    <input type="number" id="purchase-tax-nondeductible" min="0" step="1" placeholder="예: 0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="reduction-credit">경감·공제세액 (원)</label>
+                                    <input type="number" id="reduction-credit" min="0" step="1" placeholder="예: 0">
+                                </div>
+                                <div class="button-group">
+                                    <button type="submit" class="btn btn-primary">계산하기</button>
+                                    <button type="button" class="btn btn-secondary" id="reset-vat-refund">초기화</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="result-section" id="vat-refund-result" style="display:none;">
+                            <h3 class="result-title">환급/납부 계산 결과</h3>
+                            <div class="result-container">
+                                <div class="result-summary">
+                                    <div class="result-item">
+                                        <span class="result-label">납부세액</span>
+                                        <span class="result-value" id="vat-payable">-</span>
+                                    </div>
+                                    <div class="result-item highlight">
+                                        <span class="result-label">환급세액</span>
+                                        <span class="result-value" id="vat-refund">-</span>
+                                    </div>
+                                </div>
+                                <div class="calculation-steps">
+                                    <button class="toggle-steps" onclick="toggleCalculationSteps(this, 'vat-refund')">▼ 계산 과정 보기</button>
+                                    <div class="steps-content" id="vat-refund-steps" style="display:none;"></div>
+                                </div>
                             </div>
                         </div>
                     </div>

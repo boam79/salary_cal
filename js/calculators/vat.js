@@ -18,7 +18,9 @@ class VATCalculator {
         zero: typeof rates.vat.zero === 'number' ? rates.vat.zero : 0.0,
       };
     }
+    this.bindTabs();
     this.bindForm();
+    this.bindRefundForm();
   }
 
   bindForm() {
@@ -74,6 +76,100 @@ class VATCalculator {
       result.style.display = 'block';
       result.scrollIntoView({ behavior: 'smooth' });
     }
+  }
+
+  bindTabs() {
+    // VAT 화면 내부 탭 버튼 동작
+    const tabButtons = document.querySelectorAll('#vat-screen .tab-btn');
+    const calcTab = document.getElementById('vat-calc-tab');
+    const refundTab = document.getElementById('vat-refund-tab');
+    if (!tabButtons.length || !calcTab || !refundTab) return;
+    tabButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        tabButtons.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.getAttribute('data-tab');
+        calcTab.classList.toggle('active', tab === 'vat-calc');
+        refundTab.classList.toggle('active', tab === 'vat-refund');
+        // 탭 전환 시 결과 섹션 숨김
+        const result1 = document.getElementById('vat-result');
+        const result2 = document.getElementById('vat-refund-result');
+        if (result1) result1.style.display = 'none';
+        if (result2) result2.style.display = 'none';
+      });
+    });
+  }
+
+  bindRefundForm() {
+    const form = document.getElementById('vat-refund-form');
+    const resetBtn = document.getElementById('reset-vat-refund');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.calculateRefund();
+      });
+    }
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        const result = document.getElementById('vat-refund-result');
+        if (result) result.style.display = 'none';
+      });
+    }
+  }
+
+  calculateRefund() {
+    const salesTax = parseFloat(document.getElementById('sales-tax')?.value || '0');
+    const purchaseTaxDeductible = parseFloat(document.getElementById('purchase-tax-deductible')?.value || '0');
+    const purchaseTaxNonDeductible = parseFloat(document.getElementById('purchase-tax-nondeductible')?.value || '0');
+    const reductionCredit = parseFloat(document.getElementById('reduction-credit')?.value || '0');
+
+    if (!(salesTax >= 0) || !(purchaseTaxDeductible >= 0) || !(purchaseTaxNonDeductible >= 0) || !(reductionCredit >= 0)) {
+      alert('입력값을 확인해주세요. (0 이상 정수)');
+      return;
+    }
+
+    // 간이 계산식: 납부세액 = 매출세액 - 공제가능 매입세액 - 경감·공제세액
+    // 공제불가 매입세액은 공제대상이 아니므로 참조용으로만 표시
+    const payableRaw = salesTax - purchaseTaxDeductible - reductionCredit;
+    const payable = payableRaw > 0 ? Math.floor(payableRaw) : 0;
+    const refund = payableRaw < 0 ? Math.abs(Math.floor(payableRaw)) : 0;
+
+    this.renderRefundResult({ payable, refund });
+    this.renderRefundSteps({ salesTax, purchaseTaxDeductible, purchaseTaxNonDeductible, reductionCredit, payable, refund });
+  }
+
+  renderRefundResult({ payable, refund }) {
+    const result = document.getElementById('vat-refund-result');
+    document.getElementById('vat-payable').textContent = payable ? window.formatCurrency(payable) : '-';
+    document.getElementById('vat-refund').textContent = refund ? window.formatCurrency(refund) : '-';
+    if (result) {
+      result.style.display = 'block';
+      result.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  renderRefundSteps({ salesTax, purchaseTaxDeductible, purchaseTaxNonDeductible, reductionCredit, payable, refund }) {
+    const steps = document.getElementById('vat-refund-steps');
+    if (!steps) return;
+    steps.innerHTML = `
+      <div class="step-item"><h4>1. 입력값</h4>
+        <p>매출세액: <strong>${window.formatCurrency(salesTax)}</strong></p>
+        <p>공제가능 매입세액: <strong>${window.formatCurrency(purchaseTaxDeductible)}</strong></p>
+        <p>공제불가 매입세액(참고): <strong>${window.formatCurrency(purchaseTaxNonDeductible)}</strong></p>
+        <p>경감·공제세액: <strong>${window.formatCurrency(reductionCredit)}</strong></p>
+      </div>
+      <div class="step-item"><h4>2. 계산식</h4>
+        <p>납부세액 = 매출세액 − 공제가능 매입세액 − 경감·공제세액</p>
+      </div>
+      <div class="step-item"><h4>3. 결과</h4>
+        <p>납부세액: <strong>${payable ? window.formatCurrency(payable) : '-'}</strong></p>
+        <p>환급세액: <strong>${refund ? window.formatCurrency(refund) : '-'}</strong></p>
+      </div>
+      <div class="step-item"><small>참고: 공제불가 매입세액은 공제 대상이 아니므로 납부/환급 계산에는 포함되지 않습니다.</small></div>
+    `;
+    steps.style.display = 'block';
+    const toggleBtn = document.querySelector('#vat-refund-result .toggle-steps');
+    if (toggleBtn) toggleBtn.textContent = '▲ 계산 과정 숨기기';
   }
 
   renderSteps({ supplyAmount, vatAmount, totalAmount, rate, direction, type, inputAmount }) {
