@@ -290,8 +290,9 @@ app.get('/lotto/generate', (req,res) => {
     }
     const result = [];
     let tries = 0;
-    // 1차: 가중치 기반
-    while (result.length < 10 && tries < 2000) {
+    const forceUniform = String(req.query.uniform || '').trim() === '1';
+    // 1차: 가중치 기반(강제 균등 모드가 아니면)
+    while (!forceUniform && result.length < 10 && tries < 2000) {
       const set = generateUniqueSet(numberFreq || [], existing);
       if (set) {
         result.push(set);
@@ -317,7 +318,7 @@ app.get('/lotto/generate', (req,res) => {
       }
     }
     res.setHeader('Cache-Control', 'no-store, max-age=0');
-    res.json({ generated: result, count: result.length, updatedAt: stats.updatedAt, total: history.length, seed: Date.now(), strategy: 'weighted+uniform_fallback' });
+    res.json({ generated: result, count: result.length, updatedAt: stats.updatedAt, total: history.length, seed: Date.now(), strategy: forceUniform ? 'uniform_forced' : 'weighted+uniform_fallback' });
   } catch (e) {
     console.error('[lotto-backend] generate error', e);
     res.status(500).json({ error: 'generate_error' });

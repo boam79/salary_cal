@@ -132,7 +132,8 @@ async function onGenerate() {
     let combos = [];
     let metaText = '';
     try {
-      const url = `${API_BASE}/lotto/generate?t=${Date.now()}`;
+      // 임시: 문제가 지속되면 균등 모드 강제 테스트(uniform=1)
+      const url = `${API_BASE}/lotto/generate?uniform=1&t=${Date.now()}`;
       console.log('[lotto] call /lotto/generate →', url);
       const res = await fetchWithRetry(url, { cache: 'no-store', mode: 'cors' }, 3, 700);
       if (res.ok) {
@@ -140,7 +141,7 @@ async function onGenerate() {
         console.log('[lotto] /lotto/generate ok', data);
         if (Array.isArray(data.generated)) {
           combos = data.generated;
-          metaText = `total=${data.total}`;
+          metaText = `total=${data.total} · count=${data.count} · ${data.strategy||''}`;
         }
       } else {
         console.warn('[lotto] /lotto/generate http', res.status);
