@@ -58,6 +58,11 @@ class FinancialCalculatorApp {
             }
             const rates = await response.json();
             AppState.setTaxRates(rates);
+            // 푸터에 세율 버전/업데이트 날짜 반영
+            const lastUpdateEl = document.getElementById('last-update');
+            if (lastUpdateEl && rates.lastUpdated) {
+                lastUpdateEl.textContent = rates.lastUpdated;
+            }
             return rates;
         } catch (error) {
             console.error('❌ 세율 데이터 로드 실패:', error);
