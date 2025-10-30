@@ -30,14 +30,17 @@ async function fetchStatsOrHistory() {
     const res = await fetch(`${API_BASE}/lotto/stats`, { cache: 'no-cache' });
     if (res.ok) {
       const data = await res.json();
+      console.log('[lotto] /lotto/stats ok', data);
       return { type: 'stats', data };
     }
+    console.warn('[lotto] /lotto/stats http', res.status);
   } catch (_) {}
   // 2순위: 로컬 스냅샷
   try {
     const res = await fetch('data/lotto-history.json', { cache: 'no-cache' });
     if (res.ok) {
       const data = await res.json();
+      console.log('[lotto] local history ok length=', Array.isArray(data)?data.length:0);
       return { type: 'history', data };
     }
   } catch (_) {}
@@ -109,23 +112,35 @@ async function onGenerate() {
   try {
     setLoading(true);
     // 사전 동기화: 지연을 막기 위해 대기하지 않고 백그라운드 요청
-    try { fetch(`${API_BASE}/lotto/sync`, { method: 'POST' }); } catch (_) {}
+    try { fetch(`${API_BASE}/lotto/sync`, { method: 'POST' }); } catch (e) { console.warn('[lotto] sync error (ignored)', e); }
     const { type, data } = await fetchStatsOrHistory();
     let combos = [];
     let metaText = '';
     if (type === 'stats' && data && Array.isArray(data.topCombos)) {
       combos = data.topCombos.slice(0, LOTTO_SETS).map(k => k.split('-').map(n=>parseInt(n,10)));
       metaText = data.meta || '';
+      if (combos.length === 0) {
+        metaText = (metaText ? metaText + ' · ' : '') + '데이터 없음: 관리자 동기화 필요';
+        if (window.ErrorLogger?.log) {
+          window.ErrorLogger.log('Lotto Empty Stats', { meta: data.meta, topCombos: data.topCombos });
+        }
+      }
     } else if (type === 'history' && Array.isArray(data)) {
       combos = getTopCombosFromHistory(data, LOTTO_SETS);
       metaText = '로컬 스냅샷 기준';
     } else {
       metaText = '데이터를 불러오지 못했습니다.';
+      if (window.ErrorLogger?.log) {
+        window.ErrorLogger.log('Lotto Fetch Failed', { apiBase: API_BASE });
+      }
     }
     renderTicketsWithCombos(combos, metaText);
     try { localStorage.setItem('lotto:last', JSON.stringify({ combos, meta: metaText, at: Date.now() })); } catch (_) {}
   } catch (e) {
     console.error('[lotto] generate error', e);
+    if (window.ErrorLogger?.log) {
+      window.ErrorLogger.log('Lotto Generate Error', { message: e?.message, stack: e?.stack });
+    }
   } finally {
     setLoading(false);
   }

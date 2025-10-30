@@ -51,9 +51,13 @@ app.get('/lotto/stats', (req,res) => {
   try {
     ensureDataDir();
     const payload = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
+    if (!payload.topCombos || payload.topCombos.length === 0) {
+      console.warn('[lotto-backend] stats empty. run /lotto/sync to populate');
+    }
     res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
     res.json(payload);
   } catch (e) {
+    console.error('[lotto-backend] stats error', e);
     res.status(500).json({ error: 'stats_error' });
   }
 });
@@ -66,8 +70,10 @@ app.post('/lotto/sync', (req,res) => {
     ensureDataDir();
     // TODO: 실제 소스에서 최신 회차 수집/병합. 현재는 no-op.
     const payload = calculateStats();
+    console.log('[lotto-backend] sync completed', payload.updatedAt, 'topCombos=', payload.topCombos.length);
     res.json({ ok: true, updatedAt: payload.updatedAt });
   } catch (e) {
+    console.error('[lotto-backend] sync error', e);
     res.status(500).json({ error: 'sync_error' });
   }
 });
