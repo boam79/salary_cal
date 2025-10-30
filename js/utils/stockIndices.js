@@ -51,10 +51,9 @@ class StockIndices {
     // 실제 주식 지수 데이터 가져오기 (무료 API)
     async fetchRealIndices() {
         try {
-            // 무료 주식 API (Alpha Vantage 대신 다른 무료 API 시도)
-            // 실시간 데이터는 제한이 있으므로 가격 정보만 가져오기
+            console.log('📈 실제 주식 데이터 가져오기 시도...');
             
-            // 방법 1: Yahoo Finance 비공식 API
+            // Vercel Serverless Function을 통한 API 호출
             const response = await fetch('/api/stock-indices');
             
             if (!response.ok) {
@@ -62,10 +61,21 @@ class StockIndices {
             }
             
             const data = await response.json();
-            return data.indices;
+            console.log('✅ 주식 데이터 수신:', data);
+            
+            if (data.success && data.indices) {
+                console.log('✅ 실제 주식 지수 데이터 사용');
+                return data.indices;
+            } else {
+                console.warn('⚠️ 데이터 형식 오류:', data);
+                return null;
+            }
             
         } catch (error) {
             console.warn('⚠️ 주식 API 호출 실패:', error.message);
+            if (window.ErrorLogger) {
+                window.ErrorLogger.log(error, '주식 API 호출 실패');
+            }
             return null;
         }
     }

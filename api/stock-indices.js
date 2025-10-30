@@ -14,9 +14,13 @@ export default async function handler(req, res) {
     }
     
     try {
+        console.log('📈 주식 지수 API 호출됨');
+        
         // 무료 주식 API 사용
         // 실제로는 더미 데이터를 반환 (실시간 API는 CORS나 인증 문제)
         const indices = await getStockIndices();
+        
+        console.log('📈 주식 지수 데이터 생성 완료:', indices);
         
         // 캐시 제어 (5분)
         res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
