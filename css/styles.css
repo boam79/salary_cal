@@ -1451,6 +1451,9 @@ a:hover {
 .news-section {
     margin-top: var(--spacing-xl);
     padding: var(--spacing-lg);
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .section-title {
