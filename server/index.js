@@ -3,7 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import fs from 'fs';
 import path from 'path';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -309,8 +309,15 @@ app.get('/lotto/generate', (req,res) => {
       }
       tries2++;
     }
+    // 최후 보완: 여전히 0개면(이론상 불가) 히스토리 무시하고 완전 균등으로 10세트 생성
+    if (result.length === 0) {
+      for (let k=0;k<10;k++) {
+        const s = generateUniformUniqueSet(new Set());
+        if (s) result.push(s);
+      }
+    }
     res.setHeader('Cache-Control', 'no-store, max-age=0');
-    res.json({ generated: result, count: result.length, updatedAt: stats.updatedAt, total: history.length, seed: Date.now() });
+    res.json({ generated: result, count: result.length, updatedAt: stats.updatedAt, total: history.length, seed: Date.now(), strategy: 'weighted+uniform_fallback' });
   } catch (e) {
     console.error('[lotto-backend] generate error', e);
     res.status(500).json({ error: 'generate_error' });
