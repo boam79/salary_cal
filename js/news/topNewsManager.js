@@ -58,7 +58,13 @@ const topNewsManager = (() => {
     const img = document.createElement('img');
     img.className = 'news-card-image';
     const fallbackFavicon = news?.link ? `https://www.google.com/s2/favicons?sz=128&domain_url=${encodeURIComponent(news.link)}` : '';
-    img.src = hasImage(news?.image) ? news.image : fallbackFavicon;
+    if (hasImage(news?.image)) {
+      img.src = news.image;
+      // 원본 이미지 로드 실패 시에만 파비콘으로 교체
+      img.onerror = () => { if (fallbackFavicon) img.src = fallbackFavicon; };
+    } else {
+      img.src = fallbackFavicon;
+    }
     img.alt = news.title || 'thumbnail';
     a.appendChild(img);
 

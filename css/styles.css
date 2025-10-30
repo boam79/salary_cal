@@ -1579,21 +1579,15 @@ a:hover {
 
 .news-card-image {
     width: 100%;
-    height: 120px;
-    overflow: hidden;
+    aspect-ratio: 1 / 1; /* 정사각형 */
+    object-fit: cover;
     border-radius: 6px;
     margin-bottom: 8px;
-}
-
-.news-card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
     transition: transform var(--transition-medium);
 }
 
-.news-card:hover .news-card-image img {
-    transform: scale(1.05);
+.news-card:hover .news-card-image {
+    transform: scale(1.03);
 }
 
 .news-loading {
