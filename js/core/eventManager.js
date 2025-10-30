@@ -207,6 +207,11 @@ class EventManager {
         event.preventDefault();
         console.log('🏠 로고 클릭: 홈 화면으로 이동');
         
+        // 네비게이션 활성화 상태 초기화
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
         // 홈 화면으로 이동
         if (window.navigationManager) {
             window.navigationManager.navigateTo('home-screen');
@@ -243,7 +248,16 @@ class EventManager {
         
         // 화면 이동
         if (window.navigationManager) {
-            window.navigationManager.navigateTo(targetScreen);
+            const result = window.navigationManager.navigateTo(targetScreen);
+            if (!result) {
+                console.error('❌ 화면 이동 실패');
+                // 에러 로깅
+                if (window.ErrorLogger) {
+                    window.ErrorLogger.log(new Error('화면 이동 실패'), `targetScreen: ${targetScreen}`);
+                }
+            }
+        } else {
+            console.error('❌ navigationManager를 찾을 수 없음');
         }
     }
     

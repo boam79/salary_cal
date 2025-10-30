@@ -87,6 +87,10 @@ class NavigationManager {
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('back-button')) {
                 e.preventDefault();
+                // 네비게이션 활성화 상태 초기화
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
                 this.navigateTo('home-screen');
             }
         });
