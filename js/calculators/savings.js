@@ -192,6 +192,11 @@ class SavingsCalculator {
         <p><strong>실수령액 = ${window.formatCurrency(net)}</strong></p>
       </div>
     `;
+
+    // 계산 직후에는 자동으로 펼쳐서 보여주기
+    steps.style.display = 'block';
+    const toggleBtn = document.querySelector('#savings-result .toggle-steps');
+    if (toggleBtn) toggleBtn.textContent = '▲ 계산 과정 숨기기';
   }
 
   reset() {
@@ -204,5 +209,16 @@ class SavingsCalculator {
 
 // init
 document.addEventListener('DOMContentLoaded', () => new SavingsCalculator());
+
+// 토글 함수 전역 노출 (퇴직금 계산기와 동일 버튼 사용)
+if (typeof window !== 'undefined') {
+  window.toggleCalculationSteps = window.toggleCalculationSteps || function(button, calculatorType) {
+    const stepsContent = document.getElementById(`${calculatorType}-steps`);
+    if (!stepsContent) return;
+    const isHidden = stepsContent.style.display === 'none';
+    stepsContent.style.display = isHidden ? 'block' : 'none';
+    button.textContent = isHidden ? '▲ 계산 과정 숨기기' : '▼ 계산 과정 보기';
+  };
+}
 
 export default SavingsCalculator;
