@@ -818,9 +818,17 @@ a:hover {
 
 
 
-/* 모바일에서 광고 공간 완전히 숨기기 (최상위 우선순위) */
+/* 모바일에서 광고 공간 및 사이드바 완전히 숨기기 (최상위 우선순위) */
 @media (max-width: 768px) {
     .ad-space {
+        display: none !important;
+    }
+    
+    .sidebar-left {
+        display: none !important;
+    }
+    
+    .sidebar-ad {
         display: none !important;
     }
     
@@ -834,6 +842,7 @@ a:hover {
     .content-main {
         width: 100%;
         padding: 0;
+        flex: 1;
     }
 }
 
@@ -1175,6 +1184,19 @@ a:hover {
         --spacing-xl: 24px;
     }
     
+    /* 모바일에서 사이드바 및 광고 완전히 숨기기 */
+    .sidebar-left {
+        display: none !important;
+    }
+    
+    .sidebar-ad {
+        display: none !important;
+    }
+    
+    .ad-space {
+        display: none !important;
+    }
+    
     /* 가로 스크롤 방지 */
     html, body {
         overflow-x: hidden;
@@ -1188,6 +1210,13 @@ a:hover {
         margin: 0;
     }
     
+    .layout-container {
+        flex-direction: column;
+        gap: 0;
+        padding: 0;
+        max-width: 100%;
+    }
+    
     .layout-container,
     .content-main,
     .container,
@@ -1195,6 +1224,12 @@ a:hover {
     .screen {
         max-width: 100%;
         overflow-x: hidden;
+    }
+    
+    .content-main {
+        width: 100%;
+        padding: 0;
+        flex: 1;
     }
     
     img, video, canvas, iframe {
@@ -1685,14 +1720,78 @@ a:hover {
 }
 
 @media (max-width: 768px) {
+    .news-section {
+        padding: var(--spacing-md);
+        margin-top: var(--spacing-md);
+    }
+    
     .news-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+        margin-top: var(--spacing-sm);
+    }
+    
+    .news-card {
+        padding: var(--spacing-md);
+        border-radius: 12px;
+    }
+    
+    .news-card-image {
+        aspect-ratio: 16 / 9; /* 모바일에서 더 넓은 비율 */
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .news-card-title {
+        font-size: 15px;
+        line-height: 1.5;
+        min-height: auto;
+        margin: var(--spacing-sm) 0;
+        -webkit-line-clamp: 2;
+    }
+    
+    .news-card-header {
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+    
+    .news-card-footer {
+        margin-top: var(--spacing-sm);
+        padding-top: var(--spacing-sm);
+    }
+    
+    .news-card-tag {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+    
+    .news-card-link {
+        font-size: 11px;
     }
 }
 
 @media (max-width: 480px) {
+    .news-section {
+        padding: var(--spacing-sm);
+        margin-top: var(--spacing-sm);
+    }
+    
     .news-grid {
-        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+    
+    .news-card {
+        padding: var(--spacing-sm);
+        border-radius: 10px;
+    }
+    
+    .news-card-title {
+        font-size: 14px;
+        -webkit-line-clamp: 2;
+    }
+    
+    .section-title {
+        font-size: var(--font-size-h3);
+        margin-bottom: var(--spacing-sm);
     }
 }
 
@@ -1828,16 +1927,6 @@ a:hover {
     color: var(--color-error);
 }
 
-/* 모바일 반응형 */
-@media (max-width: 768px) {
-    .news-card {
-        padding: 10px;
-    }
-    
-    .section-title {
-        font-size: var(--font-size-h3);
-    }
-}
 
 /* ===================================
    Sidebar Styles
