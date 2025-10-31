@@ -37,7 +37,8 @@ class FinancialCalculatorApp {
             
             // 뉴스 매니저 초기화 (경제 뉴스)
             await newsManager.init();
-            await topNewsManager.init();
+            // 햄버거 버튼 직접 바인딩 (iOS Safari 대응)
+            this.setupHamburgerFallback();
             
             // 애플리케이션 완전 초기화 완료
             this.isInitialized = true;
@@ -49,6 +50,32 @@ class FinancialCalculatorApp {
             console.error('❌ 애플리케이션 초기화 실패:', error);
             AppState.setLoading(false);
         }
+    }
+
+    // iOS Safari 일부 케이스에서 위임 이벤트가 동작하지 않을 때를 위한 폴백
+    setupHamburgerFallback() {
+        const btn = document.getElementById('hamburger-btn');
+        if (!btn) return;
+        const toggle = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const body = document.body;
+            const isOpen = body.classList.contains('drawer-open');
+            if (isOpen) {
+                body.classList.remove('drawer-open');
+                const backdrop = document.querySelector('.drawer-backdrop');
+                if (backdrop) backdrop.setAttribute('aria-hidden', 'true');
+            } else {
+                body.classList.add('drawer-open');
+                const backdrop = document.querySelector('.drawer-backdrop');
+                if (backdrop) backdrop.setAttribute('aria-hidden', 'false');
+            }
+        };
+        btn.addEventListener('click', toggle, { passive: false });
+        btn.addEventListener('touchend', toggle, { passive: false });
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') toggle(e);
+        });
     }
     
     // 세율 데이터 로드
