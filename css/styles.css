@@ -259,12 +259,15 @@ a:hover {
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 
-.hamburger-btn span {
+/* SVG 햄버거 아이콘 - 선은 라운드 캡으로 처리 */
+.hamburger-icon {
     display: block;
-    width: 22px;
-    height: 3px; /* 두께를 키워 시각적 구분 강화 */
-    background: var(--color-primary);
-    border-radius: 3px;
+}
+
+.hamburger-icon path {
+    stroke: var(--color-text);
+    stroke-width: 2.5;
+    stroke-linecap: round;
 }
 
 @media (max-width: 768px) {
