@@ -34,7 +34,8 @@ class NewsManager {
             // 임시로 더미 데이터 사용 (나중에 API로 교체)
             const news = await this.fetchNews();
             
-            this.newsData = news;
+            // 뉴스를 랜덤하게 섞어서 매번 다른 순서로 표시
+            this.newsData = this.shuffleArray([...news]);
             this.lastUpdate = new Date();
             
             // 뉴스 화면에 표시
@@ -142,6 +143,16 @@ class NewsManager {
         ];
         
         return dummyNews;
+    }
+    
+    // 배열 섞기 (Fisher-Yates 알고리즘)
+    shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
     }
     
     // 이미지가 있는 경우 썸네일 표시

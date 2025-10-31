@@ -110,7 +110,12 @@
     
     <!-- 헤더 -->
     <header class="header">
-        <div class="container">
+        <div class="container" style="display:flex; align-items:center; justify-content:center; position:relative;">
+            <button class="hamburger-btn" aria-label="메뉴 열기" title="메뉴" type="button">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <h1 class="logo clickable" id="logo-home">📰 종합 생활 정보지</h1>
             <p class="tagline">금융계산기 · 종합뉴스</p>
         </div>
@@ -120,7 +125,7 @@
     <main class="main-content">
         <div class="layout-container">
             <!-- 좌측 사이드바 -->
-            <aside class="sidebar-left">
+            <aside class="sidebar-left" role="navigation" aria-label="사이드 메뉴">
                 <!-- 계산기 네비게이션 -->
                 <nav class="calculator-nav">
                     <h3 class="sidebar-title">💰 계산기</h3>
@@ -178,6 +183,7 @@
                     </script>
                 </div>
             </aside>
+            <div class="drawer-backdrop" aria-hidden="true"></div>
             
             <!-- 메인 컨텐츠 영역 -->
             <div class="content-main">

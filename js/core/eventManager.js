@@ -53,6 +53,16 @@ class EventManager {
         this.addDelegatedEvent('click', '.nav-item', (e) => {
             this.handleNavItemClick(e);
         });
+        
+        // 햄버거 버튼 클릭 이벤트 위임
+        this.addDelegatedEvent('click', '.hamburger-btn', (e) => {
+            this.handleHamburgerClick(e);
+        });
+        
+        // 드로어 백드롭 클릭 이벤트 위임
+        this.addDelegatedEvent('click', '.drawer-backdrop', (e) => {
+            this.handleDrawerClose(e);
+        });
     }
     
     // 이벤트 위임 추가
@@ -235,6 +245,13 @@ class EventManager {
         });
         navItem.classList.add('active');
         
+        // 모바일에서 드로어 닫기
+        if (window.innerWidth <= 768) {
+            document.body.classList.remove('drawer-open');
+            const backdrop = document.querySelector('.drawer-backdrop');
+            if (backdrop) backdrop.setAttribute('aria-hidden', 'true');
+        }
+        
         // 화면 이동
         if (window.navigationManager) {
             const result = window.navigationManager.navigateTo(targetScreen);
@@ -279,6 +296,39 @@ class EventManager {
             
             console.log(`📖 계산 과정 ${isHidden ? '표시' : '숨김'}`);
         }
+    }
+    
+    // 햄버거 버튼 클릭 처리
+    handleHamburgerClick(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const body = document.body;
+        const isOpen = body.classList.contains('drawer-open');
+        
+        if (isOpen) {
+            body.classList.remove('drawer-open');
+            const backdrop = document.querySelector('.drawer-backdrop');
+            if (backdrop) backdrop.setAttribute('aria-hidden', 'true');
+            console.log('📱 드로어 닫기');
+        } else {
+            body.classList.add('drawer-open');
+            const backdrop = document.querySelector('.drawer-backdrop');
+            if (backdrop) backdrop.setAttribute('aria-hidden', 'false');
+            console.log('📱 드로어 열기');
+        }
+    }
+    
+    // 드로어 닫기 (백드롭 클릭 또는 네비게이션 아이템 클릭 시)
+    handleDrawerClose(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const body = document.body;
+        body.classList.remove('drawer-open');
+        const backdrop = document.querySelector('.drawer-backdrop');
+        if (backdrop) backdrop.setAttribute('aria-hidden', 'true');
+        console.log('📱 드로어 닫기 (백드롭 클릭)');
     }
     
     // 자동 재계산 트리거

@@ -238,6 +238,35 @@ a:hover {
     opacity: 0.8;
 }
 
+/* 햄버거 버튼 (모바일 전용) */
+.hamburger-btn {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--color-text);
+    border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+    .hamburger-btn { display: inline-flex; }
+}
+
 /* ===================================
    Footer
    =================================== */
@@ -818,20 +847,50 @@ a:hover {
 
 
 
-/* 모바일에서 광고 공간 및 사이드바 완전히 숨기기 (최상위 우선순위) */
+/* 모바일에서 광고 공간 숨김 + 사이드바 오프캔버스 (최상위 우선순위) */
 @media (max-width: 768px) {
-    .ad-space {
-        display: none !important;
-    }
-    
-    .sidebar-left {
-        display: none !important;
-    }
-    
+    .ad-space,
     .sidebar-ad {
         display: none !important;
     }
-    
+
+    .sidebar-left {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 80%;
+        max-width: 320px;
+        background: var(--color-background);
+        z-index: 1001;
+        transform: translateX(-100%);
+        transition: transform var(--transition-medium);
+        padding: var(--spacing-md);
+        overflow-y: auto;
+        border-right: 1px solid var(--color-border);
+        box-shadow: 4px 0 16px rgba(0,0,0,0.08);
+    }
+
+    .drawer-open .sidebar-left {
+        transform: translateX(0);
+    }
+
+    .drawer-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.25);
+        backdrop-filter: blur(2px);
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--transition-medium);
+    }
+
+    .drawer-open .drawer-backdrop {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
     .layout-container {
         flex-direction: column;
         gap: 0;
@@ -1184,16 +1243,9 @@ a:hover {
         --spacing-xl: 24px;
     }
     
-    /* 모바일에서 사이드바 및 광고 완전히 숨기기 */
-    .sidebar-left {
-        display: none !important;
-    }
-    
+    /* 광고 숨김 (오프캔버스 규칙은 상단 블록에 정의) */
+    .ad-space,
     .sidebar-ad {
-        display: none !important;
-    }
-    
-    .ad-space {
         display: none !important;
     }
     
