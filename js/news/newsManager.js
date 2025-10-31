@@ -161,16 +161,33 @@ class NewsManager {
         if (newsLoading) newsLoading.style.display = 'none';
         if (newsError) newsError.style.display = 'none';
         
-        // 뉴스 카드 생성
+        // 뉴스 카드 생성 (빠른 초기 렌더 + 점진적 렌더)
         newsGrid.innerHTML = '';
         
-        this.newsData.forEach(news => {
-            const card = this.createNewsCard(news);
-            newsGrid.appendChild(card);
-        });
-        
-        // 뉴스 그리드 표시
+        // 1) 첫 배치 즉시 렌더 (초기 체감 속도 개선)
+        const firstBatchCount = Math.min(8, this.newsData.length);
+        const firstFragment = document.createDocumentFragment();
+        for (let i = 0; i < firstBatchCount; i++) {
+            firstFragment.appendChild(this.createNewsCard(this.newsData[i]));
+        }
+        newsGrid.appendChild(firstFragment);
         newsGrid.style.display = 'grid';
+
+        // 2) 나머지 배치는 브라우저 여유 시간/다음 틱에 렌더
+        const renderRest = () => {
+            if (firstBatchCount >= this.newsData.length) return;
+            const restFragment = document.createDocumentFragment();
+            for (let i = firstBatchCount; i < this.newsData.length; i++) {
+                restFragment.appendChild(this.createNewsCard(this.newsData[i]));
+            }
+            newsGrid.appendChild(restFragment);
+        };
+        
+        if (window.requestIdleCallback) {
+            window.requestIdleCallback(renderRest, { timeout: 500 });
+        } else {
+            setTimeout(renderRest, 0);
+        }
     }
     
     // 뉴스 카드 생성
