@@ -261,10 +261,10 @@ a:hover {
 
 .hamburger-btn span {
     display: block;
-    width: 20px;
-    height: 2px; /* 실선처럼 보이도록 얇게 유지 */
-    background: var(--color-text);
-    border-radius: 2px;
+    width: 22px;
+    height: 3px; /* 두께를 키워 시각적 구분 강화 */
+    background: var(--color-primary);
+    border-radius: 3px;
 }
 
 @media (max-width: 768px) {
