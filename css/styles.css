@@ -327,6 +327,121 @@ a:hover {
     font-size: 11px;
 }
 
+/* ===================================
+   후원 섹션
+   =================================== */
+.donation-section {
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md) 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.donation-text {
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 500;
+}
+
+.donation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.donation-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: var(--font-size-small);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.donation-btn:hover {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.donation-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.donation-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.donation-label {
+    line-height: 1;
+}
+
+/* 카카오페이 버튼 특별 스타일 */
+.donation-kakaopay {
+    background: linear-gradient(135deg, #FEE500 0%, #FDD835 100%);
+    border-color: #FEE500;
+    color: #3C1E1E;
+}
+
+.donation-kakaopay:hover {
+    background: linear-gradient(135deg, #FDD835 0%, #FBC02D 100%);
+    border-color: #FBC02D;
+    color: #3C1E1E;
+}
+
+/* 토스 버튼 특별 스타일 */
+.donation-toss {
+    background: linear-gradient(135deg, #0064FF 0%, #0052D4 100%);
+    border-color: #0064FF;
+    color: #FFFFFF;
+}
+
+.donation-toss:hover {
+    background: linear-gradient(135deg, #0052D4 0%, #003D99 100%);
+    border-color: #0052D4;
+    color: #FFFFFF;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+    .donation-section {
+        margin: var(--spacing-sm) 0;
+        padding: var(--spacing-sm) 0;
+    }
+    
+    .donation-text {
+        font-size: 13px;
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .donation-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+        gap: 6px;
+    }
+    
+    .donation-icon {
+        font-size: 16px;
+    }
+    
+    .donation-buttons {
+        gap: var(--spacing-xs);
+    }
+}
+
 .footer a {
     font-weight: 600;
 }
