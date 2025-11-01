@@ -2188,6 +2188,84 @@ a:hover {
     border-top: 1px solid var(--color-border-light);
 }
 
+/* 사이드바 후원 섹션 */
+.sidebar-donation {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: var(--spacing-md);
+}
+
+.sidebar-donation-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.sidebar-donation-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sidebar-donation-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-donation-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-donation-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.sidebar-donation-label {
+    line-height: 1;
+}
+
+/* 사이드바 카카오페이 버튼 */
+.sidebar-donation-kakaopay {
+    background: linear-gradient(135deg, #FEE500 0%, #FDD835 100%);
+    border-color: #FEE500;
+    color: #3C1E1E;
+}
+
+.sidebar-donation-kakaopay:hover {
+    background: linear-gradient(135deg, #FDD835 0%, #FBC02D 100%);
+    border-color: #FBC02D;
+    color: #3C1E1E;
+}
+
+/* 사이드바 토스 버튼 */
+.sidebar-donation-toss {
+    background: linear-gradient(135deg, #0064FF 0%, #0052D4 100%);
+    border-color: #0064FF;
+    color: #FFFFFF;
+}
+
+.sidebar-donation-toss:hover {
+    background: linear-gradient(135deg, #0052D4 0%, #003D99 100%);
+    border-color: #0052D4;
+    color: #FFFFFF;
+}
+
 /* 계산기 네비게이션 */
 .calculator-nav {
     background: white;

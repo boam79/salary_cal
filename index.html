@@ -39,6 +39,7 @@
     <!-- 추가 SEO 메타 태그 -->
     <meta name="theme-color" content="#000000">
     <meta name="msapplication-TileColor" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="금융 계산기">
@@ -47,11 +48,14 @@
     <link rel="canonical" href="https://salary-cal.vercel.app/">
     
     <!-- Favicon -->
+    <!-- 기본 favicon만 사용 (파일이 없어도 브라우저가 기본 아이콘을 사용) -->
+    <!--
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
+    -->
     
     <!-- Google Fonts - 한글 최적화 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -128,6 +132,24 @@
         <div class="layout-container">
             <!-- 좌측 사이드바 -->
             <aside class="sidebar-left" role="navigation" aria-label="사이드 메뉴">
+                <!-- 후원 버튼 섹션 (최상단) -->
+                <div class="sidebar-donation">
+                    <div class="sidebar-donation-text">💝 후원하기</div>
+                    <div class="sidebar-donation-buttons">
+                        <a href="https://qr.kakaopay.com/Ej8dj4X39" target="_blank" rel="noopener noreferrer" class="sidebar-donation-btn sidebar-donation-kakaopay" title="카카오페이로 후원하기">
+                            <span class="sidebar-donation-icon">💳</span>
+                            <span class="sidebar-donation-label">카카오페이</span>
+                        </a>
+                        <!-- 토스 링크: 토스 송금 링크를 받으면 아래 주석을 해제하고 URL을 업데이트하세요 -->
+                        <!--
+                        <a href="https://toss.me/YOUR_TOSS_ID" target="_blank" rel="noopener noreferrer" class="sidebar-donation-btn sidebar-donation-toss" title="토스로 후원하기">
+                            <span class="sidebar-donation-icon">💸</span>
+                            <span class="sidebar-donation-label">토스</span>
+                        </a>
+                        -->
+                    </div>
+                </div>
+                
                 <!-- 계산기 네비게이션 -->
                 <nav class="calculator-nav">
                     <h3 class="sidebar-title">💰 계산기</h3>
