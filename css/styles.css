@@ -365,6 +365,8 @@ a:hover {
     font-weight: 500;
     transition: all var(--transition-fast);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    font-family: inherit;
 }
 
 .donation-btn:hover {
