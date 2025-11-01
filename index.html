@@ -136,17 +136,31 @@
                 <div class="sidebar-donation">
                     <div class="sidebar-donation-text">💝 후원하기</div>
                     <div class="sidebar-donation-buttons">
-                        <a href="https://qr.kakaopay.com/Ej8dj4X39" target="_blank" rel="noopener noreferrer" class="sidebar-donation-btn sidebar-donation-kakaopay" title="카카오페이로 후원하기">
+                        <button type="button" class="sidebar-donation-btn sidebar-donation-kakaopay" data-kakaopay-url="https://qr.kakaopay.com/Ej8dj4X39" title="카카오페이로 후원하기">
                             <span class="sidebar-donation-icon">💳</span>
                             <span class="sidebar-donation-label">카카오페이</span>
-                        </a>
+                        </button>
                         <!-- 토스 링크: 토스 송금 링크를 받으면 아래 주석을 해제하고 URL을 업데이트하세요 -->
                         <!--
-                        <a href="https://toss.me/YOUR_TOSS_ID" target="_blank" rel="noopener noreferrer" class="sidebar-donation-btn sidebar-donation-toss" title="토스로 후원하기">
+                        <button type="button" class="sidebar-donation-btn sidebar-donation-toss" data-toss-url="https://toss.me/YOUR_TOSS_ID" title="토스로 후원하기">
                             <span class="sidebar-donation-icon">💸</span>
                             <span class="sidebar-donation-label">토스</span>
-                        </a>
+                        </button>
                         -->
+                    </div>
+                </div>
+                
+                <!-- QR 코드 모달 -->
+                <div class="qr-modal" id="qr-modal" role="dialog" aria-labelledby="qr-modal-title" aria-hidden="true">
+                    <div class="qr-modal-backdrop"></div>
+                    <div class="qr-modal-content">
+                        <button class="qr-modal-close" aria-label="모달 닫기" type="button">×</button>
+                        <h3 class="qr-modal-title" id="qr-modal-title">💝 카카오페이 후원</h3>
+                        <p class="qr-modal-description">QR 코드를 스캔하여 후원해주세요</p>
+                        <div class="qr-code-container">
+                            <img id="qr-code-image" src="" alt="카카오페이 QR 코드" class="qr-code-image">
+                        </div>
+                        <p class="qr-modal-footer">모바일 카카오페이 앱에서 스캔하세요</p>
                     </div>
                 </div>
                 

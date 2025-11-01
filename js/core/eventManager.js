@@ -63,6 +63,18 @@ class EventManager {
         this.addDelegatedEvent('click', '.drawer-backdrop', (e) => {
             this.handleDrawerClose(e);
         });
+        
+        // 후원 버튼 클릭 이벤트 위임
+        this.addDelegatedEvent('click', '.sidebar-donation-btn', (e) => {
+            this.handleDonationClick(e);
+        });
+        
+        // QR 모달 닫기 이벤트 위임
+        this.addDelegatedEvent('click', '.qr-modal-close, .qr-modal-backdrop', (e) => {
+            if (e.target.classList.contains('qr-modal-close') || e.target.classList.contains('qr-modal-backdrop')) {
+                this.handleQRModalClose(e);
+            }
+        });
     }
     
     // 이벤트 위임 추가
@@ -329,6 +341,70 @@ class EventManager {
         const backdrop = document.querySelector('.drawer-backdrop');
         if (backdrop) backdrop.setAttribute('aria-hidden', 'true');
         console.log('📱 드로어 닫기 (백드롭 클릭)');
+    }
+    
+    // 후원 버튼 클릭 처리
+    handleDonationClick(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const button = event.target.closest('.sidebar-donation-btn');
+        if (!button) return;
+        
+        const kakaopayUrl = button.dataset.kakaopayUrl;
+        const tossUrl = button.dataset.tossUrl;
+        const url = kakaopayUrl || tossUrl;
+        
+        if (!url) return;
+        
+        // 모바일 환경 체크
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        
+        if (isMobile) {
+            // 모바일: 직접 링크로 이동
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            // 데스크탑: QR 코드 모달 표시
+            this.showQRModal(url);
+        }
+        
+        // 모바일에서 드로어 닫기
+        if (window.innerWidth <= 768) {
+            const body = document.body;
+            body.classList.remove('drawer-open');
+        }
+    }
+    
+    // QR 모달 표시
+    showQRModal(url) {
+        const modal = document.getElementById('qr-modal');
+        const qrImage = document.getElementById('qr-code-image');
+        
+        if (!modal || !qrImage) return;
+        
+        // QR 코드 이미지 생성 (온라인 API 사용)
+        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+        qrImage.src = qrCodeUrl;
+        
+        // 모달 표시
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        
+        console.log('💝 QR 코드 모달 표시');
+    }
+    
+    // QR 모달 닫기
+    handleQRModalClose(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const modal = document.getElementById('qr-modal');
+        if (!modal) return;
+        
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        
+        console.log('💝 QR 코드 모달 닫기');
     }
     
     // 자동 재계산 트리거

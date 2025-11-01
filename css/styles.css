@@ -2228,6 +2228,8 @@ a:hover {
     position: relative;
     z-index: 1;
     pointer-events: auto;
+    width: 100%;
+    font-family: inherit;
 }
 
 .sidebar-donation-btn:hover {
@@ -2278,6 +2280,117 @@ a:hover {
     background: linear-gradient(135deg, #0052D4 0%, #003D99 100%);
     border-color: #0052D4;
     color: #FFFFFF;
+}
+
+/* QR 코드 모달 */
+.qr-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-modal[aria-hidden="false"] {
+    display: flex;
+}
+
+.qr-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.qr-modal-content {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    text-align: center;
+}
+
+.qr-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-modal-close:hover {
+    background: var(--color-accent);
+    color: var(--color-text);
+    transform: rotate(90deg);
+}
+
+.qr-modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 10px 0;
+}
+
+.qr-modal-description {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin: 0 0 20px 0;
+}
+
+.qr-code-container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid var(--color-border);
+    margin: 0 auto 20px;
+    display: inline-block;
+}
+
+.qr-code-image {
+    display: block;
+    width: 250px;
+    height: 250px;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.qr-modal-footer {
+    font-size: 12px;
+    color: var(--color-text-light);
+    margin: 0;
+}
+
+/* 모바일에서 QR 모달 */
+@media (max-width: 768px) {
+    .qr-modal-content {
+        padding: 24px;
+        max-width: 90%;
+    }
+    
+    .qr-code-image {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .qr-modal-title {
+        font-size: 18px;
+    }
 }
 
 /* 계산기 네비게이션 */
