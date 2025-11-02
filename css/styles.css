@@ -2448,7 +2448,8 @@ a:hover {
 .stats-popup-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 1);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
     animation: fadeIn 0.3s ease;
 }
 
