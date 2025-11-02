@@ -21,29 +21,61 @@ class StatsPopup {
         this.setupEventListeners();
         
         // 초기 진입 시 팝업 표시 여부 확인
-        if (statisticsManager.shouldShowPopup()) {
-            setTimeout(() => {
-                this.show();
-            }, 500); // 페이지 로드 후 0.5초 뒤 표시
+        // DOM이 완전히 로드된 후 실행
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.checkAndShowPopup();
+            });
+        } else {
+            // 이미 로드된 경우
+            this.checkAndShowPopup();
         }
+    }
+    
+    checkAndShowPopup() {
+        // 잠시 대기 후 팝업 표시 (다른 초기화 작업 완료 대기)
+        setTimeout(() => {
+            if (statisticsManager.shouldShowPopup()) {
+                console.log('📊 통계 팝업 표시');
+                this.show();
+            } else {
+                console.log('📊 통계 팝업 표시 안 함 (오늘 이미 표시됨)');
+            }
+        }, 800); // 페이지 로드 후 0.8초 뒤 표시
     }
     
     setupEventListeners() {
         // 닫기 버튼
         const closeBtn = document.getElementById('stats-popup-close');
         if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.hide());
+            closeBtn.addEventListener('click', () => {
+                statisticsManager.markPopupShown();
+                this.hide();
+            });
+        }
+        
+        // 오늘은 그만 보기 버튼
+        const dontShowBtn = document.getElementById('stats-popup-dont-show-today');
+        if (dontShowBtn) {
+            dontShowBtn.addEventListener('click', () => {
+                statisticsManager.markDontShowToday();
+                this.hide();
+            });
         }
         
         // 백드롭 클릭 시 닫기
         const backdrop = this.popup?.querySelector('.stats-popup-backdrop');
         if (backdrop) {
-            backdrop.addEventListener('click', () => this.hide());
+            backdrop.addEventListener('click', () => {
+                statisticsManager.markPopupShown();
+                this.hide();
+            });
         }
         
         // ESC 키로 닫기
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isVisible()) {
+                statisticsManager.markPopupShown();
                 this.hide();
             }
         });
@@ -55,7 +87,7 @@ class StatsPopup {
         this.render();
         this.popup.style.display = 'flex';
         document.body.style.overflow = 'hidden'; // 스크롤 방지
-        statisticsManager.markPopupShown();
+        // markPopupShown은 닫기 버튼 클릭 시에만 호출
     }
     
     hide() {

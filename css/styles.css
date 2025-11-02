@@ -2511,8 +2511,29 @@ a:hover {
     font-size: 20px;
     font-weight: 700;
     color: var(--color-text);
-    margin: 0 0 15px 0;
+    margin: 0 0 10px 0;
     text-align: center;
+}
+
+.stats-popup-dont-show-today {
+    position: absolute;
+    top: 50px;
+    right: 15px;
+    padding: 4px 8px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.stats-popup-dont-show-today:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
+    color: var(--color-text);
 }
 
 .stats-popup-body {
@@ -2637,6 +2658,13 @@ a:hover {
     
     .stats-popup-title {
         font-size: 18px;
+    }
+    
+    .stats-popup-dont-show-today {
+        top: 45px;
+        right: 10px;
+        font-size: 10px;
+        padding: 3px 6px;
     }
     
     .stats-summary {

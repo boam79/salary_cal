@@ -85,18 +85,51 @@ class StatisticsManager {
     }
     
     /**
-     * 팝업 표시 여부 확인
+     * 팝업 표시 여부 확인 (오늘 날짜 기준)
      */
     shouldShowPopup() {
-        const shown = localStorage.getItem(this.popupShownKey);
-        return !shown || shown === 'false';
+        try {
+            const stored = localStorage.getItem(this.popupShownKey);
+            if (!stored) {
+                return true; // 저장된 값이 없으면 표시
+            }
+            
+            const data = JSON.parse(stored);
+            const today = new Date().toDateString(); // 오늘 날짜 문자열
+            
+            // 저장된 날짜와 오늘 날짜가 다르면 표시
+            if (data.date !== today) {
+                return true;
+            }
+            
+            // 오늘 이미 표시했고 "오늘은 그만"을 선택했다면 표시 안 함
+            return !data.dontShowToday;
+        } catch (error) {
+            console.error('팝업 표시 여부 확인 실패:', error);
+            return true; // 에러 시 표시
+        }
     }
     
     /**
-     * 팝업 표시 완료 기록
+     * 팝업 표시 완료 기록 (일반 닫기)
      */
     markPopupShown() {
-        localStorage.setItem(this.popupShownKey, 'true');
+        const today = new Date().toDateString();
+        localStorage.setItem(this.popupShownKey, JSON.stringify({
+            date: today,
+            dontShowToday: false
+        }));
+    }
+    
+    /**
+     * 오늘 하루 팝업 표시 안 함
+     */
+    markDontShowToday() {
+        const today = new Date().toDateString();
+        localStorage.setItem(this.popupShownKey, JSON.stringify({
+            date: today,
+            dontShowToday: true
+        }));
     }
     
     /**
