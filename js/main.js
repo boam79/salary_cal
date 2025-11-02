@@ -7,6 +7,7 @@ import AppState from './core/appState.js';
 import navigationManager from './core/navigationManager.js';
 import eventManager from './core/eventManager.js';
 import newsManager from './news/newsManager.js';
+import statsPopup from './stats/statsPopup.js';
 // topNewsManager 제거
 
 class FinancialCalculatorApp {

@@ -6,14 +6,28 @@
 class NewsManager {
     constructor() {
         this.newsData = [];
+        this.filteredNews = [];
+        this.currentCategory = 'all';
         this.lastUpdate = null;
         this.updateInterval = 5 * 60 * 1000; // 5분마다 업데이트
         this.updateTimer = null;
+        
+        // 카테고리 매핑 (뉴스 제목/설명 기반 필터링)
+        this.categoryKeywords = {
+            'economy': ['경제', '금융', '시장', '기업', '경기', '성장', '투자', '경영'],
+            'real-estate': ['부동산', '아파트', '매매', '전세', '임대', '집값', '주택', '토지'],
+            'tax': ['세금', '세율', '과세', '공제', '환급', '연말정산', '정책', '법안'],
+            'stock': ['주식', '증권', '코스피', '코스닥', '시세', '수익', '투자', '배당'],
+            'general': ['경제', '시장', '국제', '글로벌', '산업', '무역']
+        };
     }
     
     // 초기화
     async init() {
         console.log('📰 뉴스 매니저 초기화 중...');
+        
+        // 필터 탭 이벤트 리스너 설정
+        this.setupFilterTabs();
         
         // 초기 뉴스 로드
         await this.loadNews();
@@ -22,6 +36,94 @@ class NewsManager {
         this.startAutoUpdate();
         
         console.log('✅ 뉴스 매니저 초기화 완료');
+    }
+    
+    // 필터 탭 이벤트 리스너 설정
+    setupFilterTabs() {
+        const filterTabs = document.querySelectorAll('.news-filter-tab');
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const category = e.target.dataset.category;
+                if (category) {
+                    this.filterByCategory(category);
+                    
+                    // 활성 탭 업데이트
+                    filterTabs.forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                }
+            });
+        });
+    }
+    
+    // 카테고리별 필터링
+    filterByCategory(category) {
+        this.currentCategory = category;
+        
+        if (category === 'all') {
+            this.filteredNews = [...this.newsData];
+        } else {
+            const keywords = this.categoryKeywords[category] || [];
+            this.filteredNews = this.newsData.filter(news => {
+                const title = (news.title || '').toLowerCase();
+                const description = (news.description || '').toLowerCase();
+                const categoryLower = (news.category || '').toLowerCase();
+                
+                return keywords.some(keyword => 
+                    title.includes(keyword.toLowerCase()) ||
+                    description.includes(keyword.toLowerCase()) ||
+                    categoryLower.includes(keyword.toLowerCase())
+                );
+            });
+        }
+        
+        this.renderFilteredNews();
+        console.log(`🔍 카테고리 필터: ${category} (${this.filteredNews.length}개)`);
+    }
+    
+    // 필터된 뉴스 렌더링
+    renderFilteredNews() {
+        const newsGrid = document.getElementById('news-grid');
+        const newsLoading = document.getElementById('news-loading');
+        const newsError = document.getElementById('news-error');
+        
+        if (!newsGrid) return;
+        
+        // 로딩 및 에러 숨기기
+        if (newsLoading) newsLoading.style.display = 'none';
+        if (newsError) newsError.style.display = 'none';
+        
+        // 뉴스 카드 생성
+        newsGrid.innerHTML = '';
+        
+        if (this.filteredNews.length === 0) {
+            newsGrid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--color-text-secondary);">선택한 카테고리의 뉴스가 없습니다.</p>';
+            newsGrid.style.display = 'grid';
+            return;
+        }
+        
+        const firstBatchCount = Math.min(8, this.filteredNews.length);
+        const firstFragment = document.createDocumentFragment();
+        for (let i = 0; i < firstBatchCount; i++) {
+            firstFragment.appendChild(this.createNewsCard(this.filteredNews[i]));
+        }
+        newsGrid.appendChild(firstFragment);
+        newsGrid.style.display = 'grid';
+        
+        // 나머지 렌더링
+        const renderRest = () => {
+            if (firstBatchCount >= this.filteredNews.length) return;
+            const restFragment = document.createDocumentFragment();
+            for (let i = firstBatchCount; i < this.filteredNews.length; i++) {
+                restFragment.appendChild(this.createNewsCard(this.filteredNews[i]));
+            }
+            newsGrid.appendChild(restFragment);
+        };
+        
+        if (window.requestIdleCallback) {
+            window.requestIdleCallback(renderRest, { timeout: 500 });
+        } else {
+            setTimeout(renderRest, 0);
+        }
     }
     
     // 뉴스 로드
@@ -36,10 +138,15 @@ class NewsManager {
             
             // 뉴스를 랜덤하게 섞어서 매번 다른 순서로 표시
             this.newsData = this.shuffleArray([...news]);
+            this.filteredNews = [...this.newsData];
             this.lastUpdate = new Date();
             
-            // 뉴스 화면에 표시
-            this.renderNews();
+            // 현재 필터에 맞게 뉴스 표시
+            if (this.currentCategory === 'all') {
+                this.renderNews();
+            } else {
+                this.filterByCategory(this.currentCategory);
+            }
             
             console.log(`✅ 뉴스 로드 완료: ${news.length}개`);
             
@@ -223,6 +330,9 @@ class NewsManager {
             'IT': '💻'
         };
         
+        // 관련 계산기 매핑
+        const relatedCalculator = this.getRelatedCalculator(news);
+        
         // 이미지가 있으면 썸네일 추가
         const imageHtml = this.hasImage(news) 
             ? `<div class="news-card-image">
@@ -252,6 +362,14 @@ class NewsManager {
         const category = news.category || '기타';
         const date = this.formatDate(news.date);
         
+        // 관련 계산기 추천 배지
+        const relatedBadge = relatedCalculator 
+            ? `<div class="news-card-related" data-screen="${relatedCalculator.screen}">
+                <span class="news-card-related-icon">${relatedCalculator.icon}</span>
+                <span class="news-card-related-text">관련 계산기</span>
+            </div>`
+            : '';
+        
         card.innerHTML = `
             <div class="news-card-header">
                 <span class="news-card-source">${source}</span>
@@ -263,7 +381,22 @@ class NewsManager {
                 <span class="news-card-tag">${categoryMap[category] || '📰'} ${category}</span>
                 <span class="news-card-link">전체보기 →</span>
             </div>
+            ${relatedBadge}
         `;
+        
+        // 관련 계산기 클릭 이벤트 (뉴스 링크와 분리)
+        if (relatedCalculator) {
+            const relatedEl = card.querySelector('.news-card-related');
+            if (relatedEl) {
+                relatedEl.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (window.navigationManager) {
+                        window.navigationManager.navigateTo(relatedCalculator.screen);
+                    }
+                });
+            }
+        }
         
         // 렌더링 후 확인
         const titleElement = card.querySelector('.news-card-title');
@@ -274,6 +407,61 @@ class NewsManager {
         });
         
         return card;
+    }
+    
+    // 뉴스와 관련된 계산기 찾기
+    getRelatedCalculator(news) {
+        const title = (news.title || '').toLowerCase();
+        const description = (news.description || '').toLowerCase();
+        const category = (news.category || '').toLowerCase();
+        const allText = `${title} ${description} ${category}`;
+        
+        // 키워드 매핑
+        const keywordMap = {
+            'salary-screen': ['연봉', '월급', '급여', '소득', '실수령액', '공제', '4대보험', '최저시급'],
+            'tax-screen': ['세금', '세율', '상속세', '증여세', '과세', '공제', '연말정산'],
+            'real-estate-screen': ['부동산', '아파트', '주택', '매매', '전세', '양도소득세', '중개수수료', '보유세', '집값'],
+            'loan-screen': ['대출', '금리', '이자', '상환', '주택대출', 'dsr', 'ltv', 'dti'],
+            'retirement-screen': ['퇴직금', '퇴사', '근속'],
+            'savings-screen': ['적금', '예금', '이자', '저축', '복리'],
+            'vat-screen': ['부가세', 'vat', '세액', '환급'],
+            'acquisition-tax-screen': ['취등록세', '취득세', '등록세']
+        };
+        
+        // 가장 많이 매칭되는 계산기 찾기
+        let bestMatch = null;
+        let bestScore = 0;
+        
+        for (const [screen, keywords] of Object.entries(keywordMap)) {
+            const score = keywords.filter(keyword => 
+                allText.includes(keyword.toLowerCase())
+            ).length;
+            
+            if (score > bestScore) {
+                bestScore = score;
+                bestMatch = screen;
+            }
+        }
+        
+        if (bestMatch && bestScore > 0) {
+            const calculatorNames = {
+                'salary-screen': { name: '월급/연봉', icon: '💼' },
+                'tax-screen': { name: '세금', icon: '📋' },
+                'real-estate-screen': { name: '부동산', icon: '🏢' },
+                'loan-screen': { name: '대출', icon: '🏦' },
+                'retirement-screen': { name: '퇴직금', icon: '🎯' },
+                'savings-screen': { name: '적금/예금', icon: '💰' },
+                'vat-screen': { name: '부가세', icon: '🧾' },
+                'acquisition-tax-screen': { name: '취등록세', icon: '🏛️' }
+            };
+            
+            return {
+                screen: bestMatch,
+                ...calculatorNames[bestMatch]
+            };
+        }
+        
+        return null;
     }
     
     // 날짜 포맷팅

@@ -4,6 +4,7 @@
  */
 
 import AppState from './appState.js';
+import statisticsManager from '../stats/statisticsManager.js';
 
 class NavigationManager {
     constructor() {
@@ -47,6 +48,11 @@ class NavigationManager {
         
         // 상태 업데이트
         AppState.setScreen(screenId);
+        
+        // 통계 기록 (홈 화면이 아닌 경우)
+        if (screenId !== 'home-screen') {
+            statisticsManager.recordCalculatorUsage(screenId);
+        }
         
         // 스크롤 맨 위로
         window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -1972,6 +1972,7 @@ a:hover {
 }
 
 .news-card {
+    position: relative;
     background: white;
     border: 1px solid var(--color-border);
     border-radius: 8px;
@@ -2055,6 +2056,45 @@ a:hover {
 
 .news-card-link:hover {
     text-decoration: underline;
+}
+
+/* 관련 계산기 추천 배지 */
+.news-card-related {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 12px;
+    font-size: 10px;
+    cursor: pointer;
+    z-index: 10;
+    transition: all var(--transition-fast);
+    opacity: 0;
+    transform: scale(0.9);
+}
+
+.news-card:hover .news-card-related {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.news-card-related-icon {
+    font-size: 12px;
+}
+
+.news-card-related-text {
+    font-weight: 500;
+    font-size: 10px;
+}
+
+.news-card-related:hover {
+    background: var(--color-primary-dark);
+    transform: scale(1.05);
 }
 
 .news-card-image {
@@ -2392,6 +2432,250 @@ a:hover {
     
     .qr-modal-title {
         font-size: 18px;
+    }
+}
+
+/* 통계 대시보드 팝업 */
+.stats-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stats-popup-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+}
+
+.stats-popup-content {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stats-popup-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stats-popup-close:hover {
+    background: var(--color-accent);
+    color: var(--color-text);
+    transform: rotate(90deg);
+}
+
+.stats-popup-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+.stats-popup-body {
+    margin-bottom: 20px;
+}
+
+.stats-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: var(--color-surface);
+    border-radius: var(--border-radius);
+}
+
+.stats-summary-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.stats-label {
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+}
+
+.stats-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.stats-top-calculators h3 {
+    font-size: var(--font-size-h4);
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text);
+}
+
+.stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.stats-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--color-surface);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-fast);
+}
+
+.stats-item:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
+    transform: translateX(4px);
+}
+
+.stats-item-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.stats-item-icon {
+    font-size: 24px;
+}
+
+.stats-item-name {
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.stats-item-count {
+    font-weight: 700;
+    color: var(--color-primary);
+    font-size: 18px;
+}
+
+.stats-popup-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+}
+
+.stats-reset-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.stats-reset-btn:hover {
+    background: var(--color-error);
+    color: white;
+    border-color: var(--color-error);
+}
+
+/* 뉴스 필터 탭 */
+.news-filter-tabs {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+}
+
+.news-filter-tab {
+    padding: 6px 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.news-filter-tab:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
+}
+
+.news-filter-tab.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+/* 모바일에서 통계 팝업 */
+@media (max-width: 768px) {
+    .stats-popup-content {
+        padding: 24px;
+        max-width: 95%;
+    }
+    
+    .stats-popup-title {
+        font-size: 20px;
+    }
+    
+    .stats-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .news-filter-tabs {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: var(--spacing-sm);
+    }
+    
+    .news-filter-tab {
+        font-size: 11px;
+        padding: 5px 10px;
     }
 }
 
