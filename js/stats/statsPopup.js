@@ -41,17 +41,6 @@ class StatsPopup {
             backdrop.addEventListener('click', () => this.hide());
         }
         
-        // 통계 초기화 버튼
-        const resetBtn = document.getElementById('stats-reset-btn');
-        if (resetBtn) {
-            resetBtn.addEventListener('click', () => {
-                if (confirm('통계를 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-                    statisticsManager.resetStatistics();
-                    this.render();
-                }
-            });
-        }
-        
         // ESC 키로 닫기
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isVisible()) {
