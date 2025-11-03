@@ -24,10 +24,23 @@ app.use(morgan('dev'));
 const dataDir = path.join(__dirname, 'data');
 const historyPath = path.join(dataDir, 'lotto-history.json');
 const statsPath = path.join(dataDir, 'lotto-stats.json');
+const initialDataPath = path.join(dataDir, 'lotto-history-initial.json');
 
 function ensureDataDir() {
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-  if (!fs.existsSync(historyPath)) fs.writeFileSync(historyPath, '[]');
+  
+  // 초기 데이터 파일이 없으면 빈 배열
+  if (!fs.existsSync(historyPath)) {
+    // 초기 데이터가 있으면 복사, 없으면 빈 배열
+    if (fs.existsSync(initialDataPath)) {
+      const initialData = fs.readFileSync(initialDataPath, 'utf8');
+      fs.writeFileSync(historyPath, initialData);
+      console.log('[init] Loaded initial data from lotto-history-initial.json');
+    } else {
+      fs.writeFileSync(historyPath, '[]');
+    }
+  }
+  
   if (!fs.existsSync(statsPath)) fs.writeFileSync(statsPath, JSON.stringify({ version: 1, updatedAt: new Date().toISOString(), topCombos: [], meta: 'empty' }));
 }
 
@@ -172,6 +185,7 @@ async function syncHistory() {
   let added = 0;
   // 최신 회차 파악(HTML 기준)
   const latest = await fetchLatestRoundHtml();
+  console.log(`[sync] maxRound=${maxRound}, latest=${latest}`);
   if (latest && latest > maxRound) {
     for (let r = latest; r > maxRound; r--) {
       let item = await fetchRound(r);
