@@ -126,6 +126,13 @@ function setLoading(isLoading) {
 async function onGenerate() {
   try {
     setLoading(true);
+    // 서버 웜업: 헬스체크로 서버 깨우기 (Render 무료 플랜 대응)
+    try { 
+      await fetch(`${API_BASE}/health`, { cache: 'no-store' }); 
+      console.log('[lotto] server warmed up');
+    } catch (e) { 
+      console.warn('[lotto] health check failed (ignored)', e); 
+    }
     // 사전 동기화: 지연을 막기 위해 대기하지 않고 백그라운드 요청
     try { fetch(`${API_BASE}/lotto/sync`, { method: 'POST' }); } catch (e) { console.warn('[lotto] sync error (ignored)', e); }
     // 새로운 생성 API 사용(가중치 기반, 과거 조합 제외)
