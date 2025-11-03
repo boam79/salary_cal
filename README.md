@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA 금융 계산기
 
-[![Version](https://img.shields.io/badge/version-4.4.1-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.4.1)
+[![Version](https://img.shields.io/badge/version-4.5.0-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.5.0)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
@@ -100,8 +100,8 @@
 - **Canvas API** - 그래프 렌더링 (외부 라이브러리 없음)
 
 ### 배포
-- **Vercel** - 자동 배포
-- **Render** - 로또 백엔드 서버
+- **Vercel** - 프론트엔드 자동 배포
+- **Render** - 로또 백엔드 서버 (무료 플랜 최적화)
 
 ---
 
@@ -158,6 +158,12 @@ python -m http.server 8000
 ---
 
 ## 📝 업데이트 내역
+
+### v4.5.0 (2025-11-03) - 🎲 로또 최적화
+- **Render 무료 플랜 최적화**
+- 크론 스크립트: 타임아웃 5분, 최대 3회 재시도
+- 생성 버튼 웜업: 헬스체크로 서버 깨우기
+- 상세 로그 및 결과 요약
 
 ### v4.4.1 (2025-11-03) - 🐛 버그 수정
 - **근로소득공제 구간 2025년 기준으로 수정**
@@ -240,7 +246,7 @@ MIT License
 ---
 
 **Last Updated**: 2025-11-03  
-**Version**: 4.4.1  
+**Version**: 4.5.0  
 **Status**: ✅ Production Ready
 
 ---
