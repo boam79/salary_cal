@@ -92,14 +92,23 @@ async function fetchRoundHtml(round) {
   });
   if (!res.ok) return null;
   const html = await res.text();
-  const $ = cheerio.load(html);
-  // 회차 파싱: 페이지 내 "제 xxxx회" 또는 input[name=drwNo]
+  const $ = cheerio.load(html, { decodeEntities: true });
+  // 회차 파싱: input[name=drwNo] 우선, 그 다음 페이지 내 "제 xxxx회"
   let parsedRound = round;
+  const inputVal = $('input[name="drwNo"]').val();
+  if ((!parsedRound || parsedRound === 0) && inputVal) parsedRound = parseInt(inputVal, 10);
   const titleText = $('div.win_result h4 strong').text() || $('h4').text() || $('title').text();
   const m = titleText.match(/([0-9]{3,5})\s*회/);
   if ((!parsedRound || parsedRound === 0) && m) parsedRound = parseInt(m[1], 10);
-  const inputVal = $('input[name="drwNo"]').val();
-  if ((!parsedRound || parsedRound === 0) && inputVal) parsedRound = parseInt(inputVal, 10);
+  
+  // 폴백: input의 value attribute 직접 확인
+  if ((!parsedRound || parsedRound === 0)) {
+    const inputEl = $('input[name="drwNo"]')[0];
+    if (inputEl && inputEl.attribs && inputEl.attribs.value) {
+      const v = parseInt(inputEl.attribs.value, 10);
+      if (!isNaN(v)) parsedRound = v;
+    }
+  }
   // 번호 파싱: 공통 클래스(ball) 기반 선택자들 시도
   let nums = [];
   $('span.ball_645, .win_result .num .ball, .lotto_win_number .ball').each((_, el) => {
@@ -119,8 +128,26 @@ async function fetchRoundHtml(round) {
 }
 
 async function fetchLatestRoundHtml() {
-  const item = await fetchRoundHtml(0);
-  return item?.round || 0;
+  // 최신 회차 찾기: 최근 회차부터 역으로 탐색
+  // 2025-11-03 기준: 약 1196회차, 주 2회 추첨
+  const today = new Date();
+  const yearStart = new Date(today.getFullYear(), 0, 1);
+  const daysSinceStart = Math.floor((today - yearStart) / (1000 * 60 * 60 * 24));
+  const estimatedRound = 1000 + Math.floor(daysSinceStart / 3.5); // 주 2회 = 3.5일당 1회
+  
+  // 최근 회차부터 넓은 범위에서 찾기 (1200부터 역순, 최대 50회 시도)
+  let found = false;
+  for (let tryRound = 1200; tryRound >= Math.max(1, estimatedRound - 50) && tryRound >= 1150; tryRound--) {
+    const item = await fetchRound(tryRound);
+    if (item) {
+      console.log(`[fetchLatest] Found latest round: ${tryRound}`);
+      return tryRound;
+    }
+    await new Promise(res => setTimeout(res, 50)); // API 부하 방지
+  }
+  
+  console.warn('[fetchLatest] Could not determine latest round, using fallback');
+  return estimatedRound;
 }
 
 function readHistory() {
