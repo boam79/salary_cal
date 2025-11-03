@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA 금융 계산기
 
-[![Version](https://img.shields.io/badge/version-4.4.0-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.4.0)
+[![Version](https://img.shields.io/badge/version-4.4.1-blue.svg)](https://github.com/boam79/salary_cal/releases/tag/v4.4.1)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
@@ -1068,6 +1068,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참조
 
 | 버전 | 날짜 | 주요 변경사항 | 상태 |
 |------|------|--------------|------|
+| v4.4.1 | 2025-11-03 | 🐛 근로소득공제 구간 2025년 기준으로 수정 | ✅ 완료 |
 | v4.4.0 | 2025-10-30 | 🎲 로또번호 생성기(백엔드+프런트) 구현, 생성 무작위성·초기화 개선 | ✅ 완료 |
 | v4.3.2 | 2025-10-30 | 🧾 부가세 계산기 추가, 세율 설정 갱신 | ✅ 완료 |
 | v4.3.1 | 2025-10-30 | 🗞️ 종합뉴스(카드·5열·30개·랭킹) 업데이트 | ✅ 완료 |
@@ -1084,8 +1085,8 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 참조
 
 ---
 
-**Last Updated**: 2025-10-30
-**Version**: 4.4.0
+**Last Updated**: 2025-11-03
+**Version**: 4.4.1
 **Status**: ✅ Production Ready
 
 ---

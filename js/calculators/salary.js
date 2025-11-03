@@ -76,18 +76,20 @@ function calculateSalary() {
     // 5. 소득세 계산
     const yearlyIncome = annualSalary;
     
-    // 근로소득공제 (간소화)
+    // 근로소득공제 (2025년 기준)
     let incomeDeduction = 0;
-    if (yearlyIncome <= 5000000) {
+    if (yearlyIncome <= 6000000) {
         incomeDeduction = yearlyIncome * 0.7;
     } else if (yearlyIncome <= 15000000) {
-        incomeDeduction = 3500000 + (yearlyIncome - 5000000) * 0.4;
-    } else if (yearlyIncome <= 45000000) {
-        incomeDeduction = 7500000 + (yearlyIncome - 15000000) * 0.15;
-    } else if (yearlyIncome <= 100000000) {
-        incomeDeduction = 12000000 + (yearlyIncome - 45000000) * 0.05;
+        incomeDeduction = 4200000 + (yearlyIncome - 6000000) * 0.4;
+    } else if (yearlyIncome <= 30000000) {
+        incomeDeduction = 7800000 + (yearlyIncome - 15000000) * 0.15;
+    } else if (yearlyIncome <= 50000000) {
+        incomeDeduction = 10050000 + (yearlyIncome - 30000000) * 0.08;
+    } else if (yearlyIncome <= 88000000) {
+        incomeDeduction = 11650000 + (yearlyIncome - 50000000) * 0.06;
     } else {
-        incomeDeduction = 14750000 + (yearlyIncome - 100000000) * 0.02;
+        incomeDeduction = 13930000 + (yearlyIncome - 88000000) * 0.02;
     }
     
     // 과세표준

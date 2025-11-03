@@ -425,6 +425,13 @@ HTML, JavaScript, CSS를 사용하여 다양한 금융 계산 기능을 제공�
 
 ## Project Status Board
 
+### 최근 완료 (2025-11-03)
+- [x] **Task: 근로소득공제 구간 2025년 기준으로 수정** ✅ 완료
+  - 500만원/1,500만원/4,500만원/1억원 → 600만원/1,500만원/3,000만원/5,000만원/8,800만원
+  - 세율 버전 업데이트 (3.0.0 → 3.1.0)
+  - 푸터 기준일자 변경 (2025년 10월 → 2025년 11월)
+  - README 버전 업데이트 (4.4.0 → 4.4.1)
+
 ### 최근 완료 (2025-10-15)
 - [x] **Task: 2025년 10월 기준 세율 업데이트 및 푸터 수정** ✅ 완료
   - 세율 검토 및 업데이트 (장기요양보험료율 12.27%)
@@ -508,6 +515,57 @@ js/
 ---
 
 ## Executor's Feedback or Assistance Requests
+
+### ✅ 급여 계산기 버그 수정 완료 (2025-01-15)
+
+**요청 사항:**
+사용자가 급여 계산기와 코스모스팜 계산기 결과 차이 확인 요청
+
+**발견된 버그:**
+근로소득공제 구간이 2025년 기준과 불일치!
+
+**문제점:**
+- 기존: 500만원/1,500만원/4,500만원/1억원 구간 (2024년 기준)
+- 실제: 600만원/1,500만원/3,000만원/5,000만원/8,800만원 구간 (2025년 기준)
+
+**수정 내용:**
+```javascript
+// ❌ 수정 전 (2024년 기준)
+if (yearlyIncome <= 5000000) {
+    incomeDeduction = yearlyIncome * 0.7;
+} else if (yearlyIncome <= 15000000) {
+    incomeDeduction = 3500000 + (yearlyIncome - 5000000) * 0.4;
+} else if (yearlyIncome <= 45000000) {
+    incomeDeduction = 7500000 + (yearlyIncome - 15000000) * 0.15;
+} else if (yearlyIncome <= 100000000) {
+    incomeDeduction = 12000000 + (yearlyIncome - 45000000) * 0.05;
+} else {
+    incomeDeduction = 14750000 + (yearlyIncome - 100000000) * 0.02;
+}
+
+// ✅ 수정 후 (2025년 기준)
+if (yearlyIncome <= 6000000) {
+    incomeDeduction = yearlyIncome * 0.7;
+} else if (yearlyIncome <= 15000000) {
+    incomeDeduction = 4200000 + (yearlyIncome - 6000000) * 0.4;
+} else if (yearlyIncome <= 30000000) {
+    incomeDeduction = 7800000 + (yearlyIncome - 15000000) * 0.15;
+} else if (yearlyIncome <= 50000000) {
+    incomeDeduction = 10050000 + (yearlyIncome - 30000000) * 0.08;
+} else if (yearlyIncome <= 88000000) {
+    incomeDeduction = 11650000 + (yearlyIncome - 50000000) * 0.06;
+} else {
+    incomeDeduction = 13930000 + (yearlyIncome - 88000000) * 0.02;
+}
+```
+
+**참고 자료:**
+- https://job.cosmosfarm.com/ko/calculator/salary
+
+**결과:**
+이제 코스모스팜 계산기와 동일한 결과가 나와야 합니다.
+
+---
 
 ### ✅ Phase 4.5 완료 보고 (2025-10-18)
 
