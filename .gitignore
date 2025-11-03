@@ -54,3 +54,5 @@ node_modules/
 dist/
 build/
 
+server/node_modules/
+server/package-lock.json
