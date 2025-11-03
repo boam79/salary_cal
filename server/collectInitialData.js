@@ -23,6 +23,8 @@ async function fetchRound(round) {
 
 async function findLatestRound() {
   console.log('🔍 Finding latest round...');
+  
+  // 최신 회차 찾기
   for (let tryRound = 1200; tryRound >= 1150; tryRound--) {
     const item = await fetchRound(tryRound);
     if (item) {
@@ -36,21 +38,42 @@ async function findLatestRound() {
   return 1196;
 }
 
-async function collectData(startRound, count = 200) {
-  const history = [];
-  console.log(`📦 Collecting ${count} rounds from ${startRound}...`);
+async function collectData(startRound, endRound = 1) {
+  // 기존 데이터 로드
+  let history = [];
+  if (fs.existsSync(outputPath)) {
+    try {
+      history = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
+      console.log(`📂 Loaded ${history.length} existing rounds`);
+    } catch (e) {}
+  }
   
+  const existingRounds = new Set(history.map(h => h.round));
+  const count = startRound - endRound + 1;
+  console.log(`📦 Collecting ${count} rounds from ${startRound} to ${endRound}...`);
+  
+  let collected = 0;
   for (let i = 0; i < count; i++) {
     const round = startRound - i;
+    
+    // 이미 있으면 스킵
+    if (existingRounds.has(round)) {
+      if ((i + 1) % 500 === 0) console.log(`   Skipped ${i + 1}/${count} (already exists)`);
+      continue;
+    }
+    
     const item = await fetchRound(round);
     
     if (item) {
       history.push(item);
-      if ((i + 1) % 20 === 0) {
-        console.log(`   Collected ${i + 1}/${count} rounds (latest: ${startRound - i})`);
+      collected++;
+      if (collected % 50 === 0) {
+        console.log(`   Collected ${collected} new rounds (current: ${round})`);
       }
     } else {
-      console.warn(`   ⚠️ Round ${round} not found`);
+      if (round > 1000) { // 1000회 이하는 데이터 없을 수 있음
+        console.warn(`   ⚠️ Round ${round} not found`);
+      }
     }
     
     // API 부하 방지 (50ms 지연으로 빠르게)
@@ -59,19 +82,20 @@ async function collectData(startRound, count = 200) {
   
   // 회차순으로 정렬
   history.sort((a, b) => a.round - b.round);
+  console.log(`✅ Total collected: ${collected} new rounds, ${history.length} total`);
   return history;
 }
 
 async function main() {
-  console.log('🎲 로또 초기 데이터 수집 시작');
+  console.log('🎲 로또 전체 데이터 수집 시작');
   console.log('═══════════════════════════════════════');
   
   try {
     // 1. 최신 회차 찾기
     const latestRound = await findLatestRound();
     
-    // 2. 최근 200회차 수집
-    const history = await collectData(latestRound, 200);
+    // 2. 전체 회차 수집 (최신 → 1회)
+    const history = await collectData(latestRound, 1);
     
     // 3. 파일 저장
     const outputDir = path.dirname(outputPath);
