@@ -41,3 +41,15 @@ export function calculateMonthlySalaryFromHourlyWage({ workHoursPerWeek, hourlyW
   return calculateMonthlyFromHourly({ workHoursPerWeek, hourlyWage });
 }
 
+// Backward-compatible alias for existing calculator import
+export function computeMonthlyFromHourlyWage({ workHoursPerWeek, hourlyWage, minimumWage }) {
+  const r = calculateMonthlySalaryFromHourlyWage({ workHoursPerWeek, hourlyWage, minimumWage });
+  if (!r.ok) {
+    if (r.error === 'MINIMUM_WAGE') {
+      return { ok: false, error: r.error, errorMessage: '시급은 최저시급 이상이어야 합니다.' };
+    }
+    return { ok: false, error: r.error, errorMessage: '월급 계산 중 오류가 발생했습니다.' };
+  }
+  return { ok: true, monthlySalary: r.monthlySalary };
+}
+

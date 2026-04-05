@@ -43,6 +43,17 @@ export function calculateInheritanceTax({ amount, basicDeduction, brackets }) {
   return { ok: true, taxBase, tax: r.tax, deduction: basicDeduction };
 }
 
+/**
+ * Backward-compatible wrappers for calculator modules.
+ * Keep these names stable to avoid breaking `js/calculators/tax.js`.
+ */
+export function calculateInheritanceTaxDomain({ amount, inheritanceTax }) {
+  if (!inheritanceTax || typeof inheritanceTax !== 'object') return { ok: false, error: 'invalid_inheritance_tax' };
+  const basicDeduction = inheritanceTax.basicDeduction;
+  const brackets = inheritanceTax.brackets;
+  return calculateInheritanceTax({ amount, basicDeduction, brackets });
+}
+
 export function resolveGiftDeduction({ relation, deductionsByRelation }) {
   if (!relation || typeof relation !== 'string') return { ok: false, error: 'invalid_relation' };
   if (!deductionsByRelation || typeof deductionsByRelation !== 'object') {
@@ -67,5 +78,12 @@ export function calculateGiftTaxByRelation({ amount, relation, deductionsByRelat
   const d = resolveGiftDeduction({ relation, deductionsByRelation });
   if (!d.ok) return d;
   return calculateGiftTax({ amount, deduction: d.deduction, brackets });
+}
+
+export function calculateGiftTaxDomain({ amount, relation, giftTax }) {
+  if (!giftTax || typeof giftTax !== 'object') return { ok: false, error: 'invalid_gift_tax' };
+  const deductionsByRelation = giftTax.deductions;
+  const brackets = giftTax.brackets;
+  return calculateGiftTaxByRelation({ amount, relation, deductionsByRelation, brackets });
 }
 
