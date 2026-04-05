@@ -43,8 +43,8 @@ function calculateSalary() {
         const hourlyWage = window.validateInput(document.getElementById('hourly-wage').value, '시급');
         if (hourlyWage === null) return;
         
-        // 2025년 최저시급 확인
-        const minimumWage = 10030;
+        // 최저시급 확인 (AppState 단일 출처)
+        const minimumWage = AppState.getCurrentMinimumWage();
         if (hourlyWage < minimumWage) {
             alert(`시급은 최저시급 ${minimumWage.toLocaleString()}원 이상이어야 합니다.`);
             return;
@@ -243,7 +243,7 @@ function resetSalaryCalculator() {
     // 입력 필드 초기화
     document.getElementById('annual-salary').value = '';
     document.getElementById('work-hours').value = '';
-    document.getElementById('hourly-wage').value = '10030';
+    document.getElementById('hourly-wage').value = String(AppState.getCurrentMinimumWage());
     
     // 라디오 버튼을 연봉 계산으로 초기화
     document.querySelector('input[name="salary-type"][value="annual"]').checked = true;
