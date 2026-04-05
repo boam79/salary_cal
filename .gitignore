@@ -56,3 +56,7 @@ build/
 
 server/node_modules/
 server/package-lock.json
+
+# Server runtime data files (generated locally/tests)
+server/data/lotto-history.json
+server/data/lotto-stats.json
