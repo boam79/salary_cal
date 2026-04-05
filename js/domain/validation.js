@@ -44,3 +44,35 @@ export function validateKoreanPhoneFormat(phone) {
   return { ok: phoneRegex.test(s) };
 }
 
+// Backward-compatible exports for the browser wrapper (`js/utils/validation.js`)
+// Keep these stable so that browser bundles don't fail to load.
+export function getMinValueForUnit(defaultUnit) {
+  // defaultUnit >= 1억(100,000,000) 입력은 최소 0.1(=1천만원)부터
+  return defaultUnit >= 100_000_000 ? 0.1 : 0.01;
+}
+
+export function validateInputRaw(value, options = {}) {
+  const r = validateNumber(value, options);
+  if (!r.ok) {
+    // Map to existing wrapper error keys (lowercase) to avoid UX regressions.
+    const map = {
+      EMPTY: 'empty',
+      NOT_A_NUMBER: 'nan',
+      NEGATIVE: 'negative',
+      ZERO_NOT_ALLOWED: 'zero_not_allowed',
+      BELOW_MIN: 'below_min',
+      ABOVE_MAX: 'above_max',
+    };
+    return { ok: false, error: map[r.error] || 'invalid' };
+  }
+  return { ok: true, value: r.value };
+}
+
+export function validateEmail(email) {
+  return validateEmailFormat(email).ok;
+}
+
+export function validatePhone(phone) {
+  return validateKoreanPhoneFormat(phone).ok;
+}
+
