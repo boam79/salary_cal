@@ -24,6 +24,10 @@
     "zero": 0.0,
     "note": "대한민국 일반 부가가치세율은 10%. 영세율/면세는 0% 적용."
   },
+  "minimumWage": {
+    "year": 2025,
+    "hourly": 10030
+  },
   "incomeTax": {
     "brackets": [
       { "max": 12000000, "rate": 0.06, "deduction": 0 },

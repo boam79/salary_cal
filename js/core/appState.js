@@ -9,12 +9,9 @@ const AppState = {
     taxRates: null,
     isLoading: false,
     
-    // 최저시급 데이터 (년도별)
-    minimumWageData: {
-        2024: 9860,
-        2025: 10030, // 2025년 최저시급 (고용노동부 확정)
-        2026: 11200, // 2026년 예상 최저시급
-    },
+    // 최저시급(폴백): rates.json 로드 실패/미설정 대비
+    // - "예상" 값은 계산 근거로 오해될 수 있어 포함하지 않음
+    minimumWageFallback: 10030,
     
     // 상태 변경 메서드들
     setScreen(screenId) {
@@ -45,7 +42,10 @@ const AppState = {
     },
     
     getCurrentMinimumWage() {
-        return this.minimumWageData[2025]; // 2025년 최저시급
+        // SSOT: config/rates.json(AppState.taxRates) 우선
+        const fromRates = this.taxRates?.minimumWage?.value;
+        if (Number.isFinite(fromRates) && fromRates > 0) return fromRates;
+        return this.minimumWageFallback;
     },
     
     // 상태 초기화

@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA
 
-[![Version](https://img.shields.io/badge/version-4.5.0-blue.svg)](https://github.com/boam79/salary_cal/releases)
+[![Version](https://img.shields.io/badge/version-4.6.0-blue.svg)](https://github.com/boam79/salary_cal/releases)
 [![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
 ---
@@ -77,6 +77,13 @@ python -m http.server 8000
 
 ## 📝 최근 업데이트
 
+### v4.6.0 (2026-04-05)
+- ✅ 품질 고도화: Vitest 테스트 러너 도입 (`npm test`)
+- ✅ 도메인 로직 순수 함수 분리 + 회귀 테스트 추가
+  - 월급(최저시급 경계값), 상속/증여(누진구간 경계값), 대출(3종 상환방식)
+- ✅ 로또 백엔드 API contract 테스트 추가 (`/health`, `/lotto/stats`, `/lotto/generate`)
+- ✅ 최저시급 SSOT 강화: `config/rates.json`의 `minimumWage.current`를 우선 참조
+
 ### v4.5.0 (2025-11-03)
 - 🎲 로또 전체 데이터 수집 (1~1196회, 156KB)
 - Render 무료 플랜 최적화
@@ -106,6 +113,6 @@ MIT License
 
 ---
 
-**Last Updated**: 2025-11-03 | **Version**: 4.5.0
+**Last Updated**: 2026-04-05 | **Version**: 4.6.0
 
 Made with ❤️ by [@boam79](https://github.com/boam79)

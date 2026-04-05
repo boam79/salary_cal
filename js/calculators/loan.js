@@ -6,6 +6,7 @@
  */
 
 import AppState from '../core/appState.js';
+import { calculateLoanSummary } from '../domain/loan.js';
 
 /**
  * 상환방식별 계산 공식 설명
@@ -63,72 +64,20 @@ function calculateLoan() {
     const repaymentType = document.getElementById('repayment-type').value;
     const monthlyRate = annualRate / 100 / 12;
     const months = years * 12;
-    
-    let monthlyPayment = 0;
-    let totalInterest = 0;
-    let schedule = [];
-    
-    // 상환방식별 계산
-    if (repaymentType === 'equalPrincipalInterest') {
-        monthlyPayment = principal * monthlyRate * Math.pow(1 + monthlyRate, months) / 
-                         (Math.pow(1 + monthlyRate, months) - 1);
-        
-        let balance = principal;
-        for (let i = 1; i <= months; i++) {
-            const interest = balance * monthlyRate;
-            const principalPayment = monthlyPayment - interest;
-            balance -= principalPayment;
-            totalInterest += interest;
-            
-            if (i <= 12 || i % 12 === 0 || i === months) {
-                schedule.push({
-                    month: i,
-                    principal: principalPayment,
-                    interest: interest,
-                    payment: monthlyPayment,
-                    balance: Math.max(0, balance)
-                });
-            }
-        }
-    } else if (repaymentType === 'equalPrincipal') {
-        const principalPayment = principal / months;
-        let balance = principal;
-        
-        for (let i = 1; i <= months; i++) {
-            const interest = balance * monthlyRate;
-            const payment = principalPayment + interest;
-            balance -= principalPayment;
-            totalInterest += interest;
-            
-            if (i <= 12 || i % 12 === 0 || i === months) {
-                schedule.push({
-                    month: i,
-                    principal: principalPayment,
-                    interest: interest,
-                    payment: payment,
-                    balance: Math.max(0, balance)
-                });
-            }
-        }
-        monthlyPayment = principalPayment + (principal * monthlyRate);
-    } else if (repaymentType === 'maturity') {
-        monthlyPayment = principal * monthlyRate;
-        totalInterest = monthlyPayment * months;
-        
-        for (let i = 1; i <= months; i++) {
-            if (i <= 12 || i % 12 === 0 || i === months) {
-                schedule.push({
-                    month: i,
-                    principal: i === months ? principal : 0,
-                    interest: monthlyPayment,
-                    payment: i === months ? principal + monthlyPayment : monthlyPayment,
-                    balance: i === months ? 0 : principal
-                });
-            }
-        }
+
+    const summary = calculateLoanSummary({
+        principal,
+        annualRatePercent: annualRate,
+        years,
+        repaymentType,
+        scheduleSampled: true
+    });
+    if (!summary.ok) {
+        console.error('calculateLoan: Failed to calculate summary', summary.error);
+        return;
     }
-    
-    const totalPayment = principal + totalInterest;
+
+    const { monthlyPayment, totalInterest, totalPayment, schedule } = summary;
     
     const repaymentTypeNames = {
         'equalPrincipalInterest': '원리금균등상환',
@@ -282,73 +231,19 @@ function calculateHousingLoan() {
     
     const maxLoan = Math.min(maxLoanByLTV, maxLoanByDTI, requiredLoan);
     
-    let monthlyPayment = 0;
-    let totalInterest = 0;
-    let schedule = [];
-    
-    // 상환방식별 계산
-    if (repaymentType === 'equalPrincipalInterest') {
-        // 원리금균등상환
-        monthlyPayment = maxLoan * monthlyRate * Math.pow(1 + monthlyRate, months) / 
-                         (Math.pow(1 + monthlyRate, months) - 1);
-        
-        let balance = maxLoan;
-        for (let i = 1; i <= months; i++) {
-            const interest = balance * monthlyRate;
-            const principalPayment = monthlyPayment - interest;
-            balance -= principalPayment;
-            totalInterest += interest;
-            
-            if (i <= 12 || i % 12 === 0 || i === months) {
-                schedule.push({
-                    month: i,
-                    principal: principalPayment,
-                    interest: interest,
-                    payment: monthlyPayment,
-                    balance: Math.max(0, balance)
-                });
-            }
-        }
-    } else if (repaymentType === 'equalPrincipal') {
-        // 원금균등상환
-        const principalPayment = maxLoan / months;
-        let balance = maxLoan;
-        
-        for (let i = 1; i <= months; i++) {
-            const interest = balance * monthlyRate;
-            const payment = principalPayment + interest;
-            balance -= principalPayment;
-            totalInterest += interest;
-            
-            if (i <= 12 || i % 12 === 0 || i === months) {
-                schedule.push({
-                    month: i,
-                    principal: principalPayment,
-                    interest: interest,
-                    payment: payment,
-                    balance: Math.max(0, balance)
-                });
-            }
-        }
-        monthlyPayment = principalPayment + (maxLoan * monthlyRate);
-    } else if (repaymentType === 'maturity') {
-        // 만기일시상환
-        monthlyPayment = maxLoan * monthlyRate;
-        totalInterest = monthlyPayment * months;
-        
-        for (let i = 1; i <= months; i++) {
-            if (i <= 12 || i % 12 === 0 || i === months) {
-                schedule.push({
-                    month: i,
-                    principal: i === months ? maxLoan : 0,
-                    interest: monthlyPayment,
-                    payment: i === months ? maxLoan + monthlyPayment : monthlyPayment,
-                    balance: i === months ? 0 : maxLoan
-                });
-            }
-        }
+    const summary = calculateLoanSummary({
+        principal: maxLoan,
+        annualRatePercent: annualRate,
+        years,
+        repaymentType,
+        scheduleSampled: true
+    });
+    if (!summary.ok) {
+        console.error('calculateHousingLoan: Failed to calculate summary', summary.error);
+        return;
     }
-    
+
+    const { monthlyPayment, totalInterest, schedule } = summary;
     const totalPayment = maxLoan + totalInterest;
     
     const summaryElement = document.getElementById('housing-loan-summary');

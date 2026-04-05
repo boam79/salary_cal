@@ -6,6 +6,7 @@
  */
 
 import AppState from '../core/appState.js';
+import { calculateInheritanceTaxDomain, calculateGiftTaxDomain } from '../domain/tax.js';
 
 /**
  * 상속세 계산
@@ -27,19 +28,16 @@ function calculateInheritanceTax() {
         return;
     }
     
-    // 일괄공제 5억원 (간소화)
-    const deduction = 500000000;
-    const taxBase = Math.max(0, amount - deduction);
-    
-    // 상속세 계산
-    let tax = 0;
-    const brackets = rates.inheritanceTax.brackets;
-    for (let i = 0; i < brackets.length; i++) {
-        if (taxBase <= brackets[i].max) {
-            tax = taxBase * brackets[i].rate - brackets[i].deduction;
-            break;
-        }
+    const domain = calculateInheritanceTaxDomain({
+        amount,
+        inheritanceTax: rates.inheritanceTax
+    });
+    if (!domain.ok) {
+        console.error('calculateInheritanceTax: domain error', domain.error);
+        alert('상속세 계산 중 오류가 발생했습니다. 입력값을 확인해주세요.');
+        return;
     }
+    const { deduction, taxBase, tax } = domain;
     
     // 결과 표시
     const resultSection = document.getElementById('inheritance-result');
@@ -100,19 +98,17 @@ function calculateGiftTax() {
         return;
     }
     
-    // 공제액
-    const deduction = rates.giftTax.deductions[relation];
-    const taxBase = Math.max(0, amount - deduction);
-    
-    // 증여세 계산
-    let tax = 0;
-    const brackets = rates.giftTax.brackets;
-    for (let i = 0; i < brackets.length; i++) {
-        if (taxBase <= brackets[i].max) {
-            tax = taxBase * brackets[i].rate - brackets[i].deduction;
-            break;
-        }
+    const domain = calculateGiftTaxDomain({
+        amount,
+        relation,
+        giftTax: rates.giftTax
+    });
+    if (!domain.ok) {
+        console.error('calculateGiftTax: domain error', domain.error);
+        alert('증여세 계산 중 오류가 발생했습니다. 입력값/관계를 확인해주세요.');
+        return;
     }
+    const { deduction, taxBase, tax } = domain;
     
     const relationNames = {
         spouse: '배우자',
