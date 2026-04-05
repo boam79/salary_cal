@@ -8,7 +8,7 @@ import navigationManager from './core/navigationManager.js';
 import eventManager from './core/eventManager.js';
 import newsManager from './news/newsManager.js';
 import statsPopup from './stats/statsPopup.js';
-// topNewsManager 제거
+// topNewsManager 제거 (기능 미사용)
 
 class FinancialCalculatorApp {
     constructor() {
@@ -165,7 +165,7 @@ class FinancialCalculatorApp {
     cleanup() {
         eventManager.cleanup();
         newsManager.cleanup();
-        topNewsManager.cleanup();
+        // topNewsManager는 현재 앱에서 사용하지 않음
         AppState.reset();
         this.isInitialized = false;
         console.log('🧹 애플리케이션 정리 완료');
