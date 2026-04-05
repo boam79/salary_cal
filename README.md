@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA
 
-[![Version](https://img.shields.io/badge/version-4.6.0-blue.svg)](https://github.com/boam79/salary_cal/releases)
+[![Version](https://img.shields.io/badge/version-4.6.1-blue.svg)](https://github.com/boam79/salary_cal/releases)
 [![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
 ---
@@ -34,7 +34,7 @@
 ```bash
 git clone https://github.com/boam79/salary_cal.git
 cd salary_cal
-python -m http.server 8000
+python3 -m http.server 8000
 # http://localhost:8000
 ```
 
@@ -77,6 +77,10 @@ python -m http.server 8000
 
 ## 📝 최근 업데이트
 
+### v4.6.1 (2026-04-05)
+- ✅ E2E(브라우저) 스모크 테스트 추가 (Playwright)
+  - `npm run test:e2e`로 핵심 계산기(연봉/상속세/대출) 입력→계산→결과 렌더링까지 자동 검증
+
 ### v4.6.0 (2026-04-05)
 - ✅ 품질 고도화: Vitest 테스트 러너 도입 (`npm test`)
 - ✅ 도메인 로직 순수 함수 분리 + 회귀 테스트 추가
@@ -107,12 +111,26 @@ python -m http.server 8000
 
 ---
 
+## ✅ 테스트
+
+```bash
+# Unit / Contract tests (Vitest)
+npm test
+
+# E2E smoke tests (Playwright)
+npm run test:e2e
+```
+
+> E2E는 내부적으로 `python3 -m http.server`로 정적 서버를 띄웁니다.
+
+---
+
 ## 📄 라이선스
 
 MIT License
 
 ---
 
-**Last Updated**: 2026-04-05 | **Version**: 4.6.0
+**Last Updated**: 2026-04-05 | **Version**: 4.6.1
 
 Made with ❤️ by [@boam79](https://github.com/boam79)
