@@ -6,6 +6,7 @@
  */
 
 import AppState from '../core/appState.js';
+import { computeMonthlyFromHourlyWage } from '../domain/salary.js';
 
 /**
  * 연봉/월급 실수령액 계산
@@ -45,18 +46,16 @@ function calculateSalary() {
         
         // 최저시급 확인 (AppState 단일 출처)
         const minimumWage = AppState.getCurrentMinimumWage();
-        if (hourlyWage < minimumWage) {
-            alert(`시급은 최저시급 ${minimumWage.toLocaleString()}원 이상이어야 합니다.`);
+        const monthlyComputation = computeMonthlyFromHourlyWage({
+            workHoursPerWeek: workHours,
+            hourlyWage,
+            minimumWage,
+        });
+        if (!monthlyComputation.ok) {
+            alert(monthlyComputation.errorMessage);
             return;
         }
-        
-        // 주휴수당 포함 주급 계산
-        const weeklySalary = workHours * hourlyWage; // 주급
-        const weeklyHolidayPay = (workHours * hourlyWage) * 0.125; // 주휴수당 (주급의 12.5%)
-        const totalWeeklySalary = weeklySalary + weeklyHolidayPay;
-        
-        // 월급 계산 (주 4.33주 기준)
-        monthlySalary = totalWeeklySalary * 4.33;
+        monthlySalary = monthlyComputation.monthlySalary;
         annualSalary = monthlySalary * 12;
     }
     

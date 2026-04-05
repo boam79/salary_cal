@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { calculateMonthlySalaryFromHourlyWage } from '../js/domain/salary.js';
 
 // validation.js 는 IIFE로 window에 붙이는 형태라, 테스트에서는 필요한 로직을 직접 재현한다.
 // (품질 고도화 단계에서 순수 함수로 분리하면 이 테스트는 실제 모듈 import로 교체)
@@ -31,6 +32,28 @@ describe('validateInput (smoke)', () => {
 
   it('enforces allowZero=false by default', () => {
     expect(validateInput('0', '금액')).toBeNull();
+  });
+});
+
+describe('salary domain (smoke)', () => {
+  it('rejects hourly wage below minimum wage', () => {
+    const r = calculateMonthlySalaryFromHourlyWage({
+      workHoursPerWeek: 40,
+      hourlyWage: 10029,
+      minimumWage: 10030,
+    });
+    expect(r.ok).toBe(false);
+    expect(r.error).toBe('MINIMUM_WAGE');
+  });
+
+  it('accepts hourly wage equal to minimum wage', () => {
+    const r = calculateMonthlySalaryFromHourlyWage({
+      workHoursPerWeek: 40,
+      hourlyWage: 10030,
+      minimumWage: 10030,
+    });
+    expect(r.ok).toBe(true);
+    expect(r.monthlySalary).toBeGreaterThan(0);
   });
 });
 
