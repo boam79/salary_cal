@@ -304,6 +304,19 @@
                             <label for="annual-salary">연봉</label>
                             <input type="number" id="annual-salary" placeholder="예: 5000 (만원)" min="0">
                         </div>
+                        <div class="form-group" id="salary-detail-options" style="display: block;">
+                            <label>상세 옵션</label>
+                            <div class="checkbox-group" style="display: grid; gap: 8px;">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="salary-detail-enabled">
+                                    상세 모드 사용 (간편 모드는 기존 계산 유지)
+                                </label>
+                                <label for="salary-dependents">부양가족 수</label>
+                                <input type="number" id="salary-dependents" min="0" max="20" value="0" disabled>
+                                <label for="salary-non-taxable">비과세 월 수당</label>
+                                <input type="number" id="salary-non-taxable" min="0" placeholder="예: 20 (만원)" disabled>
+                            </div>
+                        </div>
                         
                         <div class="form-group" id="monthly-salary-group" style="display: none;">
                             <label for="work-hours">주간 근무시간</label>
@@ -313,6 +326,7 @@
                         </div>
                         <div class="button-group">
                             <button class="btn btn-primary" id="calculate-salary">계산하기</button>
+                            <button class="btn btn-secondary" id="compare-salary">A/B 비교</button>
                             <button class="btn btn-secondary" id="reset-salary">초기화</button>
                         </div>
                     </div>
@@ -320,7 +334,10 @@
                     <div class="result-section" id="salary-result" style="display: none;">
                         <div class="button-group" style="justify-content: space-between; margin-bottom: var(--spacing-sm);">
                             <h3 class="result-title" style="margin: 0;">계산 결과</h3>
-                            <button class="btn btn-secondary" type="button" id="share-salary-link">결과 공유 링크 복사</button>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary" type="button" id="copy-salary-summary">요약 복사</button>
+                                <button class="btn btn-secondary" type="button" id="share-salary-link">결과 공유 링크 복사</button>
+                            </div>
                         </div>
                         <div class="result-container">
                             <div class="result-main">
@@ -333,6 +350,11 @@
                                         <span class="result-label">연 실수령액</span>
                                         <span class="result-value" id="annual-net"></span>
                                     </div>
+                                </div>
+                                <div class="result-note" style="margin-top: var(--spacing-sm);">
+                                    <strong>요약</strong>
+                                    <p id="salary-summary-text" class="text-muted" style="margin-top: 6px;"></p>
+                                    <p id="salary-basis-info" class="text-muted" style="margin-top: 6px;"></p>
                                 </div>
 
                                 <div class="result-details">
@@ -355,6 +377,44 @@
                                 <div class="explanation-section">
                                     <button class="explanation-toggle">▼ 계산 과정 보기</button>
                                     <div class="explanation-content" id="salary-explanation"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-section" id="salary-compare-result" style="display: none;">
+                        <h3 class="result-title">A/B 비교 결과</h3>
+                        <div class="result-container">
+                            <div class="result-main" id="salary-compare-summary"></div>
+                        </div>
+                    </div>
+                    <div class="result-section" id="salary-compare-section" style="display: none;">
+                        <h3 class="result-title">A/B 비교 입력</h3>
+                        <div class="result-container">
+                            <div class="result-main">
+                                <div class="form-group">
+                                    <label for="salary-compare-annual-a">A 연봉</label>
+                                    <input type="number" id="salary-compare-annual-a" placeholder="예: 5000 (만원)" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="salary-compare-annual-b">B 연봉</label>
+                                    <input type="number" id="salary-compare-annual-b" placeholder="예: 6000 (만원)" min="0">
+                                </div>
+                                <div class="button-group">
+                                    <button class="btn btn-primary" type="button" id="calculate-salary-compare">비교 계산</button>
+                                </div>
+                                <div class="table-wrapper" style="margin-top: var(--spacing-sm);">
+                                    <table class="result-table">
+                                        <thead>
+                                            <tr>
+                                                <th>항목</th>
+                                                <th>A</th>
+                                                <th>B</th>
+                                                <th>Delta(B-A)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="salary-compare-body"></tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -410,16 +470,31 @@
                                 <button class="btn btn-primary" id="calculate-inheritance">계산하기</button>
                                 <button class="btn btn-secondary" id="reset-inheritance">초기화</button>
                             </div>
+                            <div class="form-group">
+                                <label for="inheritance-special-deduction">추가 공제 옵션</label>
+                                <select id="inheritance-special-deduction">
+                                    <option value="none">없음</option>
+                                    <option value="financial">금융재산 공제 (2천만원)</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="result-section" id="inheritance-result" style="display: none;">
                             <div class="button-group" style="justify-content: space-between; margin-bottom: var(--spacing-sm);">
                                 <h3 class="result-title" style="margin: 0;">계산 결과</h3>
-                                <button class="btn btn-secondary" type="button" id="share-tax-link">결과 공유 링크 복사</button>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-secondary" type="button" id="copy-tax-summary">요약 복사</button>
+                                    <button class="btn btn-secondary" type="button" id="share-tax-link">결과 공유 링크 복사</button>
+                                </div>
                             </div>
                             <div class="result-container">
                                 <div class="result-main" id="inheritance-summary">
                                     <!-- 계산 결과가 여기에 표시됩니다 -->
+                                </div>
+                                <div class="result-note" style="margin-top: var(--spacing-sm);">
+                                    <strong>요약</strong>
+                                    <p id="tax-summary-text" class="text-muted" style="margin-top: 6px;"></p>
+                                    <p id="tax-basis-info" class="text-muted" style="margin-top: 6px;"></p>
                                 </div>
                                 <div class="result-explanation">
                                     <div class="explanation-section">
@@ -472,6 +547,7 @@
                                     <option value="linealDescendant">직계존비속 (성인)</option>
                                     <option value="linealDescendantMinor">직계존비속 (미성년자)</option>
                                     <option value="otherRelative">기타 친족</option>
+                                    <option value="nonRelative">비친족/타인</option>
                                 </select>
                             </div>
                             <div class="button-group">
@@ -594,6 +670,14 @@
                                     <option value="land">토지</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label for="property-tax-house-count">보유 주택 수</label>
+                                <select id="property-tax-house-count">
+                                    <option value="1">1주택</option>
+                                    <option value="2">2주택</option>
+                                    <option value="3">3주택 이상</option>
+                                </select>
+                            </div>
                             <div class="button-group">
                                 <button class="btn btn-primary" id="calculate-property-tax">계산하기</button>
                                 <button class="btn btn-secondary" id="reset-property-tax">초기화</button>
@@ -611,6 +695,10 @@
                                         <button class="explanation-toggle">▼ 계산 과정 보기</button>
                                         <div class="explanation-content" id="property-tax-explanation"></div>
                                     </div>
+                                </div>
+                                <div class="result-note" style="margin-top: var(--spacing-sm);">
+                                    <strong>기준 정보</strong>
+                                    <p id="real-estate-basis-info" class="text-muted" style="margin-top: 6px;"></p>
                                 </div>
                             </div>
                         </div>
@@ -1152,6 +1240,7 @@
                             </div>
                             <div class="button-group">
                                 <button class="btn btn-primary" id="calculate-loan">계산하기</button>
+                                <button class="btn btn-secondary" id="compare-loan">A/B 비교</button>
                                 <button class="btn btn-secondary" id="reset-loan">초기화</button>
                             </div>
                         </div>
@@ -1159,16 +1248,66 @@
                         <div class="result-section" id="loan-result" style="display: none;">
                             <div class="button-group" style="justify-content: space-between; margin-bottom: var(--spacing-sm);">
                                 <h3 class="result-title" style="margin: 0;">계산 결과</h3>
-                                <button class="btn btn-secondary" type="button" id="share-loan-link">결과 공유 링크 복사</button>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-secondary" type="button" id="copy-loan-summary">요약 복사</button>
+                                    <button class="btn btn-secondary" type="button" id="share-loan-link">결과 공유 링크 복사</button>
+                                </div>
                             </div>
                             <div class="result-container">
                                 <div class="result-main" id="loan-summary">
                                     <!-- 계산 결과 요약 및 상세 내역이 여기에 표시됩니다 -->
                                 </div>
+                                <div class="result-note" style="margin-top: var(--spacing-sm);">
+                                    <strong>요약</strong>
+                                    <p id="loan-summary-text" class="text-muted" style="margin-top: 6px;"></p>
+                                </div>
                                 <div class="result-explanation">
                                     <div class="explanation-section">
                                         <button class="explanation-toggle">▼ 계산 과정 보기</button>
                                         <div class="explanation-content" id="loan-explanation"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="result-section" id="loan-compare-result" style="display: none;">
+                            <h3 class="result-title">A/B 비교 결과</h3>
+                            <div class="result-container">
+                                <div class="result-main" id="loan-compare-summary"></div>
+                            </div>
+                        </div>
+                        <div class="result-section" id="loan-compare-section" style="display: none;">
+                            <h3 class="result-title">A/B 비교 입력</h3>
+                            <div class="result-container">
+                                <div class="result-main">
+                                    <div class="form-group">
+                                        <label for="loan-amount-a">A 대출금액</label>
+                                        <input type="number" id="loan-amount-a" placeholder="예: 1 (억원)" min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="interest-rate-a">A 연이자율 (%)</label>
+                                        <input type="number" id="interest-rate-a" placeholder="예: 4.0" min="0" max="30" step="0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="loan-period-a">A 대출기간 (년)</label>
+                                        <input type="number" id="loan-period-a" placeholder="예: 20" min="1" max="50">
+                                    </div>
+                                    <input type="hidden" id="repayment-type-a" value="equalPrincipalInterest">
+                                    <div class="form-group">
+                                        <label for="loan-amount-b">B 대출금액</label>
+                                        <input type="number" id="loan-amount-b" placeholder="예: 1.2 (억원)" min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="interest-rate-b">B 연이자율 (%)</label>
+                                        <input type="number" id="interest-rate-b" placeholder="예: 4.5" min="0" max="30" step="0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="loan-period-b">B 대출기간 (년)</label>
+                                        <input type="number" id="loan-period-b" placeholder="예: 20" min="1" max="50">
+                                    </div>
+                                    <input type="hidden" id="repayment-type-b" value="equalPrincipalInterest">
+                                    <div class="button-group">
+                                        <button class="btn btn-primary" type="button" id="calculate-loan-compare">비교 계산</button>
                                     </div>
                                 </div>
                             </div>

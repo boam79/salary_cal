@@ -13,7 +13,7 @@ import {
     removeRecentCalculatorInput,
     clearRecentCalculatorInputs,
 } from '../core/storage.js';
-import { updateShareButtons } from '../core/deepLink.js';
+import { updateShareButtons, setupSummaryCopyButtons } from '../core/deepLink.js';
 
 const SALARY_STORAGE_KEY = 'salary';
 
@@ -119,6 +119,167 @@ function setupSalaryRecentHistory() {
     }
 }
 
+function buildSalarySummaryText({ salaryType, monthlyNet, annualNet, totalDeduction }) {
+    const typeLabel = salaryType === 'monthly' ? '월급(시급 기반)' : '연봉';
+    return [
+        `[월급/연봉 계산 요약]`,
+        `- 계산 유형: ${typeLabel}`,
+        `- 월 실수령액: ${window.formatCurrency(monthlyNet)}`,
+        `- 연 실수령액: ${window.formatCurrency(annualNet)}`,
+        `- 월 총 공제액: ${window.formatCurrency(totalDeduction)}`,
+    ].join('\n');
+}
+
+function getSalaryDetailAdjustments() {
+    const detailEnabled = document.getElementById('salary-detail-enabled')?.checked === true;
+    if (!detailEnabled) {
+        return {
+            enabled: false,
+            annualDependentDeduction: 0,
+            monthlyNonTaxable: 0,
+            annualNonTaxable: 0,
+        };
+    }
+
+    const dependentsRaw = Number(document.getElementById('salary-dependents')?.value || 0);
+    const nonTaxableRaw = Number(document.getElementById('salary-non-taxable')?.value || 0);
+    const dependents = Number.isFinite(dependentsRaw) ? Math.max(0, Math.floor(dependentsRaw)) : 0;
+    const monthlyNonTaxable = Number.isFinite(nonTaxableRaw) ? Math.max(0, nonTaxableRaw * 10000) : 0;
+    const annualDependentDeduction = dependents * 1500000;
+    const annualNonTaxable = monthlyNonTaxable * 12;
+
+    return {
+        enabled: true,
+        annualDependentDeduction,
+        monthlyNonTaxable,
+        annualNonTaxable,
+    };
+}
+
+function renderSalaryBasisInfo(detailAdjustments) {
+    const basisEl = document.getElementById('salary-basis-info');
+    if (!basisEl) return;
+    const mode = detailAdjustments.enabled ? '상세' : '간편';
+    basisEl.textContent = `기준일: 2026-04-05 · 버전: v4.7 · 계산 모드: ${mode}`;
+}
+
+function calculateSalaryFromAnnualForCompare(annualSalary, rates) {
+    const monthlySalary = annualSalary / 12;
+    const pensionBase = Math.min(monthlySalary, rates.insurance.pension.maxMonthlyIncome);
+    const pension = pensionBase * rates.insurance.pension.rate;
+    const health = monthlySalary * rates.insurance.health.rate;
+    const longTermCare = health * rates.insurance.longTermCare.rateOfHealth;
+    const employment = monthlySalary * rates.insurance.employment.rate;
+
+    let incomeDeduction = 0;
+    if (annualSalary <= 6000000) {
+        incomeDeduction = annualSalary * 0.7;
+    } else if (annualSalary <= 15000000) {
+        incomeDeduction = 4200000 + (annualSalary - 6000000) * 0.4;
+    } else if (annualSalary <= 30000000) {
+        incomeDeduction = 7800000 + (annualSalary - 15000000) * 0.15;
+    } else if (annualSalary <= 50000000) {
+        incomeDeduction = 10050000 + (annualSalary - 30000000) * 0.08;
+    } else if (annualSalary <= 88000000) {
+        incomeDeduction = 11650000 + (annualSalary - 50000000) * 0.06;
+    } else {
+        incomeDeduction = 13930000 + (annualSalary - 88000000) * 0.02;
+    }
+
+    const taxBase = Math.max(0, annualSalary - incomeDeduction);
+    let incomeTax = 0;
+    const brackets = rates.incomeTax.brackets;
+    for (let i = 0; i < brackets.length; i++) {
+        if (taxBase <= brackets[i].max) {
+            incomeTax = taxBase * brackets[i].rate - brackets[i].deduction;
+            break;
+        }
+    }
+    const monthlyIncomeTax = incomeTax / 12;
+    const localTax = monthlyIncomeTax * rates.incomeTax.localTaxRate;
+    const totalDeduction = pension + health + longTermCare + employment + monthlyIncomeTax + localTax;
+    const monthlyNet = monthlySalary - totalDeduction;
+    const annualNet = monthlyNet * 12;
+    return { monthlyNet, annualNet };
+}
+
+function formatDelta(value) {
+    const sign = value > 0 ? '+' : value < 0 ? '-' : '';
+    return `${sign}${window.formatCurrency(Math.abs(value))}`;
+}
+
+function openSalaryCompareMode() {
+    const section = document.getElementById('salary-compare-section');
+    if (section) section.style.display = 'block';
+}
+
+async function compareSalaryAB() {
+    let rates = AppState.getTaxRates();
+    if (!rates && window.FinancialCalculatorApp?.loadTaxRates) {
+        try {
+            await window.FinancialCalculatorApp.loadTaxRates();
+            rates = AppState.getTaxRates();
+        } catch (error) {
+            console.error('compareSalaryAB: failed to load tax rates', error);
+        }
+    }
+    if (!rates) {
+        alert('세율 데이터를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
+    const annualA = window.getValueWithUnit('salary-compare-annual-a', 10000);
+    if (annualA === null) return;
+    const annualB = window.getValueWithUnit('salary-compare-annual-b', 10000);
+    if (annualB === null) return;
+
+    const a = calculateSalaryFromAnnualForCompare(annualA, rates);
+    const b = calculateSalaryFromAnnualForCompare(annualB, rates);
+    const deltaMonthly = b.monthlyNet - a.monthlyNet;
+    const deltaAnnual = b.annualNet - a.annualNet;
+
+    const summary = document.getElementById('salary-compare-summary');
+    const body = document.getElementById('salary-compare-body');
+    const result = document.getElementById('salary-compare-result');
+    const section = document.getElementById('salary-compare-section');
+    if (!summary || !body || !result || !section) return;
+    summary.innerHTML = `
+        <div class="result-summary">
+            <div class="result-item">
+                <span class="result-label">A 월 실수령액</span>
+                <span class="result-value">${window.formatCurrency(a.monthlyNet)}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">B 월 실수령액</span>
+                <span class="result-value">${window.formatCurrency(b.monthlyNet)}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">A 연 실수령액</span>
+                <span class="result-value">${window.formatCurrency(a.annualNet)}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">B 연 실수령액</span>
+                <span class="result-value">${window.formatCurrency(b.annualNet)}</span>
+            </div>
+        </div>
+    `;
+    body.innerHTML = `
+        <tr>
+            <td>월 실수령액</td>
+            <td>${window.formatCurrency(a.monthlyNet)}</td>
+            <td>${window.formatCurrency(b.monthlyNet)}</td>
+            <td>${formatDelta(deltaMonthly)}</td>
+        </tr>
+        <tr>
+            <td>연 실수령액</td>
+            <td>${window.formatCurrency(a.annualNet)}</td>
+            <td>${window.formatCurrency(b.annualNet)}</td>
+            <td>${formatDelta(deltaAnnual)}</td>
+        </tr>
+    `;
+    section.style.display = 'block';
+    result.style.display = 'block';
+}
+
 /**
  * 연봉/월급 실수령액 계산
  * 소득세, 지방소득세, 4대보험 공제 후 실수령액 계산
@@ -170,21 +331,25 @@ function calculateSalary() {
         annualSalary = monthlySalary * 12;
     }
     
+    const detailAdjustments = getSalaryDetailAdjustments();
+    const taxableMonthlySalary = Math.max(0, monthlySalary - detailAdjustments.monthlyNonTaxable);
+    const taxableYearlyIncome = Math.max(0, annualSalary - detailAdjustments.annualNonTaxable);
+
     // 1. 국민연금 (4.5%, 상한액: 553만원)
-    const pensionBase = Math.min(monthlySalary, rates.insurance.pension.maxMonthlyIncome);
+    const pensionBase = Math.min(taxableMonthlySalary, rates.insurance.pension.maxMonthlyIncome);
     const pension = pensionBase * rates.insurance.pension.rate;
     
     // 2. 건강보험 (3.545%)
-    const health = monthlySalary * rates.insurance.health.rate;
+    const health = taxableMonthlySalary * rates.insurance.health.rate;
     
     // 3. 장기요양보험 (건강보험료의 12.27%)
     const longTermCare = health * rates.insurance.longTermCare.rateOfHealth;
     
     // 4. 고용보험 (0.9%)
-    const employment = monthlySalary * rates.insurance.employment.rate;
+    const employment = taxableMonthlySalary * rates.insurance.employment.rate;
     
     // 5. 소득세 계산
-    const yearlyIncome = annualSalary;
+    const yearlyIncome = taxableYearlyIncome;
     
     // 근로소득공제 (2025년 기준)
     let incomeDeduction = 0;
@@ -203,7 +368,7 @@ function calculateSalary() {
     }
     
     // 과세표준
-    const taxBase = Math.max(0, yearlyIncome - incomeDeduction);
+    const taxBase = Math.max(0, yearlyIncome - incomeDeduction - detailAdjustments.annualDependentDeduction);
     
     // 소득세 계산 (누진공제 적용)
     let incomeTax = 0;
@@ -342,9 +507,30 @@ function calculateSalary() {
     }
     
     explanation.innerHTML = explanationHTML;
+    if (detailAdjustments.enabled) {
+        explanation.innerHTML += `
+            <div class="explanation-step">
+                <strong>상세 모드 보정</strong><br>
+                • 부양가족 공제(연): ${window.formatCurrency(detailAdjustments.annualDependentDeduction)}<br>
+                • 비과세 월 수당: ${window.formatCurrency(detailAdjustments.monthlyNonTaxable)}
+            </div>
+        `;
+    }
     
     document.getElementById('salary-result').style.display = 'block';
+    renderSalaryBasisInfo(detailAdjustments);
     updateShareButtons();
+    const salarySummaryText = buildSalarySummaryText({
+        salaryType,
+        monthlyNet,
+        annualNet,
+        totalDeduction,
+    });
+    const salarySummaryTextEl = document.getElementById('salary-summary-text');
+    if (salarySummaryTextEl) salarySummaryTextEl.textContent = salarySummaryText;
+    setupSummaryCopyButtons({
+        '#copy-salary-summary': () => salarySummaryText,
+    });
 
     // 최근 입력 저장
     saveCalculatorInput(SALARY_STORAGE_KEY, getSalaryInputState(), 5);
@@ -382,26 +568,52 @@ function setupSalaryTypeToggle() {
     const salaryTypeRadios = document.querySelectorAll('input[name="salary-type"]');
     const annualGroup = document.getElementById('annual-salary-group');
     const monthlyGroup = document.getElementById('monthly-salary-group');
+    const detailGroup = document.getElementById('salary-detail-options');
+    const detailEnabled = document.getElementById('salary-detail-enabled');
+    const dependentsEl = document.getElementById('salary-dependents');
+    const nonTaxableEl = document.getElementById('salary-non-taxable');
+    const syncDetailEnabledState = () => {
+        const enabled = detailEnabled?.checked === true;
+        if (dependentsEl) dependentsEl.disabled = !enabled;
+        if (nonTaxableEl) nonTaxableEl.disabled = !enabled;
+    };
     
     salaryTypeRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             if (this.value === 'annual') {
                 annualGroup.style.display = 'block';
                 monthlyGroup.style.display = 'none';
+                if (detailGroup) detailGroup.style.display = 'block';
                 console.log('📊 연봉 계산 UI로 전환');
             } else if (this.value === 'monthly') {
                 annualGroup.style.display = 'none';
                 monthlyGroup.style.display = 'block';
+                if (detailGroup) detailGroup.style.display = 'none';
                 console.log('💰 월급 계산 UI로 전환');
             }
         });
     });
+    if (detailEnabled && !detailEnabled.dataset.bound) {
+        detailEnabled.addEventListener('change', syncDetailEnabledState);
+        detailEnabled.dataset.bound = 'true';
+    }
+    syncDetailEnabledState();
 }
 
 // 페이지 로드 시 UI 전환 로직 초기화
 document.addEventListener('DOMContentLoaded', function() {
     setupSalaryTypeToggle();
     setupSalaryRecentHistory();
+    const compareBtn = document.getElementById('compare-salary');
+    if (compareBtn && !compareBtn.dataset.bound) {
+        compareBtn.addEventListener('click', openSalaryCompareMode);
+        compareBtn.dataset.bound = 'true';
+    }
+    const compareRunBtn = document.getElementById('calculate-salary-compare');
+    if (compareRunBtn && !compareRunBtn.dataset.bound) {
+        compareRunBtn.addEventListener('click', compareSalaryAB);
+        compareRunBtn.dataset.bound = 'true';
+    }
 });
 
 // 전역 함수로 노출
