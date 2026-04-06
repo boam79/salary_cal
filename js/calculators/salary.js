@@ -130,6 +130,39 @@ function buildSalarySummaryText({ salaryType, monthlyNet, annualNet, totalDeduct
     ].join('\n');
 }
 
+function getSalaryDetailAdjustments() {
+    const detailEnabled = document.getElementById('salary-detail-enabled')?.checked === true;
+    if (!detailEnabled) {
+        return {
+            enabled: false,
+            annualDependentDeduction: 0,
+            monthlyNonTaxable: 0,
+            annualNonTaxable: 0,
+        };
+    }
+
+    const dependentsRaw = Number(document.getElementById('salary-dependents')?.value || 0);
+    const nonTaxableRaw = Number(document.getElementById('salary-non-taxable')?.value || 0);
+    const dependents = Number.isFinite(dependentsRaw) ? Math.max(0, Math.floor(dependentsRaw)) : 0;
+    const monthlyNonTaxable = Number.isFinite(nonTaxableRaw) ? Math.max(0, nonTaxableRaw * 10000) : 0;
+    const annualDependentDeduction = dependents * 1500000;
+    const annualNonTaxable = monthlyNonTaxable * 12;
+
+    return {
+        enabled: true,
+        annualDependentDeduction,
+        monthlyNonTaxable,
+        annualNonTaxable,
+    };
+}
+
+function renderSalaryBasisInfo(detailAdjustments) {
+    const basisEl = document.getElementById('salary-basis-info');
+    if (!basisEl) return;
+    const mode = detailAdjustments.enabled ? '상세' : '간편';
+    basisEl.textContent = `기준일: 2026-04-05 · 버전: v4.7 · 계산 모드: ${mode}`;
+}
+
 function calculateSalaryFromAnnualForCompare(annualSalary, rates) {
     const monthlySalary = annualSalary / 12;
     const pensionBase = Math.min(monthlySalary, rates.insurance.pension.maxMonthlyIncome);
@@ -298,21 +331,25 @@ function calculateSalary() {
         annualSalary = monthlySalary * 12;
     }
     
+    const detailAdjustments = getSalaryDetailAdjustments();
+    const taxableMonthlySalary = Math.max(0, monthlySalary - detailAdjustments.monthlyNonTaxable);
+    const taxableYearlyIncome = Math.max(0, annualSalary - detailAdjustments.annualNonTaxable);
+
     // 1. 국민연금 (4.5%, 상한액: 553만원)
-    const pensionBase = Math.min(monthlySalary, rates.insurance.pension.maxMonthlyIncome);
+    const pensionBase = Math.min(taxableMonthlySalary, rates.insurance.pension.maxMonthlyIncome);
     const pension = pensionBase * rates.insurance.pension.rate;
     
     // 2. 건강보험 (3.545%)
-    const health = monthlySalary * rates.insurance.health.rate;
+    const health = taxableMonthlySalary * rates.insurance.health.rate;
     
     // 3. 장기요양보험 (건강보험료의 12.27%)
     const longTermCare = health * rates.insurance.longTermCare.rateOfHealth;
     
     // 4. 고용보험 (0.9%)
-    const employment = monthlySalary * rates.insurance.employment.rate;
+    const employment = taxableMonthlySalary * rates.insurance.employment.rate;
     
     // 5. 소득세 계산
-    const yearlyIncome = annualSalary;
+    const yearlyIncome = taxableYearlyIncome;
     
     // 근로소득공제 (2025년 기준)
     let incomeDeduction = 0;
@@ -331,7 +368,7 @@ function calculateSalary() {
     }
     
     // 과세표준
-    const taxBase = Math.max(0, yearlyIncome - incomeDeduction);
+    const taxBase = Math.max(0, yearlyIncome - incomeDeduction - detailAdjustments.annualDependentDeduction);
     
     // 소득세 계산 (누진공제 적용)
     let incomeTax = 0;
@@ -470,8 +507,18 @@ function calculateSalary() {
     }
     
     explanation.innerHTML = explanationHTML;
+    if (detailAdjustments.enabled) {
+        explanation.innerHTML += `
+            <div class="explanation-step">
+                <strong>상세 모드 보정</strong><br>
+                • 부양가족 공제(연): ${window.formatCurrency(detailAdjustments.annualDependentDeduction)}<br>
+                • 비과세 월 수당: ${window.formatCurrency(detailAdjustments.monthlyNonTaxable)}
+            </div>
+        `;
+    }
     
     document.getElementById('salary-result').style.display = 'block';
+    renderSalaryBasisInfo(detailAdjustments);
     updateShareButtons();
     const salarySummaryText = buildSalarySummaryText({
         salaryType,
@@ -521,20 +568,36 @@ function setupSalaryTypeToggle() {
     const salaryTypeRadios = document.querySelectorAll('input[name="salary-type"]');
     const annualGroup = document.getElementById('annual-salary-group');
     const monthlyGroup = document.getElementById('monthly-salary-group');
+    const detailGroup = document.getElementById('salary-detail-options');
+    const detailEnabled = document.getElementById('salary-detail-enabled');
+    const dependentsEl = document.getElementById('salary-dependents');
+    const nonTaxableEl = document.getElementById('salary-non-taxable');
+    const syncDetailEnabledState = () => {
+        const enabled = detailEnabled?.checked === true;
+        if (dependentsEl) dependentsEl.disabled = !enabled;
+        if (nonTaxableEl) nonTaxableEl.disabled = !enabled;
+    };
     
     salaryTypeRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             if (this.value === 'annual') {
                 annualGroup.style.display = 'block';
                 monthlyGroup.style.display = 'none';
+                if (detailGroup) detailGroup.style.display = 'block';
                 console.log('📊 연봉 계산 UI로 전환');
             } else if (this.value === 'monthly') {
                 annualGroup.style.display = 'none';
                 monthlyGroup.style.display = 'block';
+                if (detailGroup) detailGroup.style.display = 'none';
                 console.log('💰 월급 계산 UI로 전환');
             }
         });
     });
+    if (detailEnabled && !detailEnabled.dataset.bound) {
+        detailEnabled.addEventListener('change', syncDetailEnabledState);
+        detailEnabled.dataset.bound = 'true';
+    }
+    syncDetailEnabledState();
 }
 
 // 페이지 로드 시 UI 전환 로직 초기화

@@ -161,11 +161,21 @@ function calculatePropertyTax() {
     const propertyValue = window.getValueWithUnit('property-value', 100000000);
     if (propertyValue === null) return;
     
+    const propertyType = document.getElementById('property-tax-type')?.value || 'house';
+    const houseCountRaw = document.getElementById('property-tax-house-count')?.value || '1';
+    const houseCount = Number.parseInt(houseCountRaw, 10);
+    const normalizedHouseCount = Number.isInteger(houseCount) && houseCount > 0 ? houseCount : 1;
+
     let propertyTaxRate = 0;
     if (propertyValue <= 60000000) propertyTaxRate = 0.001;
     else if (propertyValue <= 150000000) propertyTaxRate = 0.0015;
     else if (propertyValue <= 300000000) propertyTaxRate = 0.0025;
     else propertyTaxRate = 0.004;
+
+    if (propertyType === 'house' || propertyType === 'apartment') {
+        if (normalizedHouseCount >= 3) propertyTaxRate += 0.0010;
+        else if (normalizedHouseCount === 2) propertyTaxRate += 0.0005;
+    }
     
     const propertyTax = propertyValue * propertyTaxRate;
     
@@ -225,6 +235,11 @@ function calculatePropertyTax() {
                 재산세 + 종합부동산세 = <strong>${window.formatCurrency(totalTax)}</strong>
             </div>
         `;
+    }
+
+    const basisInfo = document.getElementById('real-estate-basis-info');
+    if (basisInfo) {
+        basisInfo.textContent = `기준일: 2026-04-05 · 버전: v4.7.0 · 유형: ${propertyType} · 주택 수: ${normalizedHouseCount}주택`;
     }
     
     document.getElementById('property-tax-result').style.display = 'block';

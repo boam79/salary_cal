@@ -46,6 +46,7 @@ function getTaxShareState() {
         inheritanceAmount: document.getElementById('inheritance-amount')?.value || '',
         giftAmount: document.getElementById('gift-amount')?.value || '',
         giftRelation: document.getElementById('gift-relation')?.value || 'spouse',
+        inheritanceHeirType: document.getElementById('inheritance-heir-type')?.value || 'general',
     };
 }
 
@@ -85,6 +86,10 @@ function applyTaxShareState(state) {
     }
     if (giftRelationEl && typeof state.giftRelation === 'string') {
         giftRelationEl.value = state.giftRelation;
+    }
+    const heirTypeEl = document.getElementById('inheritance-heir-type');
+    if (heirTypeEl && typeof state.inheritanceHeirType === 'string') {
+        heirTypeEl.value = state.inheritanceHeirType;
     }
 }
 
@@ -193,6 +198,12 @@ function buildTaxSummaryText({ kind, amount, deduction, taxBase, tax, relationLa
     ].join('\n');
 }
 
+function renderTaxBasisInfo() {
+    const el = document.getElementById('tax-basis-info');
+    if (!el) return;
+    el.textContent = '기준일: 2026-04-05 · 버전: v4.7.x · 규정: 상속/증여세 단순화 모델';
+}
+
 async function copyTaxSummary() {
     const summaryEl = document.getElementById('tax-summary-text');
     const btn = document.getElementById('share-tax-summary');
@@ -220,6 +231,7 @@ function calculateInheritanceTax() {
     
     const amount = window.getValueWithUnit('inheritance-amount', 100000000); // 억원 단위
     if (amount === null) return;
+    const heirType = document.getElementById('inheritance-heir-type')?.value || 'general';
     
     const rates = AppState.getTaxRates();
     if (!rates) {
@@ -237,6 +249,13 @@ function calculateInheritanceTax() {
         return;
     }
     const { deduction, taxBase, tax } = domain;
+    const heirMultiplierMap = {
+        general: 1,
+        spousePrimary: 0.85,
+        minorIncluded: 0.95,
+    };
+    const multiplier = heirMultiplierMap[heirType] ?? 1;
+    const adjustedTax = Math.max(0, tax * multiplier);
     
     // 결과 표시
     const resultSection = document.getElementById('inheritance-result');
@@ -252,7 +271,7 @@ function calculateInheritanceTax() {
         <div class="result-summary">
             <div class="result-item highlight">
                 <span class="result-label">상속세액</span>
-                <span class="result-value">${window.formatCurrency(tax)}</span>
+                <span class="result-value">${window.formatCurrency(adjustedTax)}</span>
             </div>
             <div class="result-item">
                 <span class="result-label">과세표준</span>
@@ -269,7 +288,7 @@ function calculateInheritanceTax() {
         <div class="explanation-step">
             <strong>2단계: 상속세 계산</strong><br>
             과세표준 ${window.formatCurrency(taxBase)}에 누진세율 적용<br>
-            상속세액: <strong>${window.formatCurrency(tax)}</strong>
+            상속세액: <strong>${window.formatCurrency(adjustedTax)}</strong>
         </div>
     `;
 
@@ -280,9 +299,10 @@ function calculateInheritanceTax() {
             amount,
             deduction,
             taxBase,
-            tax,
+            tax: adjustedTax,
         });
     }
+    renderTaxBasisInfo();
     
     resultSection.style.display = 'block';
     saveCalculatorInput(TAX_STORAGE_KEY, getTaxInputState('inheritance'), 5);
@@ -311,9 +331,10 @@ function calculateGiftTax() {
         return;
     }
     
+    const normalizedRelation = rates.giftTax?.deductions?.[relation] != null ? relation : 'otherRelative';
     const domain = calculateGiftTaxDomain({
         amount,
-        relation,
+        relation: normalizedRelation,
         giftTax: rates.giftTax
     });
     if (!domain.ok) {
@@ -327,8 +348,10 @@ function calculateGiftTax() {
         spouse: '배우자',
         linealDescendant: '직계존비속(성인)',
         linealDescendantMinor: '직계존비속(미성년자)',
-        otherRelative: '기타 친족'
+        otherRelative: '기타 친족',
+        nonRelative: '비친족/타인'
     };
+    const adjustedTax = tax;
     
     // 결과 표시
     const resultSection = document.getElementById('gift-result');
@@ -351,7 +374,7 @@ function calculateGiftTax() {
         <div class="result-summary">
             <div class="result-item highlight">
                 <span class="result-label">증여세액</span>
-                <span class="result-value">${window.formatCurrency(tax)}</span>
+                <span class="result-value">${window.formatCurrency(adjustedTax)}</span>
             </div>
             <div class="result-item">
                 <span class="result-label">과세표준</span>
@@ -363,7 +386,7 @@ function calculateGiftTax() {
     explanationElement.innerHTML = `
         <div class="explanation-step">
             <strong>1단계: 공제액 적용</strong><br>
-            증여자 관계: ${relationNames[relation]}<br>
+            증여자 관계: ${relationNames[relation] || relationNames[normalizedRelation]}<br>
             공제액: ${window.formatCurrency(deduction)} (10년간)
         </div>
         <div class="explanation-step">
@@ -373,7 +396,7 @@ function calculateGiftTax() {
         <div class="explanation-step">
             <strong>3단계: 증여세 계산</strong><br>
             과세표준 ${window.formatCurrency(taxBase)}에 누진세율 적용<br>
-            증여세액: <strong>${window.formatCurrency(tax)}</strong>
+            증여세액: <strong>${window.formatCurrency(adjustedTax)}</strong>
         </div>
     `;
 
@@ -384,10 +407,11 @@ function calculateGiftTax() {
             amount,
             deduction,
             taxBase,
-            tax,
-            relationLabel: relationNames[relation],
+            tax: adjustedTax,
+            relationLabel: relationNames[relation] || relationNames[normalizedRelation],
         });
     }
+    renderTaxBasisInfo();
     
     resultSection.style.display = 'block';
     saveCalculatorInput(TAX_STORAGE_KEY, getTaxInputState('gift'), 5);

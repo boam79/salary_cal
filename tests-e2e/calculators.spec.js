@@ -23,6 +23,21 @@ test.describe('calculators smoke', () => {
     await expect(page.locator('#salary-summary-text')).not.toHaveText('');
   });
 
+  test('salary detail mode applies options', async ({ page }) => {
+    await page.click('[data-screen="salary-screen"]');
+    await page.waitForSelector('#salary-screen.screen.active');
+
+    await page.fill('#annual-salary', '5000');
+    await expect(page.locator('#salary-detail-enabled')).toBeVisible();
+    await page.click('#salary-detail-enabled');
+    await page.fill('#salary-dependents', '2');
+    await page.fill('#salary-non-taxable', '20');
+    await page.click('#calculate-salary');
+
+    await expect(page.locator('#salary-result')).toBeVisible();
+    await expect(page.locator('#salary-basis-info')).toContainText('계산 모드: 상세');
+  });
+
   test('salary compare mode A/B renders delta', async ({ page }) => {
     await page.click('[data-screen="salary-screen"]');
     await page.waitForSelector('#salary-screen.screen.active');
@@ -52,6 +67,20 @@ test.describe('calculators smoke', () => {
     await expect(page.locator('#inheritance-result')).toBeVisible();
     await expect(page.locator('#inheritance-summary')).toContainText('상속세액');
     await expect(page.locator('#tax-summary-text')).not.toHaveText('');
+  });
+
+  test('gift tax supports non-relative option safely', async ({ page }) => {
+    await page.click('[data-screen="tax-screen"]');
+    await page.waitForSelector('#tax-screen.screen.active');
+    await page.click('#tax-screen .tab-btn[data-tab="gift"]');
+    await page.waitForSelector('#gift-tab.tab-content.active');
+
+    await page.fill('#gift-amount', '5');
+    await page.selectOption('#gift-relation', 'nonRelative');
+    await page.click('#calculate-gift');
+
+    await expect(page.locator('#gift-result')).toBeVisible();
+    await expect(page.locator('#tax-basis-info')).toContainText('기준일');
   });
 
   test('tax deep link restores screen and input', async ({ page }) => {
@@ -89,6 +118,19 @@ test.describe('calculators smoke', () => {
     await expect(page.locator('#loan-result')).toBeVisible();
     await expect(page.locator('#loan-summary')).toContainText('월 상환액');
     await expect(page.locator('#loan-summary-text')).not.toHaveText('');
+  });
+
+  test('property tax supports house count option', async ({ page }) => {
+    await page.click('[data-screen="real-estate-screen"]');
+    await page.waitForSelector('#real-estate-screen.screen.active');
+    await page.click('#real-estate-screen .tab-btn[data-tab="property-tax"]');
+
+    await page.fill('#property-value', '12');
+    await page.selectOption('#property-tax-house-count', '3');
+    await page.click('#calculate-property-tax');
+
+    await expect(page.locator('#property-tax-result')).toBeVisible();
+    await expect(page.locator('#real-estate-basis-info')).toContainText('기준일');
   });
 
   test('loan compare mode A/B renders delta', async ({ page }) => {

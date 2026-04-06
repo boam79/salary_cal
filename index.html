@@ -304,6 +304,19 @@
                             <label for="annual-salary">연봉</label>
                             <input type="number" id="annual-salary" placeholder="예: 5000 (만원)" min="0">
                         </div>
+                        <div class="form-group" id="salary-detail-options" style="display: block;">
+                            <label>상세 옵션</label>
+                            <div class="checkbox-group" style="display: grid; gap: 8px;">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="salary-detail-enabled">
+                                    상세 모드 사용 (간편 모드는 기존 계산 유지)
+                                </label>
+                                <label for="salary-dependents">부양가족 수</label>
+                                <input type="number" id="salary-dependents" min="0" max="20" value="0" disabled>
+                                <label for="salary-non-taxable">비과세 월 수당</label>
+                                <input type="number" id="salary-non-taxable" min="0" placeholder="예: 20 (만원)" disabled>
+                            </div>
+                        </div>
                         
                         <div class="form-group" id="monthly-salary-group" style="display: none;">
                             <label for="work-hours">주간 근무시간</label>
@@ -341,6 +354,7 @@
                                 <div class="result-note" style="margin-top: var(--spacing-sm);">
                                     <strong>요약</strong>
                                     <p id="salary-summary-text" class="text-muted" style="margin-top: 6px;"></p>
+                                    <p id="salary-basis-info" class="text-muted" style="margin-top: 6px;"></p>
                                 </div>
 
                                 <div class="result-details">
@@ -456,6 +470,13 @@
                                 <button class="btn btn-primary" id="calculate-inheritance">계산하기</button>
                                 <button class="btn btn-secondary" id="reset-inheritance">초기화</button>
                             </div>
+                            <div class="form-group">
+                                <label for="inheritance-special-deduction">추가 공제 옵션</label>
+                                <select id="inheritance-special-deduction">
+                                    <option value="none">없음</option>
+                                    <option value="financial">금융재산 공제 (2천만원)</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="result-section" id="inheritance-result" style="display: none;">
@@ -473,6 +494,7 @@
                                 <div class="result-note" style="margin-top: var(--spacing-sm);">
                                     <strong>요약</strong>
                                     <p id="tax-summary-text" class="text-muted" style="margin-top: 6px;"></p>
+                                    <p id="tax-basis-info" class="text-muted" style="margin-top: 6px;"></p>
                                 </div>
                                 <div class="result-explanation">
                                     <div class="explanation-section">
@@ -525,6 +547,7 @@
                                     <option value="linealDescendant">직계존비속 (성인)</option>
                                     <option value="linealDescendantMinor">직계존비속 (미성년자)</option>
                                     <option value="otherRelative">기타 친족</option>
+                                    <option value="nonRelative">비친족/타인</option>
                                 </select>
                             </div>
                             <div class="button-group">
@@ -647,6 +670,14 @@
                                     <option value="land">토지</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label for="property-tax-house-count">보유 주택 수</label>
+                                <select id="property-tax-house-count">
+                                    <option value="1">1주택</option>
+                                    <option value="2">2주택</option>
+                                    <option value="3">3주택 이상</option>
+                                </select>
+                            </div>
                             <div class="button-group">
                                 <button class="btn btn-primary" id="calculate-property-tax">계산하기</button>
                                 <button class="btn btn-secondary" id="reset-property-tax">초기화</button>
@@ -664,6 +695,10 @@
                                         <button class="explanation-toggle">▼ 계산 과정 보기</button>
                                         <div class="explanation-content" id="property-tax-explanation"></div>
                                     </div>
+                                </div>
+                                <div class="result-note" style="margin-top: var(--spacing-sm);">
+                                    <strong>기준 정보</strong>
+                                    <p id="real-estate-basis-info" class="text-muted" style="margin-top: 6px;"></p>
                                 </div>
                             </div>
                         </div>
