@@ -142,6 +142,45 @@
 
 ---
 
-**Last Updated**: 2025-11-03  
-**Version**: 4.5.0  
-**Status**: ✅ Production Ready
+## Planner Update (2026-04-05)
+
+### Background and Motivation (추가)
+- 품질 고도화(테스트 체계, 도메인 순수 함수, API contract, E2E 스모크) 이후 다음 단계는 **기능 고도화**입니다.
+- `DOC/feature-enhancement-proposals.md`, `DOC/feature-enhancement-backlog-v1.md`를 기준으로, 사용자 가치가 큰 P0 기능부터 순차 구현합니다.
+
+### Key Challenges and Analysis (추가)
+- 기능 확장은 UX 복잡도 증가 리스크가 있으므로 **간편 모드 유지**가 최우선입니다.
+- 공유/복원 기능은 상태 직렬화 품질이 핵심이며, 잘못된 query 입력에도 앱이 깨지지 않아야 합니다.
+- 비교 모드는 계산 엔진 재사용이 가능해야 유지보수 비용이 낮아집니다.
+
+### High-level Task Breakdown (기능 고도화 사이클)
+1. **FEAT-001 결과 저장/불러오기(최근 5개)**
+   - 성공 기준: 계산기별 최근 기록 저장/복원/최대 5개 유지
+2. **FEAT-002 URL 공유(딥링크 복원)**
+   - 성공 기준: 공유 URL 진입 시 계산기 화면+입력값 복원
+3. **FEAT-003 결과 요약문 + 복사**
+   - 성공 기준: 연봉/세금/대출 결과에서 요약 생성 및 복사 피드백 제공
+4. **FEAT-004 비교 모드 A/B(연봉/대출 우선)**
+   - 성공 기준: A/B 입력 독립 + Delta 계산 정확
+
+### Project Status Board (추가)
+- [x] FEAT-001 결과 저장/불러오기 (연봉/세금/대출 확장 완료)
+- [x] FEAT-002 URL 공유 (딥링크 복원 + 공유 URL 복사 버튼 구현)
+- [ ] FEAT-003 결과 요약문 + 복사
+- [ ] FEAT-004 비교 모드 A/B
+
+### Executor's Feedback or Assistance Requests (추가)
+- 다음 Executor 단계는 **FEAT-001**부터 1개 태스크씩 진행 권장.
+- 각 태스크 완료 시 `npm test` + `npm run test:e2e` 통과를 마일스톤으로 보고.
+- FEAT-001을 세금/대출까지 확장 구현 완료. 최근 기록 저장/불러오기/삭제/전체삭제와 E2E 스모크(세금/대출) 검증 케이스를 추가함.
+- FEAT-002 구현 완료: `?screen=` + 계산기별 입력 query를 읽어 초기 화면/입력 복원, 결과 섹션 공유 버튼으로 현재 상태 URL 생성/복사 가능.
+
+## Lessons Learned
+- 딥링크는 입력값이 비정상이어도 앱이 깨지지 않도록 "존재하는 DOM에만 복원"하는 방어 로직이 중요함.
+- E2E에서 localStorage 초기화는 `context.addInitScript`로 새 문서마다 적용해야 안정적으로 격리됨.
+
+---
+
+**Last Updated**: 2026-04-05  
+**Version**: 4.6.1  
+**Status**: ✅ Production Ready (Quality Hardened, Feature Planning Ready)

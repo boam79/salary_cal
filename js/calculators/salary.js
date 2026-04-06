@@ -7,6 +7,117 @@
 
 import AppState from '../core/appState.js';
 import { computeMonthlyFromHourlyWage } from '../domain/salary.js';
+import {
+    getRecentCalculatorInputs,
+    saveCalculatorInput,
+    removeRecentCalculatorInput,
+    clearRecentCalculatorInputs,
+} from '../core/storage.js';
+import { updateShareButtons } from '../core/deepLink.js';
+
+const SALARY_STORAGE_KEY = 'salary';
+
+function getSalaryInputState() {
+    const salaryTypeEl = document.querySelector('input[name="salary-type"]:checked');
+    const salaryType = salaryTypeEl ? salaryTypeEl.value : 'annual';
+    return {
+        salaryType,
+        annualSalary: document.getElementById('annual-salary')?.value || '',
+        workHours: document.getElementById('work-hours')?.value || '',
+        hourlyWage: document.getElementById('hourly-wage')?.value || '',
+        createdAt: Date.now(),
+    };
+}
+
+function applySalaryInputState(state) {
+    if (!state || typeof state !== 'object') return;
+    const salaryType = state.salaryType === 'monthly' ? 'monthly' : 'annual';
+    const radio = document.querySelector(`input[name="salary-type"][value="${salaryType}"]`);
+    if (radio) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change'));
+    }
+
+    const annualEl = document.getElementById('annual-salary');
+    const workEl = document.getElementById('work-hours');
+    const hourlyEl = document.getElementById('hourly-wage');
+    if (annualEl) annualEl.value = state.annualSalary ?? '';
+    if (workEl) workEl.value = state.workHours ?? '';
+    if (hourlyEl) hourlyEl.value = state.hourlyWage ?? String(AppState.getCurrentMinimumWage());
+}
+
+function renderSalaryRecentHistory() {
+    const listEl = document.getElementById('salary-recent-list');
+    const emptyEl = document.getElementById('salary-recent-empty');
+    if (!listEl || !emptyEl) return;
+
+    const items = getRecentCalculatorInputs(SALARY_STORAGE_KEY);
+    listEl.innerHTML = '';
+
+    if (!items.length) {
+        emptyEl.style.display = 'block';
+        return;
+    }
+
+    emptyEl.style.display = 'none';
+
+    items.forEach((item, idx) => {
+        const li = document.createElement('li');
+        li.className = 'recent-item';
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        li.style.gap = '8px';
+        li.style.padding = '6px 0';
+        const typeLabel = item.salaryType === 'monthly' ? '월급' : '연봉';
+        const valueLabel = item.salaryType === 'monthly'
+            ? `주 ${item.workHours || '-'}h / 시급 ${item.hourlyWage || '-'}`
+            : `연봉 ${item.annualSalary || '-'}`;
+        const date = item.createdAt ? new Date(item.createdAt).toLocaleString('ko-KR') : '';
+        li.innerHTML = `
+            <button type="button" class="btn btn-secondary salary-recent-load" data-index="${idx}" style="flex:1; text-align:left;">
+                ${typeLabel} · ${valueLabel}<br><small>${date}</small>
+            </button>
+            <button type="button" class="btn btn-secondary salary-recent-delete" data-index="${idx}" aria-label="기록 삭제">삭제</button>
+        `;
+        listEl.appendChild(li);
+    });
+}
+
+function setupSalaryRecentHistory() {
+    const sectionEl = document.getElementById('salary-recent-section');
+    if (!sectionEl) return;
+
+    renderSalaryRecentHistory();
+
+    if (!sectionEl.dataset.bound) {
+        sectionEl.addEventListener('click', (e) => {
+            const loadBtn = e.target.closest('.salary-recent-load');
+            if (loadBtn) {
+                const idx = Number(loadBtn.dataset.index);
+                const items = getRecentCalculatorInputs(SALARY_STORAGE_KEY);
+                if (Number.isInteger(idx) && items[idx]) {
+                    applySalaryInputState(items[idx]);
+                }
+                return;
+            }
+
+            const delBtn = e.target.closest('.salary-recent-delete');
+            if (delBtn) {
+                const idx = Number(delBtn.dataset.index);
+                removeRecentCalculatorInput(SALARY_STORAGE_KEY, idx);
+                renderSalaryRecentHistory();
+                return;
+            }
+
+            if (e.target.closest('#salary-recent-clear')) {
+                clearRecentCalculatorInputs(SALARY_STORAGE_KEY);
+                renderSalaryRecentHistory();
+            }
+        });
+        sectionEl.dataset.bound = 'true';
+    }
+}
 
 /**
  * 연봉/월급 실수령액 계산
@@ -233,6 +344,11 @@ function calculateSalary() {
     explanation.innerHTML = explanationHTML;
     
     document.getElementById('salary-result').style.display = 'block';
+    updateShareButtons();
+
+    // 최근 입력 저장
+    saveCalculatorInput(SALARY_STORAGE_KEY, getSalaryInputState(), 5);
+    renderSalaryRecentHistory();
 }
 
 /**
@@ -285,6 +401,7 @@ function setupSalaryTypeToggle() {
 // 페이지 로드 시 UI 전환 로직 초기화
 document.addEventListener('DOMContentLoaded', function() {
     setupSalaryTypeToggle();
+    setupSalaryRecentHistory();
 });
 
 // 전역 함수로 노출
