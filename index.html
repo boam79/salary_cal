@@ -356,6 +356,30 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="result-section" id="salary-recent-section" style="display: none;">
+                        <h3 class="result-title">최근 계산</h3>
+                        <div class="result-container">
+                            <div class="result-main">
+                                <div class="button-group" style="justify-content: flex-end; margin-bottom: var(--spacing-sm);">
+                                    <button class="btn btn-secondary" type="button" id="salary-clear-recent">최근 기록 전체 삭제</button>
+                                </div>
+                                <div class="table-wrapper">
+                                    <table class="result-table">
+                                        <thead>
+                                            <tr>
+                                                <th>유형</th>
+                                                <th>입력값</th>
+                                                <th>저장 시각</th>
+                                                <th>동작</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="salary-recent-list"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
