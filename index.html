@@ -423,6 +423,33 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="result-section" id="tax-recent-section" style="display: none;">
+                            <h3 class="result-title">최근 계산</h3>
+                            <div class="result-container">
+                                <div class="result-main">
+                                    <div class="button-group" style="justify-content: flex-end; margin-bottom: var(--spacing-sm);">
+                                        <button class="btn btn-secondary" type="button" id="tax-clear-recent">최근 기록 전체 삭제</button>
+                                    </div>
+                                    <div class="table-wrapper">
+                                        <table class="result-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>유형</th>
+                                                    <th>입력값</th>
+                                                    <th>저장 시각</th>
+                                                    <th>동작</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tax-recent-list"></tbody>
+                                        </table>
+                                    </div>
+                                    <div id="tax-recent-empty" class="text-muted" style="display: none; text-align: center; margin-top: var(--spacing-sm);">
+                                        최근 계산 기록이 없습니다.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 증여세 탭 -->
@@ -1142,6 +1169,23 @@
                             <h3 class="chart-title">상환 스케줄 차트</h3>
                             <canvas id="loan-chart" width="800" height="400"></canvas>
                         </div>
+
+                        <div class="result-section" id="financial-loan-recent-section" style="display: none;">
+                            <h3 class="result-title">최근 계산</h3>
+                            <div class="result-container">
+                                <div class="result-main">
+                                    <div class="button-group" style="justify-content: flex-end; margin-bottom: var(--spacing-sm);">
+                                        <button class="btn btn-secondary" type="button" id="financial-loan-recent-clear">최근 기록 전체 삭제</button>
+                                    </div>
+                                    <div class="table-wrapper">
+                                        <ul id="financial-loan-recent-list" class="recent-list"></ul>
+                                    </div>
+                                    <div id="financial-loan-recent-empty" class="text-muted" style="display: none; text-align: center; margin-top: var(--spacing-sm);">
+                                        최근 계산 기록이 없습니다.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 주택대출 탭 -->
@@ -1212,6 +1256,23 @@
                         <div class="chart-section" id="housing-loan-chart-section" style="display: none;">
                             <h3 class="chart-title">상환 스케줄 차트</h3>
                             <canvas id="housing-loan-chart" width="800" height="400"></canvas>
+                        </div>
+
+                        <div class="result-section" id="housing-loan-recent-section" style="display: none;">
+                            <h3 class="result-title">최근 계산</h3>
+                            <div class="result-container">
+                                <div class="result-main">
+                                    <div class="button-group" style="justify-content: flex-end; margin-bottom: var(--spacing-sm);">
+                                        <button class="btn btn-secondary" type="button" id="housing-loan-recent-clear">최근 기록 전체 삭제</button>
+                                    </div>
+                                    <div class="table-wrapper">
+                                        <ul id="housing-loan-recent-list" class="recent-list"></ul>
+                                    </div>
+                                    <div id="housing-loan-recent-empty" class="text-muted" style="display: none; text-align: center; margin-top: var(--spacing-sm);">
+                                        최근 계산 기록이 없습니다.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

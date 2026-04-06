@@ -7,6 +7,120 @@
 
 import AppState from '../core/appState.js';
 import { calculateInheritanceTaxDomain, calculateGiftTaxDomain } from '../domain/tax.js';
+import {
+    getRecentCalculatorInputs,
+    saveCalculatorInput,
+    removeRecentCalculatorInput,
+    clearRecentCalculatorInputs,
+} from '../core/storage.js';
+
+const TAX_STORAGE_KEY = 'tax';
+
+function getTaxInputState(kind) {
+    if (kind === 'gift') {
+        return {
+            kind,
+            amount: document.getElementById('gift-amount')?.value || '',
+            relation: document.getElementById('gift-relation')?.value || 'spouse',
+            createdAt: Date.now(),
+        };
+    }
+    return {
+        kind: 'inheritance',
+        amount: document.getElementById('inheritance-amount')?.value || '',
+        createdAt: Date.now(),
+    };
+}
+
+function applyTaxInputState(state) {
+    if (!state || typeof state !== 'object') return;
+    if (state.kind === 'gift') {
+        const giftTabBtn = document.querySelector('#tax-screen .tab-btn[data-tab="gift"]');
+        if (giftTabBtn) giftTabBtn.click();
+        const amountEl = document.getElementById('gift-amount');
+        const relationEl = document.getElementById('gift-relation');
+        if (amountEl) amountEl.value = state.amount ?? '';
+        if (relationEl) relationEl.value = state.relation ?? 'spouse';
+        return;
+    }
+
+    const inheritanceTabBtn = document.querySelector('#tax-screen .tab-btn[data-tab="inheritance"]');
+    if (inheritanceTabBtn) inheritanceTabBtn.click();
+    const amountEl = document.getElementById('inheritance-amount');
+    if (amountEl) amountEl.value = state.amount ?? '';
+}
+
+function renderTaxRecentHistory() {
+    const listEl = document.getElementById('tax-recent-list');
+    const emptyEl = document.getElementById('tax-recent-empty');
+    const sectionEl = document.getElementById('tax-recent-section');
+    if (!listEl || !emptyEl) return;
+
+    const items = getRecentCalculatorInputs(TAX_STORAGE_KEY);
+    listEl.innerHTML = '';
+    if (sectionEl) sectionEl.style.display = 'block';
+
+    if (!items.length) {
+        emptyEl.style.display = 'block';
+        return;
+    }
+    emptyEl.style.display = 'none';
+
+    items.forEach((item, idx) => {
+        const row = document.createElement('tr');
+        const kindLabel = item.kind === 'gift' ? '증여세' : '상속세';
+        const inputLabel = item.kind === 'gift'
+            ? `${item.amount || '-'}억원 / ${item.relation || 'spouse'}`
+            : `${item.amount || '-'}억원`;
+        const date = item.createdAt ? new Date(item.createdAt).toLocaleString('ko-KR') : '';
+
+        row.innerHTML = `
+            <td>${kindLabel}</td>
+            <td>${inputLabel}</td>
+            <td>${date}</td>
+            <td>
+                <button type="button" class="btn btn-secondary tax-recent-load" data-index="${idx}">불러오기</button>
+                <button type="button" class="btn btn-secondary tax-recent-delete" data-index="${idx}">삭제</button>
+            </td>
+        `;
+        listEl.appendChild(row);
+    });
+}
+
+function setupTaxRecentHistory() {
+    const sectionEl = document.getElementById('tax-recent-section');
+    if (!sectionEl) return;
+
+    renderTaxRecentHistory();
+
+    if (!sectionEl.dataset.bound) {
+        sectionEl.addEventListener('click', (e) => {
+            const loadBtn = e.target.closest('.tax-recent-load');
+            if (loadBtn) {
+                const idx = Number(loadBtn.dataset.index);
+                const items = getRecentCalculatorInputs(TAX_STORAGE_KEY);
+                if (Number.isInteger(idx) && items[idx]) {
+                    applyTaxInputState(items[idx]);
+                }
+                return;
+            }
+
+            const deleteBtn = e.target.closest('.tax-recent-delete');
+            if (deleteBtn) {
+                const idx = Number(deleteBtn.dataset.index);
+                removeRecentCalculatorInput(TAX_STORAGE_KEY, idx);
+                renderTaxRecentHistory();
+                return;
+            }
+
+            if (e.target.closest('#tax-clear-recent')) {
+                clearRecentCalculatorInputs(TAX_STORAGE_KEY);
+                renderTaxRecentHistory();
+            }
+        });
+        sectionEl.dataset.bound = 'true';
+    }
+}
 
 /**
  * 상속세 계산
@@ -75,6 +189,8 @@ function calculateInheritanceTax() {
     `;
     
     resultSection.style.display = 'block';
+    saveCalculatorInput(TAX_STORAGE_KEY, getTaxInputState('inheritance'), 5);
+    renderTaxRecentHistory();
 }
 
 /**
@@ -165,11 +281,17 @@ function calculateGiftTax() {
     `;
     
     resultSection.style.display = 'block';
+    saveCalculatorInput(TAX_STORAGE_KEY, getTaxInputState('gift'), 5);
+    renderTaxRecentHistory();
 }
 
 // Export to global scope
 window.calculateInheritanceTax = calculateInheritanceTax;
 window.calculateGiftTax = calculateGiftTax;
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupTaxRecentHistory();
+});
 
 console.log('✅ Tax Calculator 모듈 로드 완료');
 

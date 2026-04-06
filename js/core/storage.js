@@ -91,7 +91,12 @@ export function saveCalculatorInput(calculatorKey, inputState, options = {}) {
 
 export function removeRecentCalculatorInput(calculatorKey, indexOrPredicate, options = {}) {
   if (typeof indexOrPredicate === 'number') {
-    return removeRecentItem(calculatorKey, (item, idx, arr) => false, options); // no-op fallback
+    const items = getRecentItems(calculatorKey, options);
+    const next = items.filter((_, idx) => idx !== indexOrPredicate);
+    const storage = getStorage(options.storage);
+    if (!storage || !calculatorKey) return [];
+    writeJson(storage, buildStorageKey(calculatorKey), next);
+    return next;
   }
   return removeRecentItem(calculatorKey, indexOrPredicate, options);
 }

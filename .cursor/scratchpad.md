@@ -164,7 +164,7 @@
    - 성공 기준: A/B 입력 독립 + Delta 계산 정확
 
 ### Project Status Board (추가)
-- [ ] FEAT-001 결과 저장/불러오기
+- [x] FEAT-001 결과 저장/불러오기 (연봉/세금/대출 확장 완료)
 - [ ] FEAT-002 URL 공유
 - [ ] FEAT-003 결과 요약문 + 복사
 - [ ] FEAT-004 비교 모드 A/B
@@ -172,6 +172,7 @@
 ### Executor's Feedback or Assistance Requests (추가)
 - 다음 Executor 단계는 **FEAT-001**부터 1개 태스크씩 진행 권장.
 - 각 태스크 완료 시 `npm test` + `npm run test:e2e` 통과를 마일스톤으로 보고.
+- FEAT-001을 세금/대출까지 확장 구현 완료. 최근 기록 저장/불러오기/삭제/전체삭제와 E2E 스모크(세금/대출) 검증 케이스를 추가함.
 
 ---
 

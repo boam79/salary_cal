@@ -7,6 +7,180 @@
 
 import AppState from '../core/appState.js';
 import { calculateLoanSummary } from '../domain/loan.js';
+import {
+    getRecentCalculatorInputs,
+    saveCalculatorInput,
+    removeRecentCalculatorInput,
+    clearRecentCalculatorInputs,
+} from '../core/storage.js';
+
+const FINANCIAL_LOAN_STORAGE_KEY = 'loan-financial';
+const HOUSING_LOAN_STORAGE_KEY = 'loan-housing';
+
+function getFinancialLoanInputState() {
+    return {
+        loanAmount: document.getElementById('loan-amount')?.value || '',
+        interestRate: document.getElementById('interest-rate')?.value || '',
+        loanPeriod: document.getElementById('loan-period')?.value || '',
+        repaymentType: document.getElementById('repayment-type')?.value || 'equalPrincipalInterest',
+        createdAt: Date.now(),
+    };
+}
+
+function applyFinancialLoanInputState(state) {
+    if (!state || typeof state !== 'object') return;
+    const loanAmountEl = document.getElementById('loan-amount');
+    const interestRateEl = document.getElementById('interest-rate');
+    const loanPeriodEl = document.getElementById('loan-period');
+    const repaymentTypeEl = document.getElementById('repayment-type');
+    if (loanAmountEl) loanAmountEl.value = state.loanAmount ?? '';
+    if (interestRateEl) interestRateEl.value = state.interestRate ?? '';
+    if (loanPeriodEl) loanPeriodEl.value = state.loanPeriod ?? '';
+    if (repaymentTypeEl) repaymentTypeEl.value = state.repaymentType ?? 'equalPrincipalInterest';
+    const tabBtn = document.querySelector(`#repayment-type-tabs .tab-button[data-value="${repaymentTypeEl?.value}"]`);
+    if (tabBtn) tabBtn.click();
+}
+
+function getHousingLoanInputState() {
+    return {
+        housePrice: document.getElementById('house-price')?.value || '',
+        ownFunds: document.getElementById('own-funds')?.value || '',
+        annualIncome: document.getElementById('housing-annual-income')?.value || '',
+        interestRate: document.getElementById('housing-interest-rate')?.value || '',
+        loanPeriod: document.getElementById('housing-loan-period')?.value || '',
+        repaymentType: document.getElementById('housing-repayment-type')?.value || 'equalPrincipalInterest',
+        createdAt: Date.now(),
+    };
+}
+
+function applyHousingLoanInputState(state) {
+    if (!state || typeof state !== 'object') return;
+    const housePriceEl = document.getElementById('house-price');
+    const ownFundsEl = document.getElementById('own-funds');
+    const annualIncomeEl = document.getElementById('housing-annual-income');
+    const interestRateEl = document.getElementById('housing-interest-rate');
+    const loanPeriodEl = document.getElementById('housing-loan-period');
+    const repaymentTypeEl = document.getElementById('housing-repayment-type');
+    if (housePriceEl) housePriceEl.value = state.housePrice ?? '';
+    if (ownFundsEl) ownFundsEl.value = state.ownFunds ?? '';
+    if (annualIncomeEl) annualIncomeEl.value = state.annualIncome ?? '';
+    if (interestRateEl) interestRateEl.value = state.interestRate ?? '';
+    if (loanPeriodEl) loanPeriodEl.value = state.loanPeriod ?? '';
+    if (repaymentTypeEl) repaymentTypeEl.value = state.repaymentType ?? 'equalPrincipalInterest';
+    const tabBtn = document.querySelector(`#housing-repayment-type-tabs .tab-button[data-value="${repaymentTypeEl?.value}"]`);
+    if (tabBtn) tabBtn.click();
+}
+
+function renderLoanRecentHistory(storageKey, listId, emptyId, itemFormatter, itemClassPrefix) {
+    const listEl = document.getElementById(listId);
+    const emptyEl = document.getElementById(emptyId);
+    const sectionId = listId.includes('financial') ? 'financial-loan-recent-section' : 'housing-loan-recent-section';
+    const sectionEl = document.getElementById(sectionId);
+    if (!listEl || !emptyEl) return;
+
+    const items = getRecentCalculatorInputs(storageKey);
+    listEl.innerHTML = '';
+    if (sectionEl) sectionEl.style.display = 'block';
+
+    if (!items.length) {
+        emptyEl.style.display = 'block';
+        return;
+    }
+
+    emptyEl.style.display = 'none';
+    items.forEach((item, idx) => {
+        const li = document.createElement('li');
+        li.className = 'recent-item';
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        li.style.gap = '8px';
+        li.style.padding = '6px 0';
+        const date = item.createdAt ? new Date(item.createdAt).toLocaleString('ko-KR') : '';
+        li.innerHTML = `
+            <button type="button" class="btn btn-secondary ${itemClassPrefix}-load" data-index="${idx}" style="flex:1; text-align:left;">
+                ${itemFormatter(item)}<br><small>${date}</small>
+            </button>
+            <button type="button" class="btn btn-secondary ${itemClassPrefix}-delete" data-index="${idx}" aria-label="기록 삭제">삭제</button>
+        `;
+        listEl.appendChild(li);
+    });
+}
+
+function renderFinancialLoanRecentHistory() {
+    renderLoanRecentHistory(
+        FINANCIAL_LOAN_STORAGE_KEY,
+        'financial-loan-recent-list',
+        'financial-loan-recent-empty',
+        (item) => `금융대출 · ${item.loanAmount || '-'}억 / ${item.interestRate || '-'}% / ${item.loanPeriod || '-'}년`,
+        'financial-loan-recent'
+    );
+}
+
+function renderHousingLoanRecentHistory() {
+    renderLoanRecentHistory(
+        HOUSING_LOAN_STORAGE_KEY,
+        'housing-loan-recent-list',
+        'housing-loan-recent-empty',
+        (item) => `주택대출 · ${item.housePrice || '-'}억 / 자금 ${item.ownFunds || '-'}억 / 금리 ${item.interestRate || '-'}%`,
+        'housing-loan-recent'
+    );
+}
+
+function setupLoanRecentHistory() {
+    const financialSection = document.getElementById('financial-loan-recent-section');
+    const housingSection = document.getElementById('housing-loan-recent-section');
+    renderFinancialLoanRecentHistory();
+    renderHousingLoanRecentHistory();
+
+    if (financialSection && !financialSection.dataset.bound) {
+        financialSection.addEventListener('click', (e) => {
+            const loadBtn = e.target.closest('.financial-loan-recent-load');
+            if (loadBtn) {
+                const idx = Number(loadBtn.dataset.index);
+                const items = getRecentCalculatorInputs(FINANCIAL_LOAN_STORAGE_KEY);
+                if (Number.isInteger(idx) && items[idx]) applyFinancialLoanInputState(items[idx]);
+                return;
+            }
+            const delBtn = e.target.closest('.financial-loan-recent-delete');
+            if (delBtn) {
+                const idx = Number(delBtn.dataset.index);
+                removeRecentCalculatorInput(FINANCIAL_LOAN_STORAGE_KEY, idx);
+                renderFinancialLoanRecentHistory();
+                return;
+            }
+            if (e.target.closest('#financial-loan-recent-clear')) {
+                clearRecentCalculatorInputs(FINANCIAL_LOAN_STORAGE_KEY);
+                renderFinancialLoanRecentHistory();
+            }
+        });
+        financialSection.dataset.bound = 'true';
+    }
+
+    if (housingSection && !housingSection.dataset.bound) {
+        housingSection.addEventListener('click', (e) => {
+            const loadBtn = e.target.closest('.housing-loan-recent-load');
+            if (loadBtn) {
+                const idx = Number(loadBtn.dataset.index);
+                const items = getRecentCalculatorInputs(HOUSING_LOAN_STORAGE_KEY);
+                if (Number.isInteger(idx) && items[idx]) applyHousingLoanInputState(items[idx]);
+                return;
+            }
+            const delBtn = e.target.closest('.housing-loan-recent-delete');
+            if (delBtn) {
+                const idx = Number(delBtn.dataset.index);
+                removeRecentCalculatorInput(HOUSING_LOAN_STORAGE_KEY, idx);
+                renderHousingLoanRecentHistory();
+                return;
+            }
+            if (e.target.closest('#housing-loan-recent-clear')) {
+                clearRecentCalculatorInputs(HOUSING_LOAN_STORAGE_KEY);
+                renderHousingLoanRecentHistory();
+            }
+        });
+        housingSection.dataset.bound = 'true';
+    }
+}
 
 /**
  * 상환방식별 계산 공식 설명
@@ -167,6 +341,9 @@ function calculateLoan() {
     
     document.getElementById('loan-result').style.display = 'block';
     document.getElementById('loan-chart-section').style.display = 'block';
+
+    saveCalculatorInput(FINANCIAL_LOAN_STORAGE_KEY, getFinancialLoanInputState(), 5);
+    renderFinancialLoanRecentHistory();
     
     // Store chart data globally for resize
     window.loanChartData = { schedule, principal };
@@ -323,6 +500,9 @@ function calculateHousingLoan() {
     
     document.getElementById('housing-loan-result').style.display = 'block';
     document.getElementById('housing-loan-chart-section').style.display = 'block';
+
+    saveCalculatorInput(HOUSING_LOAN_STORAGE_KEY, getHousingLoanInputState(), 5);
+    renderHousingLoanRecentHistory();
     
     // Store chart data globally for resize
     window.housingLoanChartData = { schedule, principal: maxLoan };
@@ -333,6 +513,10 @@ function calculateHousingLoan() {
 window.calculateLoan = calculateLoan;
 window.calculateHousingLoan = calculateHousingLoan;
 window.getRepaymentFormula = getRepaymentFormula;
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupLoanRecentHistory();
+});
 
 console.log('✅ Loan Calculator 모듈 로드 완료');
 
