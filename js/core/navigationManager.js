@@ -5,6 +5,7 @@
 
 import AppState from './appState.js';
 import statisticsManager from '../stats/statisticsManager.js';
+import { scheduleDeepLinkApplyForScreen } from './deepLink.js';
 
 class NavigationManager {
     constructor() {
@@ -59,6 +60,9 @@ class NavigationManager {
         
         // 화면별 초기화 작업
         this.initializeScreen(screenId);
+
+        // 딥링크 복원(해당 화면 진입 이후에 적용)
+        scheduleDeepLinkApplyForScreen(screenId);
         
         console.log(`✅ 화면 전환 완료: ${screenId}`);
         return true;

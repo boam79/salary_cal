@@ -13,6 +13,7 @@ import {
     removeRecentCalculatorInput,
     clearRecentCalculatorInputs,
 } from '../core/storage.js';
+import { getShareStateFromUrl, updateShareUrl, setupShareCopyButtons } from '../core/deepLink.js';
 
 const TAX_STORAGE_KEY = 'tax';
 
@@ -32,6 +33,17 @@ function getTaxInputState(kind) {
     };
 }
 
+function getTaxShareState() {
+    const inheritanceTabActive = document.getElementById('inheritance-tab')?.classList.contains('active');
+    const tab = inheritanceTabActive ? 'inheritance' : 'gift';
+    return {
+        tab,
+        inheritanceAmount: document.getElementById('inheritance-amount')?.value || '',
+        giftAmount: document.getElementById('gift-amount')?.value || '',
+        giftRelation: document.getElementById('gift-relation')?.value || 'spouse',
+    };
+}
+
 function applyTaxInputState(state) {
     if (!state || typeof state !== 'object') return;
     if (state.kind === 'gift') {
@@ -48,6 +60,27 @@ function applyTaxInputState(state) {
     if (inheritanceTabBtn) inheritanceTabBtn.click();
     const amountEl = document.getElementById('inheritance-amount');
     if (amountEl) amountEl.value = state.amount ?? '';
+}
+
+function applyTaxShareState(state) {
+    if (!state || typeof state !== 'object') return;
+    const tab = state.tab === 'gift' ? 'gift' : 'inheritance';
+    const tabBtn = document.querySelector(`#tax-screen .tab-btn[data-tab="${tab}"]`);
+    if (tabBtn) tabBtn.click();
+
+    const inheritanceAmountEl = document.getElementById('inheritance-amount');
+    const giftAmountEl = document.getElementById('gift-amount');
+    const giftRelationEl = document.getElementById('gift-relation');
+
+    if (inheritanceAmountEl && typeof state.inheritanceAmount === 'string') {
+        inheritanceAmountEl.value = state.inheritanceAmount;
+    }
+    if (giftAmountEl && typeof state.giftAmount === 'string') {
+        giftAmountEl.value = state.giftAmount;
+    }
+    if (giftRelationEl && typeof state.giftRelation === 'string') {
+        giftRelationEl.value = state.giftRelation;
+    }
 }
 
 function renderTaxRecentHistory() {
@@ -122,6 +155,12 @@ function setupTaxRecentHistory() {
     }
 }
 
+function setupTaxShareFeature() {
+    setupShareCopyButtons({
+        '.copy-share-url[data-share-target="tax"]': () => getTaxShareState(),
+    });
+}
+
 /**
  * 상속세 계산
  * 상속 재산가액에서 공제액을 차감하고 누진세율 적용
@@ -191,6 +230,7 @@ function calculateInheritanceTax() {
     resultSection.style.display = 'block';
     saveCalculatorInput(TAX_STORAGE_KEY, getTaxInputState('inheritance'), 5);
     renderTaxRecentHistory();
+    updateShareUrl('tax-screen', getTaxShareState());
 }
 
 /**
@@ -283,6 +323,7 @@ function calculateGiftTax() {
     resultSection.style.display = 'block';
     saveCalculatorInput(TAX_STORAGE_KEY, getTaxInputState('gift'), 5);
     renderTaxRecentHistory();
+    updateShareUrl('tax-screen', getTaxShareState());
 }
 
 // Export to global scope
@@ -291,6 +332,12 @@ window.calculateGiftTax = calculateGiftTax;
 
 document.addEventListener('DOMContentLoaded', function() {
     setupTaxRecentHistory();
+    setupTaxShareFeature();
+
+    const share = getShareStateFromUrl('tax-screen');
+    if (share) {
+        applyTaxShareState(share);
+    }
 });
 
 console.log('✅ Tax Calculator 모듈 로드 완료');

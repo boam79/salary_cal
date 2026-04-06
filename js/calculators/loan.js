@@ -7,6 +7,7 @@
 
 import AppState from '../core/appState.js';
 import { calculateLoanSummary } from '../domain/loan.js';
+import { buildShareUrl, copyTextToClipboard } from '../core/deepLink.js';
 import {
     getRecentCalculatorInputs,
     saveCalculatorInput,
@@ -16,6 +17,38 @@ import {
 
 const FINANCIAL_LOAN_STORAGE_KEY = 'loan-financial';
 const HOUSING_LOAN_STORAGE_KEY = 'loan-housing';
+
+function getLoanShareState() {
+    return {
+        screen: 'loan-screen',
+        financial: {
+            loanAmount: document.getElementById('loan-amount')?.value || '',
+            interestRate: document.getElementById('interest-rate')?.value || '',
+            loanPeriod: document.getElementById('loan-period')?.value || '',
+            repaymentType: document.getElementById('repayment-type')?.value || 'equalPrincipalInterest',
+        },
+        housing: {
+            housePrice: document.getElementById('house-price')?.value || '',
+            ownFunds: document.getElementById('own-funds')?.value || '',
+            annualIncome: document.getElementById('housing-annual-income')?.value || '',
+            interestRate: document.getElementById('housing-interest-rate')?.value || '',
+            loanPeriod: document.getElementById('housing-loan-period')?.value || '',
+            repaymentType: document.getElementById('housing-repayment-type')?.value || 'equalPrincipalInterest',
+        },
+    };
+}
+
+async function copyLoanShareUrl() {
+    const btn = document.getElementById('copy-loan-share');
+    if (!btn) return;
+    const original = btn.textContent;
+    const url = buildShareUrl(getLoanShareState());
+    const ok = await copyTextToClipboard(url);
+    btn.textContent = ok ? '복사됨!' : '복사 실패';
+    setTimeout(() => {
+        btn.textContent = original;
+    }, 1200);
+}
 
 function getFinancialLoanInputState() {
     return {
@@ -516,6 +549,11 @@ window.getRepaymentFormula = getRepaymentFormula;
 
 document.addEventListener('DOMContentLoaded', function() {
     setupLoanRecentHistory();
+    const copyBtn = document.getElementById('copy-loan-share');
+    if (copyBtn && !copyBtn.dataset.bound) {
+        copyBtn.addEventListener('click', copyLoanShareUrl);
+        copyBtn.dataset.bound = 'true';
+    }
 });
 
 console.log('✅ Loan Calculator 모듈 로드 완료');

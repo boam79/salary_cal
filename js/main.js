@@ -8,6 +8,7 @@ import navigationManager from './core/navigationManager.js';
 import eventManager from './core/eventManager.js';
 import newsManager from './news/newsManager.js';
 import statsPopup from './stats/statsPopup.js';
+import { restoreDeepLinkOnInit } from './core/deepLink.js';
 // topNewsManager 제거 (기능 미사용)
 
 class FinancialCalculatorApp {
@@ -38,6 +39,7 @@ class FinancialCalculatorApp {
             
             // 뉴스 매니저 초기화 (경제 뉴스)
             await newsManager.init();
+            restoreDeepLinkOnInit();
             // 햄버거 버튼 직접 바인딩 (iOS Safari 대응)
             this.setupHamburgerFallback();
             

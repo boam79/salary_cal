@@ -13,6 +13,7 @@ import {
     removeRecentCalculatorInput,
     clearRecentCalculatorInputs,
 } from '../core/storage.js';
+import { updateShareButtons } from '../core/deepLink.js';
 
 const SALARY_STORAGE_KEY = 'salary';
 
@@ -343,6 +344,7 @@ function calculateSalary() {
     explanation.innerHTML = explanationHTML;
     
     document.getElementById('salary-result').style.display = 'block';
+    updateShareButtons();
 
     // 최근 입력 저장
     saveCalculatorInput(SALARY_STORAGE_KEY, getSalaryInputState(), 5);
