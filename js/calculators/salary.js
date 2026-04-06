@@ -130,6 +130,123 @@ function buildSalarySummaryText({ salaryType, monthlyNet, annualNet, totalDeduct
     ].join('\n');
 }
 
+function calculateSalaryFromAnnualForCompare(annualSalary, rates) {
+    const monthlySalary = annualSalary / 12;
+    const pensionBase = Math.min(monthlySalary, rates.insurance.pension.maxMonthlyIncome);
+    const pension = pensionBase * rates.insurance.pension.rate;
+    const health = monthlySalary * rates.insurance.health.rate;
+    const longTermCare = health * rates.insurance.longTermCare.rateOfHealth;
+    const employment = monthlySalary * rates.insurance.employment.rate;
+
+    let incomeDeduction = 0;
+    if (annualSalary <= 6000000) {
+        incomeDeduction = annualSalary * 0.7;
+    } else if (annualSalary <= 15000000) {
+        incomeDeduction = 4200000 + (annualSalary - 6000000) * 0.4;
+    } else if (annualSalary <= 30000000) {
+        incomeDeduction = 7800000 + (annualSalary - 15000000) * 0.15;
+    } else if (annualSalary <= 50000000) {
+        incomeDeduction = 10050000 + (annualSalary - 30000000) * 0.08;
+    } else if (annualSalary <= 88000000) {
+        incomeDeduction = 11650000 + (annualSalary - 50000000) * 0.06;
+    } else {
+        incomeDeduction = 13930000 + (annualSalary - 88000000) * 0.02;
+    }
+
+    const taxBase = Math.max(0, annualSalary - incomeDeduction);
+    let incomeTax = 0;
+    const brackets = rates.incomeTax.brackets;
+    for (let i = 0; i < brackets.length; i++) {
+        if (taxBase <= brackets[i].max) {
+            incomeTax = taxBase * brackets[i].rate - brackets[i].deduction;
+            break;
+        }
+    }
+    const monthlyIncomeTax = incomeTax / 12;
+    const localTax = monthlyIncomeTax * rates.incomeTax.localTaxRate;
+    const totalDeduction = pension + health + longTermCare + employment + monthlyIncomeTax + localTax;
+    const monthlyNet = monthlySalary - totalDeduction;
+    const annualNet = monthlyNet * 12;
+    return { monthlyNet, annualNet };
+}
+
+function formatDelta(value) {
+    const sign = value > 0 ? '+' : value < 0 ? '-' : '';
+    return `${sign}${window.formatCurrency(Math.abs(value))}`;
+}
+
+function openSalaryCompareMode() {
+    const section = document.getElementById('salary-compare-section');
+    if (section) section.style.display = 'block';
+}
+
+async function compareSalaryAB() {
+    let rates = AppState.getTaxRates();
+    if (!rates && window.FinancialCalculatorApp?.loadTaxRates) {
+        try {
+            await window.FinancialCalculatorApp.loadTaxRates();
+            rates = AppState.getTaxRates();
+        } catch (error) {
+            console.error('compareSalaryAB: failed to load tax rates', error);
+        }
+    }
+    if (!rates) {
+        alert('세율 데이터를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
+    const annualA = window.getValueWithUnit('salary-compare-annual-a', 10000);
+    if (annualA === null) return;
+    const annualB = window.getValueWithUnit('salary-compare-annual-b', 10000);
+    if (annualB === null) return;
+
+    const a = calculateSalaryFromAnnualForCompare(annualA, rates);
+    const b = calculateSalaryFromAnnualForCompare(annualB, rates);
+    const deltaMonthly = b.monthlyNet - a.monthlyNet;
+    const deltaAnnual = b.annualNet - a.annualNet;
+
+    const summary = document.getElementById('salary-compare-summary');
+    const body = document.getElementById('salary-compare-body');
+    const result = document.getElementById('salary-compare-result');
+    const section = document.getElementById('salary-compare-section');
+    if (!summary || !body || !result || !section) return;
+    summary.innerHTML = `
+        <div class="result-summary">
+            <div class="result-item">
+                <span class="result-label">A 월 실수령액</span>
+                <span class="result-value">${window.formatCurrency(a.monthlyNet)}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">B 월 실수령액</span>
+                <span class="result-value">${window.formatCurrency(b.monthlyNet)}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">A 연 실수령액</span>
+                <span class="result-value">${window.formatCurrency(a.annualNet)}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">B 연 실수령액</span>
+                <span class="result-value">${window.formatCurrency(b.annualNet)}</span>
+            </div>
+        </div>
+    `;
+    body.innerHTML = `
+        <tr>
+            <td>월 실수령액</td>
+            <td>${window.formatCurrency(a.monthlyNet)}</td>
+            <td>${window.formatCurrency(b.monthlyNet)}</td>
+            <td>${formatDelta(deltaMonthly)}</td>
+        </tr>
+        <tr>
+            <td>연 실수령액</td>
+            <td>${window.formatCurrency(a.annualNet)}</td>
+            <td>${window.formatCurrency(b.annualNet)}</td>
+            <td>${formatDelta(deltaAnnual)}</td>
+        </tr>
+    `;
+    section.style.display = 'block';
+    result.style.display = 'block';
+}
+
 /**
  * 연봉/월급 실수령액 계산
  * 소득세, 지방소득세, 4대보험 공제 후 실수령액 계산
@@ -424,6 +541,16 @@ function setupSalaryTypeToggle() {
 document.addEventListener('DOMContentLoaded', function() {
     setupSalaryTypeToggle();
     setupSalaryRecentHistory();
+    const compareBtn = document.getElementById('compare-salary');
+    if (compareBtn && !compareBtn.dataset.bound) {
+        compareBtn.addEventListener('click', openSalaryCompareMode);
+        compareBtn.dataset.bound = 'true';
+    }
+    const compareRunBtn = document.getElementById('calculate-salary-compare');
+    if (compareRunBtn && !compareRunBtn.dataset.bound) {
+        compareRunBtn.addEventListener('click', compareSalaryAB);
+        compareRunBtn.dataset.bound = 'true';
+    }
 });
 
 // 전역 함수로 노출

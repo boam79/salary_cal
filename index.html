@@ -313,6 +313,7 @@
                         </div>
                         <div class="button-group">
                             <button class="btn btn-primary" id="calculate-salary">계산하기</button>
+                            <button class="btn btn-secondary" id="compare-salary">A/B 비교</button>
                             <button class="btn btn-secondary" id="reset-salary">초기화</button>
                         </div>
                     </div>
@@ -362,6 +363,44 @@
                                 <div class="explanation-section">
                                     <button class="explanation-toggle">▼ 계산 과정 보기</button>
                                     <div class="explanation-content" id="salary-explanation"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-section" id="salary-compare-result" style="display: none;">
+                        <h3 class="result-title">A/B 비교 결과</h3>
+                        <div class="result-container">
+                            <div class="result-main" id="salary-compare-summary"></div>
+                        </div>
+                    </div>
+                    <div class="result-section" id="salary-compare-section" style="display: none;">
+                        <h3 class="result-title">A/B 비교 입력</h3>
+                        <div class="result-container">
+                            <div class="result-main">
+                                <div class="form-group">
+                                    <label for="salary-compare-annual-a">A 연봉</label>
+                                    <input type="number" id="salary-compare-annual-a" placeholder="예: 5000 (만원)" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="salary-compare-annual-b">B 연봉</label>
+                                    <input type="number" id="salary-compare-annual-b" placeholder="예: 6000 (만원)" min="0">
+                                </div>
+                                <div class="button-group">
+                                    <button class="btn btn-primary" type="button" id="calculate-salary-compare">비교 계산</button>
+                                </div>
+                                <div class="table-wrapper" style="margin-top: var(--spacing-sm);">
+                                    <table class="result-table">
+                                        <thead>
+                                            <tr>
+                                                <th>항목</th>
+                                                <th>A</th>
+                                                <th>B</th>
+                                                <th>Delta(B-A)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="salary-compare-body"></tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -1166,6 +1205,7 @@
                             </div>
                             <div class="button-group">
                                 <button class="btn btn-primary" id="calculate-loan">계산하기</button>
+                                <button class="btn btn-secondary" id="compare-loan">A/B 비교</button>
                                 <button class="btn btn-secondary" id="reset-loan">초기화</button>
                             </div>
                         </div>
@@ -1190,6 +1230,49 @@
                                     <div class="explanation-section">
                                         <button class="explanation-toggle">▼ 계산 과정 보기</button>
                                         <div class="explanation-content" id="loan-explanation"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="result-section" id="loan-compare-result" style="display: none;">
+                            <h3 class="result-title">A/B 비교 결과</h3>
+                            <div class="result-container">
+                                <div class="result-main" id="loan-compare-summary"></div>
+                            </div>
+                        </div>
+                        <div class="result-section" id="loan-compare-section" style="display: none;">
+                            <h3 class="result-title">A/B 비교 입력</h3>
+                            <div class="result-container">
+                                <div class="result-main">
+                                    <div class="form-group">
+                                        <label for="loan-amount-a">A 대출금액</label>
+                                        <input type="number" id="loan-amount-a" placeholder="예: 1 (억원)" min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="interest-rate-a">A 연이자율 (%)</label>
+                                        <input type="number" id="interest-rate-a" placeholder="예: 4.0" min="0" max="30" step="0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="loan-period-a">A 대출기간 (년)</label>
+                                        <input type="number" id="loan-period-a" placeholder="예: 20" min="1" max="50">
+                                    </div>
+                                    <input type="hidden" id="repayment-type-a" value="equalPrincipalInterest">
+                                    <div class="form-group">
+                                        <label for="loan-amount-b">B 대출금액</label>
+                                        <input type="number" id="loan-amount-b" placeholder="예: 1.2 (억원)" min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="interest-rate-b">B 연이자율 (%)</label>
+                                        <input type="number" id="interest-rate-b" placeholder="예: 4.5" min="0" max="30" step="0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="loan-period-b">B 대출기간 (년)</label>
+                                        <input type="number" id="loan-period-b" placeholder="예: 20" min="1" max="50">
+                                    </div>
+                                    <input type="hidden" id="repayment-type-b" value="equalPrincipalInterest">
+                                    <div class="button-group">
+                                        <button class="btn btn-primary" type="button" id="calculate-loan-compare">비교 계산</button>
                                     </div>
                                 </div>
                             </div>

@@ -44,6 +44,20 @@ function setupLoanShareFeature() {
     });
 }
 
+function getNumberInputValue(id, unit = 1) {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    const raw = Number(el.value);
+    if (!Number.isFinite(raw)) return null;
+    return raw * unit;
+}
+
+function formatSignedCurrency(value) {
+    if (!Number.isFinite(value)) return '-';
+    const sign = value >= 0 ? '+' : '';
+    return `${sign}${window.formatCurrency(value)}`;
+}
+
 function buildLoanSummaryText({ principal, annualRate, years, repaymentTypeLabel, monthlyPayment, totalInterest, totalPayment }) {
     return [
         '[대출 계산 요약]',
@@ -55,6 +69,84 @@ function buildLoanSummaryText({ principal, annualRate, years, repaymentTypeLabel
         `총 이자: ${window.formatCurrency(totalInterest)}`,
         `총 상환액: ${window.formatCurrency(totalPayment)}`,
     ].join('\n');
+}
+
+function calculateLoanComparison() {
+    const principalA = getNumberInputValue('loan-amount-a', 100000000);
+    const principalB = getNumberInputValue('loan-amount-b', 100000000);
+    const annualRateA = getNumberInputValue('interest-rate-a');
+    const annualRateB = getNumberInputValue('interest-rate-b');
+    const yearsA = getNumberInputValue('loan-period-a');
+    const yearsB = getNumberInputValue('loan-period-b');
+    const repaymentTypeA = document.getElementById('loan-compare-a-repayment')?.value || 'equalPrincipalInterest';
+    const repaymentTypeB = document.getElementById('loan-compare-b-repayment')?.value || 'equalPrincipalInterest';
+
+    if (
+        !Number.isFinite(principalA) || !Number.isFinite(principalB) ||
+        !Number.isFinite(annualRateA) || !Number.isFinite(annualRateB) ||
+        !Number.isFinite(yearsA) || !Number.isFinite(yearsB)
+    ) {
+        alert('비교 입력값을 모두 정확히 입력해주세요.');
+        return;
+    }
+
+    const summaryA = calculateLoanSummary({
+        principal: principalA,
+        annualRatePercent: annualRateA,
+        years: yearsA,
+        repaymentType: repaymentTypeA,
+        scheduleSampled: false
+    });
+    const summaryB = calculateLoanSummary({
+        principal: principalB,
+        annualRatePercent: annualRateB,
+        years: yearsB,
+        repaymentType: repaymentTypeB,
+        scheduleSampled: false
+    });
+    if (!summaryA.ok || !summaryB.ok) {
+        alert('대출 비교 계산 중 오류가 발생했습니다.');
+        return;
+    }
+
+    const target = document.getElementById('loan-compare-summary');
+    const section = document.getElementById('loan-compare-result');
+    if (!target || !section) return;
+
+    const deltaMonthly = summaryB.monthlyPayment - summaryA.monthlyPayment;
+    const deltaInterest = summaryB.totalInterest - summaryA.totalInterest;
+    const deltaTotal = summaryB.totalPayment - summaryA.totalPayment;
+
+    target.innerHTML = `
+        <div class="result-summary">
+            <div class="result-item">
+                <span class="result-label">A 월 상환액</span>
+                <span class="result-value">${window.formatCurrency(summaryA.monthlyPayment)}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">B 월 상환액</span>
+                <span class="result-value">${window.formatCurrency(summaryB.monthlyPayment)}</span>
+            </div>
+            <div class="result-item highlight" id="loan-compare-delta">
+                <span class="result-label">월 상환액 차이(B-A)</span>
+                <span class="result-value">${formatSignedCurrency(deltaMonthly)}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">총 이자 차이(B-A)</span>
+                <span class="result-value">${formatSignedCurrency(deltaInterest)}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">총 상환액 차이(B-A)</span>
+                <span class="result-value">${formatSignedCurrency(deltaTotal)}</span>
+            </div>
+        </div>
+    `;
+    section.style.display = 'block';
+}
+
+function openLoanCompareMode() {
+    const section = document.getElementById('loan-compare-section');
+    if (section) section.style.display = 'block';
 }
 
 function getFinancialLoanInputState() {
@@ -578,10 +670,22 @@ function calculateHousingLoan() {
 window.calculateLoan = calculateLoan;
 window.calculateHousingLoan = calculateHousingLoan;
 window.getRepaymentFormula = getRepaymentFormula;
+window.calculateLoanComparison = calculateLoanComparison;
 
 document.addEventListener('DOMContentLoaded', function() {
     setupLoanRecentHistory();
     setupLoanShareFeature();
+
+    const compareBtn = document.getElementById('compare-loan');
+    if (compareBtn && !compareBtn.dataset.bound) {
+        compareBtn.addEventListener('click', openLoanCompareMode);
+        compareBtn.dataset.bound = 'true';
+    }
+    const compareRunBtn = document.getElementById('calculate-loan-compare');
+    if (compareRunBtn && !compareRunBtn.dataset.bound) {
+        compareRunBtn.addEventListener('click', calculateLoanComparison);
+        compareRunBtn.dataset.bound = 'true';
+    }
 });
 
 console.log('✅ Loan Calculator 모듈 로드 완료');
