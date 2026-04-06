@@ -7,7 +7,7 @@
 
 import AppState from '../core/appState.js';
 import { calculateLoanSummary } from '../domain/loan.js';
-import { buildShareUrl, copyTextToClipboard } from '../core/deepLink.js';
+import { updateShareUrl, setupShareCopyButtons, setupSummaryCopyButtons } from '../core/deepLink.js';
 import {
     getRecentCalculatorInputs,
     saveCalculatorInput,
@@ -38,16 +38,23 @@ function getLoanShareState() {
     };
 }
 
-async function copyLoanShareUrl() {
-    const btn = document.getElementById('copy-loan-share');
-    if (!btn) return;
-    const original = btn.textContent;
-    const url = buildShareUrl(getLoanShareState());
-    const ok = await copyTextToClipboard(url);
-    btn.textContent = ok ? '복사됨!' : '복사 실패';
-    setTimeout(() => {
-        btn.textContent = original;
-    }, 1200);
+function setupLoanShareFeature() {
+    setupShareCopyButtons({
+        '#share-loan-link': () => getLoanShareState(),
+    });
+}
+
+function buildLoanSummaryText({ principal, annualRate, years, repaymentTypeLabel, monthlyPayment, totalInterest, totalPayment }) {
+    return [
+        '[대출 계산 요약]',
+        `대출원금: ${window.formatCurrency(principal)}`,
+        `연이자율: ${annualRate}%`,
+        `대출기간: ${years}년`,
+        `상환방식: ${repaymentTypeLabel}`,
+        `월 상환액: ${window.formatCurrency(monthlyPayment)}`,
+        `총 이자: ${window.formatCurrency(totalInterest)}`,
+        `총 상환액: ${window.formatCurrency(totalPayment)}`,
+    ].join('\n');
 }
 
 function getFinancialLoanInputState() {
@@ -374,6 +381,30 @@ function calculateLoan() {
     
     document.getElementById('loan-result').style.display = 'block';
     document.getElementById('loan-chart-section').style.display = 'block';
+    updateShareUrl('loan-screen', getLoanShareState());
+    const loanSummaryTextEl = document.getElementById('loan-summary-text');
+    if (loanSummaryTextEl) {
+        loanSummaryTextEl.textContent = buildLoanSummaryText({
+            principal,
+            annualRate,
+            years,
+            repaymentTypeLabel: repaymentTypeNames[repaymentType] || repaymentType,
+            monthlyPayment,
+            totalInterest,
+            totalPayment,
+        });
+    }
+    setupSummaryCopyButtons({
+        '#copy-loan-summary': () => buildLoanSummaryText({
+            principal,
+            annualRate,
+            years,
+            repaymentTypeLabel: repaymentTypeNames[repaymentType] || repaymentType,
+            monthlyPayment,
+            totalInterest,
+            totalPayment,
+        }),
+    });
 
     saveCalculatorInput(FINANCIAL_LOAN_STORAGE_KEY, getFinancialLoanInputState(), 5);
     renderFinancialLoanRecentHistory();
@@ -533,6 +564,7 @@ function calculateHousingLoan() {
     
     document.getElementById('housing-loan-result').style.display = 'block';
     document.getElementById('housing-loan-chart-section').style.display = 'block';
+    updateShareUrl('loan-screen', getLoanShareState());
 
     saveCalculatorInput(HOUSING_LOAN_STORAGE_KEY, getHousingLoanInputState(), 5);
     renderHousingLoanRecentHistory();
@@ -549,11 +581,7 @@ window.getRepaymentFormula = getRepaymentFormula;
 
 document.addEventListener('DOMContentLoaded', function() {
     setupLoanRecentHistory();
-    const copyBtn = document.getElementById('copy-loan-share');
-    if (copyBtn && !copyBtn.dataset.bound) {
-        copyBtn.addEventListener('click', copyLoanShareUrl);
-        copyBtn.dataset.bound = 'true';
-    }
+    setupLoanShareFeature();
 });
 
 console.log('✅ Loan Calculator 모듈 로드 완료');

@@ -20,6 +20,7 @@ test.describe('calculators smoke', () => {
     await expect(page.locator('#salary-result')).toBeVisible();
     await expect(page.locator('#monthly-net')).not.toHaveText('');
     await expect(page.locator('#annual-net')).not.toHaveText('');
+    await expect(page.locator('#salary-summary-text')).not.toHaveText('');
   });
 
   test('salary deep link restores screen and input', async ({ page }) => {
@@ -37,6 +38,7 @@ test.describe('calculators smoke', () => {
 
     await expect(page.locator('#inheritance-result')).toBeVisible();
     await expect(page.locator('#inheritance-summary')).toContainText('상속세액');
+    await expect(page.locator('#tax-summary-text')).not.toHaveText('');
   });
 
   test('tax deep link restores screen and input', async ({ page }) => {
@@ -73,6 +75,7 @@ test.describe('calculators smoke', () => {
 
     await expect(page.locator('#loan-result')).toBeVisible();
     await expect(page.locator('#loan-summary')).toContainText('월 상환액');
+    await expect(page.locator('#loan-summary-text')).not.toHaveText('');
   });
 
   test('loan deep link restores screen and input', async ({ page }) => {

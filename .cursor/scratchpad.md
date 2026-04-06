@@ -166,7 +166,7 @@
 ### Project Status Board (추가)
 - [x] FEAT-001 결과 저장/불러오기 (연봉/세금/대출 확장 완료)
 - [x] FEAT-002 URL 공유 (딥링크 복원 + 공유 URL 복사 버튼 구현)
-- [ ] FEAT-003 결과 요약문 + 복사
+- [x] FEAT-003 결과 요약문 + 복사 (연봉/세금/대출 요약 생성 + 복사 버튼 구현)
 - [ ] FEAT-004 비교 모드 A/B
 
 ### Executor's Feedback or Assistance Requests (추가)
@@ -174,10 +174,12 @@
 - 각 태스크 완료 시 `npm test` + `npm run test:e2e` 통과를 마일스톤으로 보고.
 - FEAT-001을 세금/대출까지 확장 구현 완료. 최근 기록 저장/불러오기/삭제/전체삭제와 E2E 스모크(세금/대출) 검증 케이스를 추가함.
 - FEAT-002 구현 완료: `?screen=` + 계산기별 입력 query를 읽어 초기 화면/입력 복원, 결과 섹션 공유 버튼으로 현재 상태 URL 생성/복사 가능.
+- FEAT-003 구현 완료: 연봉/세금/대출 계산 결과에 `summary-*` 영역과 복사 버튼을 추가해 결과 요약문을 즉시 생성/복사 가능.
 
 ## Lessons Learned
 - 딥링크는 입력값이 비정상이어도 앱이 깨지지 않도록 "존재하는 DOM에만 복원"하는 방어 로직이 중요함.
 - E2E에서 localStorage 초기화는 `context.addInitScript`로 새 문서마다 적용해야 안정적으로 격리됨.
+- 공유/복사 UX는 공통 유틸(`copyTextToClipboard`)로 통합하면 계산기별 구현 편차와 예외 처리를 줄일 수 있음.
 
 ---
 

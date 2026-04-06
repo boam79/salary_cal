@@ -13,7 +13,12 @@ import {
     removeRecentCalculatorInput,
     clearRecentCalculatorInputs,
 } from '../core/storage.js';
-import { getShareStateFromUrl, updateShareUrl, setupShareCopyButtons } from '../core/deepLink.js';
+import {
+    getShareStateFromUrl,
+    updateShareUrl,
+    setupShareCopyButtons,
+    copyTextToClipboard,
+} from '../core/deepLink.js';
 
 const TAX_STORAGE_KEY = 'tax';
 
@@ -159,6 +164,47 @@ function setupTaxShareFeature() {
     setupShareCopyButtons({
         '.copy-share-url[data-share-target="tax"]': () => getTaxShareState(),
     });
+
+    const copyBtn = document.getElementById('copy-tax-summary');
+    if (copyBtn && !copyBtn.dataset.bound) {
+        copyBtn.addEventListener('click', copyTaxSummary);
+        copyBtn.dataset.bound = 'true';
+    }
+}
+
+function buildTaxSummaryText({ kind, amount, deduction, taxBase, tax, relationLabel }) {
+    if (kind === 'gift') {
+        return [
+            '[세금 계산 요약]',
+            `유형: 증여세 (${relationLabel || '관계 미지정'})`,
+            `증여 재산가액: ${window.formatCurrency(amount)}`,
+            `공제액: ${window.formatCurrency(deduction)}`,
+            `과세표준: ${window.formatCurrency(taxBase)}`,
+            `예상 증여세: ${window.formatCurrency(tax)}`,
+        ].join('\n');
+    }
+    return [
+        '[세금 계산 요약]',
+        '유형: 상속세',
+        `상속 재산가액: ${window.formatCurrency(amount)}`,
+        `공제액: ${window.formatCurrency(deduction)}`,
+        `과세표준: ${window.formatCurrency(taxBase)}`,
+        `예상 상속세: ${window.formatCurrency(tax)}`,
+    ].join('\n');
+}
+
+async function copyTaxSummary() {
+    const summaryEl = document.getElementById('tax-summary-text');
+    const btn = document.getElementById('share-tax-summary');
+    if (!summaryEl || !btn) return;
+    const text = summaryEl.textContent || '';
+    if (!text.trim()) return;
+    const original = btn.textContent;
+    const ok = await copyTextToClipboard(text);
+    btn.textContent = ok ? '복사됨!' : '복사 실패';
+    setTimeout(() => {
+        btn.textContent = original;
+    }, 1200);
 }
 
 /**
@@ -226,6 +272,17 @@ function calculateInheritanceTax() {
             상속세액: <strong>${window.formatCurrency(tax)}</strong>
         </div>
     `;
+
+    const summaryTextEl = document.getElementById('tax-summary-text');
+    if (summaryTextEl) {
+        summaryTextEl.textContent = buildTaxSummaryText({
+            kind: 'inheritance',
+            amount,
+            deduction,
+            taxBase,
+            tax,
+        });
+    }
     
     resultSection.style.display = 'block';
     saveCalculatorInput(TAX_STORAGE_KEY, getTaxInputState('inheritance'), 5);
@@ -319,6 +376,18 @@ function calculateGiftTax() {
             증여세액: <strong>${window.formatCurrency(tax)}</strong>
         </div>
     `;
+
+    const summaryTextEl = document.getElementById('tax-summary-text');
+    if (summaryTextEl) {
+        summaryTextEl.textContent = buildTaxSummaryText({
+            kind: 'gift',
+            amount,
+            deduction,
+            taxBase,
+            tax,
+            relationLabel: relationNames[relation],
+        });
+    }
     
     resultSection.style.display = 'block';
     saveCalculatorInput(TAX_STORAGE_KEY, getTaxInputState('gift'), 5);

@@ -13,7 +13,7 @@ import {
     removeRecentCalculatorInput,
     clearRecentCalculatorInputs,
 } from '../core/storage.js';
-import { updateShareButtons } from '../core/deepLink.js';
+import { updateShareButtons, setupSummaryCopyButtons } from '../core/deepLink.js';
 
 const SALARY_STORAGE_KEY = 'salary';
 
@@ -117,6 +117,17 @@ function setupSalaryRecentHistory() {
         });
         sectionEl.dataset.bound = 'true';
     }
+}
+
+function buildSalarySummaryText({ salaryType, monthlyNet, annualNet, totalDeduction }) {
+    const typeLabel = salaryType === 'monthly' ? '월급(시급 기반)' : '연봉';
+    return [
+        `[월급/연봉 계산 요약]`,
+        `- 계산 유형: ${typeLabel}`,
+        `- 월 실수령액: ${window.formatCurrency(monthlyNet)}`,
+        `- 연 실수령액: ${window.formatCurrency(annualNet)}`,
+        `- 월 총 공제액: ${window.formatCurrency(totalDeduction)}`,
+    ].join('\n');
 }
 
 /**
@@ -345,6 +356,17 @@ function calculateSalary() {
     
     document.getElementById('salary-result').style.display = 'block';
     updateShareButtons();
+    const salarySummaryText = buildSalarySummaryText({
+        salaryType,
+        monthlyNet,
+        annualNet,
+        totalDeduction,
+    });
+    const salarySummaryTextEl = document.getElementById('salary-summary-text');
+    if (salarySummaryTextEl) salarySummaryTextEl.textContent = salarySummaryText;
+    setupSummaryCopyButtons({
+        '#copy-salary-summary': () => salarySummaryText,
+    });
 
     // 최근 입력 저장
     saveCalculatorInput(SALARY_STORAGE_KEY, getSalaryInputState(), 5);
