@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA
 
-[![Version](https://img.shields.io/badge/version-4.6.1-blue.svg)](https://github.com/boam79/salary_cal/releases)
+[![Version](https://img.shields.io/badge/version-4.7.0-blue.svg)](https://github.com/boam79/salary_cal/releases)
 [![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
 ---
@@ -77,6 +77,17 @@ python3 -m http.server 8000
 
 ## 📝 최근 업데이트
 
+### v4.7.0 (2026-04-06)
+- ✅ FEAT-005 설명/근거 UX 고도화
+  - 연봉/세금/부동산 계산 결과에 기준일/버전 정보 노출
+- ✅ FEAT-006 연봉 상세 모드(간편/상세) 추가
+  - 상세 옵션: 부양가족 수, 비과세 월 수당
+  - 간편 모드 기존 계산 흐름 유지
+- ✅ FEAT-007 세금/부동산 규정 옵션 확장
+  - 증여세 `비친족/타인` 옵션 추가 및 안전 폴백 처리
+  - 보유세 `보유 주택 수` 옵션 추가 및 반영
+- ✅ E2E 시나리오 보강 (상세 모드/증여세 옵션/보유세 옵션)
+
 ### v4.6.1 (2026-04-05)
 - ✅ E2E(브라우저) 스모크 테스트 추가 (Playwright)
   - `npm run test:e2e`로 핵심 계산기(연봉/상속세/대출) 입력→계산→결과 렌더링까지 자동 검증
@@ -131,6 +142,6 @@ MIT License
 
 ---
 
-**Last Updated**: 2026-04-05 | **Version**: 4.6.1
+**Last Updated**: 2026-04-06 | **Version**: 4.7.0
 
 Made with ❤️ by [@boam79](https://github.com/boam79)
