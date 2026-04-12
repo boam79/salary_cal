@@ -3,6 +3,11 @@
 const LOTTO_SETS = 10; // A~J
 const SET_LABELS = ['A','B','C','D','E','F','G','H','I','J'];
 
+function announceLotto(message) {
+  const el = document.getElementById('calc-announce');
+  if (el) el.textContent = message;
+}
+
 function renderEmptyTickets() {
   const container = document.getElementById('lotto-tickets');
   if (!container) return;
@@ -173,6 +178,11 @@ async function onGenerate() {
       }
     }
     renderTicketsWithCombos(combos, metaText);
+    announceLotto(
+      combos.length
+        ? `로또 번호 ${combos.length}세트가 생성되었습니다.`
+        : '로또 번호를 생성하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+    );
     try { localStorage.setItem('lotto:last', JSON.stringify({ combos, meta: metaText, at: Date.now() })); } catch (_) {}
   } catch (e) {
     console.error('[lotto] generate error', e);

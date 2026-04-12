@@ -11,6 +11,24 @@ import statsPopup from './stats/statsPopup.js';
 import { restoreDeepLinkOnInit } from './core/deepLink.js';
 // topNewsManager 제거 (기능 미사용)
 
+function getOrCreateClientSessionId() {
+    const key = 'fcClientSessionId';
+    try {
+        let id = sessionStorage.getItem(key);
+        if (!id) {
+            const bytes = new Uint8Array(16);
+            crypto.getRandomValues(bytes);
+            id = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+            sessionStorage.setItem(key, id);
+        }
+        return id;
+    } catch {
+        return 'nosession';
+    }
+}
+
+window.__CLIENT_SESSION_ID = getOrCreateClientSessionId();
+
 class FinancialCalculatorApp {
     constructor() {
         this.isInitialized = false;
@@ -24,6 +42,12 @@ class FinancialCalculatorApp {
         }
         
         console.log('💰 금융 계산기 앱 시작');
+
+        try {
+            await this.loadAppVersionMeta();
+        } catch {
+            /* optional */
+        }
         
         try {
             AppState.setLoading(true);
@@ -52,6 +76,59 @@ class FinancialCalculatorApp {
         } catch (error) {
             console.error('❌ 애플리케이션 초기화 실패:', error);
             AppState.setLoading(false);
+            this.showRatesLoadFailure(error);
+        }
+    }
+
+    async loadAppVersionMeta() {
+        const res = await fetch('/version.json', { cache: 'no-store' });
+        if (!res.ok) return;
+        const j = await res.json();
+        window.__APP_VERSION = j.version || '';
+        window.__APP_SCHEMA = j.schema;
+    }
+
+    showRatesLoadFailure(error) {
+        const id = 'rates-load-banner';
+        if (document.getElementById(id)) return;
+        const el = document.createElement('div');
+        el.id = id;
+        el.setAttribute('role', 'alert');
+        el.style.cssText =
+            'position:fixed;bottom:0;left:0;right:0;z-index:9999;padding:12px 16px;background:#1a1a2e;color:#fff;font-size:14px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;';
+        el.innerHTML = '';
+        const msg = document.createElement('span');
+        msg.textContent =
+            '세율 설정(config/rates.json)을 불러오지 못했습니다. 네트워크를 확인한 뒤 다시 시도해 주세요.';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = '다시 시도';
+        btn.style.cssText =
+            'padding:8px 14px;border:none;border-radius:6px;background:#4361ee;color:#fff;cursor:pointer;font-weight:600;';
+        btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            try {
+                await this.loadTaxRates();
+                this.setupMinimumWage();
+                el.remove();
+                if (!this.isInitialized) {
+                    AppState.setLoading(true);
+                    await newsManager.init();
+                    restoreDeepLinkOnInit();
+                    this.setupHamburgerFallback();
+                    this.isInitialized = true;
+                    AppState.setLoading(false);
+                }
+            } catch (e) {
+                console.error(e);
+                btn.disabled = false;
+            }
+        });
+        el.appendChild(msg);
+        el.appendChild(btn);
+        document.body.appendChild(el);
+        if (window.ErrorLogger?.log) {
+            window.ErrorLogger.log(error || new Error('rates_load_failed'), 'loadTaxRates');
         }
     }
 
@@ -83,23 +160,33 @@ class FinancialCalculatorApp {
     
     // 세율 데이터 로드
     async loadTaxRates() {
-        try {
-            const response = await fetch('config/rates.json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+        const maxAttempts = 3;
+        let lastErr;
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                const response = await fetch(`config/rates.json?attempt=${attempt}`, { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const rates = await response.json();
+                AppState.setTaxRates(rates);
+                const lastUpdateEl = document.getElementById('last-update');
+                if (lastUpdateEl && rates.lastUpdated) {
+                    lastUpdateEl.textContent = rates.lastUpdated;
+                }
+                const b = document.getElementById('rates-load-banner');
+                if (b) b.remove();
+                return rates;
+            } catch (error) {
+                lastErr = error;
+                console.warn(`세율 로드 재시도 (${attempt}/${maxAttempts})`, error);
+                if (attempt < maxAttempts) {
+                    await new Promise((r) => setTimeout(r, 400 * attempt));
+                }
             }
-            const rates = await response.json();
-            AppState.setTaxRates(rates);
-            // 푸터에 세율 버전/업데이트 날짜 반영
-            const lastUpdateEl = document.getElementById('last-update');
-            if (lastUpdateEl && rates.lastUpdated) {
-                lastUpdateEl.textContent = rates.lastUpdated;
-            }
-            return rates;
-        } catch (error) {
-            console.error('❌ 세율 데이터 로드 실패:', error);
-            throw error;
         }
+        console.error('❌ 세율 데이터 로드 실패:', lastErr);
+        throw lastErr;
     }
     
     // 최저시급 설정
@@ -134,7 +221,8 @@ class FinancialCalculatorApp {
                     filename: event.filename,
                     lineno: event.lineno,
                     colno: event.colno,
-                    error: event.error?.stack
+                    error: event.error?.stack,
+                    screenId: document.querySelector('.screen.active')?.id || '',
                 });
             }
         });
@@ -145,7 +233,8 @@ class FinancialCalculatorApp {
             if (window.ErrorLogger && window.ErrorLogger.log) {
                 window.ErrorLogger.log('Promise Rejection', {
                     reason: event.reason?.toString(),
-                    promise: event.promise
+                    promise: event.promise,
+                    screenId: document.querySelector('.screen.active')?.id || '',
                 });
             }
         });
