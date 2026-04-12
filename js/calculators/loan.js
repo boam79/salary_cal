@@ -19,22 +19,25 @@ const FINANCIAL_LOAN_STORAGE_KEY = 'loan-financial';
 const HOUSING_LOAN_STORAGE_KEY = 'loan-housing';
 
 function getLoanShareState() {
+    const financialTab = document.getElementById('financial-loan-tab');
+    const tab =
+        financialTab && financialTab.classList.contains('active')
+            ? 'financial-loan'
+            : 'housing-loan';
     return {
         screen: 'loan-screen',
-        financial: {
-            loanAmount: document.getElementById('loan-amount')?.value || '',
-            interestRate: document.getElementById('interest-rate')?.value || '',
-            loanPeriod: document.getElementById('loan-period')?.value || '',
-            repaymentType: document.getElementById('repayment-type')?.value || 'equalPrincipalInterest',
-        },
-        housing: {
-            housePrice: document.getElementById('house-price')?.value || '',
-            ownFunds: document.getElementById('own-funds')?.value || '',
-            annualIncome: document.getElementById('housing-annual-income')?.value || '',
-            interestRate: document.getElementById('housing-interest-rate')?.value || '',
-            loanPeriod: document.getElementById('housing-loan-period')?.value || '',
-            repaymentType: document.getElementById('housing-repayment-type')?.value || 'equalPrincipalInterest',
-        },
+        tab,
+        loanAmount: document.getElementById('loan-amount')?.value || '',
+        interestRate: document.getElementById('interest-rate')?.value || '',
+        loanPeriod: document.getElementById('loan-period')?.value || '',
+        repaymentType: document.getElementById('repayment-type')?.value || 'equalPrincipalInterest',
+        housePrice: document.getElementById('house-price')?.value || '',
+        ownFunds: document.getElementById('own-funds')?.value || '',
+        housingAnnualIncome: document.getElementById('housing-annual-income')?.value || '',
+        housingInterestRate: document.getElementById('housing-interest-rate')?.value || '',
+        housingLoanPeriod: document.getElementById('housing-loan-period')?.value || '',
+        housingRepaymentType:
+            document.getElementById('housing-repayment-type')?.value || 'equalPrincipalInterest',
     };
 }
 

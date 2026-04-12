@@ -1,0 +1,13 @@
+:root {
+  --fc-color-primary: #2563eb;
+  --fc-color-primary-dark: #1d4ed8;
+  --fc-color-bg: #0f172a;
+  --fc-color-surface: #1e293b;
+  --fc-color-text: #f8fafc;
+  --fc-color-muted: #94a3b8;
+  --fc-radius: 12px;
+  --fc-space-sm: 8px;
+  --fc-space-md: 16px;
+  --fc-space-lg: 24px;
+  --fc-font: 'Noto Sans KR', system-ui, sans-serif;
+}

@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, 'cursor/**']
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install workspace dependencies
+        run: npm ci
+
+      - name: Unit & API contract tests
+        run: npm test
+
+      - name: Build React app (public/app)
+        run: npm run build:app
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E legacy smoke tests
+        run: npm run test:e2e -- --workers=1 --retries=0
+
+      - name: E2E React app shell
+        run: npm run test:e2e:app -- --workers=1 --retries=0
+
+      - name: Install server dependencies & audit
+        working-directory: server
+        run: npm ci && npm audit --audit-level=high

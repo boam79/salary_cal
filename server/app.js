@@ -269,7 +269,45 @@ export function createLottoApp({
   };
   app.use(cors(corsOptions));
   app.options('*', cors(corsOptions));
-  app.use(express.json());
+  app.use(express.json({ limit: '256kb' }));
+
+  /** Simple in-memory rate limit (per process). Good enough for small APIs. */
+  const rateBuckets = new Map();
+  function allowRate(key, windowMs, max) {
+    const now = Date.now();
+    let b = rateBuckets.get(key);
+    if (!b || now > b.resetAt) {
+      b = { count: 0, resetAt: now + windowMs };
+      rateBuckets.set(key, b);
+    }
+    b.count += 1;
+    return b.count <= max;
+  }
+
+  function rateLimit({ name, windowMs, max }) {
+    return (req, res, next) => {
+      const ip = req.ip || req.socket?.remoteAddress || 'unknown';
+      const key = `${name}:${ip}`;
+      if (!allowRate(key, windowMs, max)) {
+        res.setHeader('Retry-After', String(Math.ceil(windowMs / 1000)));
+        return res.status(429).json({ error: 'rate_limit' });
+      }
+      next();
+    };
+  }
+
+  app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    const xfProto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim();
+    if (req.secure || xfProto === 'https') {
+      res.setHeader('Strict-Transport-Security', 'max-age=15552000; includeSubDomains');
+    }
+    next();
+  });
+
   if (logger) app.use(logger);
 
   app.get('/lotto/stats', (req, res) => {
@@ -309,7 +347,10 @@ export function createLottoApp({
     }
   });
 
-  app.post('/lotto/sync', (req, res) => {
+  app.post(
+    '/lotto/sync',
+    rateLimit({ name: 'lotto_sync', windowMs: 60 * 60 * 1000, max: 20 }),
+    (req, res) => {
     (async () => {
       if (adminKey && req.header('X-ADMIN-KEY') !== adminKey) {
         return res.status(401).json({ error: 'unauthorized' });
@@ -325,7 +366,10 @@ export function createLottoApp({
     })();
   });
 
-  app.get('/lotto/generate', (req, res) => {
+  app.get(
+    '/lotto/generate',
+    rateLimit({ name: 'lotto_generate', windowMs: 60 * 1000, max: 120 }),
+    (req, res) => {
     try {
       ensureDataDir();
       const stats = JSON.parse(fs.readFileSync(resolvedPaths.statsPath, 'utf8'));

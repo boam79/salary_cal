@@ -13,7 +13,14 @@ import {
     removeRecentCalculatorInput,
     clearRecentCalculatorInputs,
 } from '../core/storage.js';
-import { updateShareButtons, setupSummaryCopyButtons } from '../core/deepLink.js';
+import {
+    updateShareButtons,
+    setupSummaryCopyButtons,
+    updateShareUrl,
+    setupShareCopyButtons,
+    getShareStateFromUrl,
+    scheduleDeepLinkApplyForScreen,
+} from '../core/deepLink.js';
 
 const SALARY_STORAGE_KEY = 'salary';
 
@@ -27,6 +34,53 @@ function getSalaryInputState() {
         hourlyWage: document.getElementById('hourly-wage')?.value || '',
         createdAt: Date.now(),
     };
+}
+
+function getSalaryShareState() {
+    const salaryTypeEl = document.querySelector('input[name="salary-type"]:checked');
+    const salaryType = salaryTypeEl ? salaryTypeEl.value : 'annual';
+    const detailCb = document.getElementById('salary-detail-enabled');
+    return {
+        screen: 'salary-screen',
+        salaryType,
+        annualSalary: document.getElementById('annual-salary')?.value || '',
+        workHours: document.getElementById('work-hours')?.value || '',
+        hourlyWage: document.getElementById('hourly-wage')?.value || '',
+        salaryDetailEnabled: detailCb?.checked ? '1' : '',
+        salaryDependents: document.getElementById('salary-dependents')?.value || '',
+        salaryNonTaxable: document.getElementById('salary-non-taxable')?.value || '',
+    };
+}
+
+function applySalaryShareState(state) {
+    if (!state || typeof state !== 'object') return;
+    if (state.salaryType === 'annual' || state.salaryType === 'monthly') {
+        const radio = document.querySelector(`input[name="salary-type"][value="${state.salaryType}"]`);
+        if (radio) {
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change'));
+        }
+    }
+    if (typeof state.annualSalary === 'string' && document.getElementById('annual-salary')) {
+        document.getElementById('annual-salary').value = state.annualSalary;
+    }
+    if (typeof state.workHours === 'string' && document.getElementById('work-hours')) {
+        document.getElementById('work-hours').value = state.workHours;
+    }
+    if (typeof state.hourlyWage === 'string' && document.getElementById('hourly-wage')) {
+        document.getElementById('hourly-wage').value = state.hourlyWage;
+    }
+    const detailCb = document.getElementById('salary-detail-enabled');
+    if (detailCb && (state.salaryDetailEnabled === '1' || state.salaryDetailEnabled === 'true')) {
+        detailCb.checked = true;
+        detailCb.dispatchEvent(new Event('change'));
+    }
+    if (typeof state.salaryDependents === 'string' && document.getElementById('salary-dependents')) {
+        document.getElementById('salary-dependents').value = state.salaryDependents;
+    }
+    if (typeof state.salaryNonTaxable === 'string' && document.getElementById('salary-non-taxable')) {
+        document.getElementById('salary-non-taxable').value = state.salaryNonTaxable;
+    }
 }
 
 function applySalaryInputState(state) {
@@ -519,6 +573,7 @@ function calculateSalary() {
     
     document.getElementById('salary-result').style.display = 'block';
     renderSalaryBasisInfo(detailAdjustments);
+    updateShareUrl('salary-screen', getSalaryShareState());
     updateShareButtons();
     const salarySummaryText = buildSalarySummaryText({
         salaryType,
@@ -604,6 +659,14 @@ function setupSalaryTypeToggle() {
 document.addEventListener('DOMContentLoaded', function() {
     setupSalaryTypeToggle();
     setupSalaryRecentHistory();
+    setupShareCopyButtons({
+        '#share-salary-link': () => getSalaryShareState(),
+    });
+    const salaryShare = getShareStateFromUrl('salary-screen');
+    if (salaryShare) {
+        applySalaryShareState(salaryShare);
+    }
+    scheduleDeepLinkApplyForScreen('salary-screen');
     const compareBtn = document.getElementById('compare-salary');
     if (compareBtn && !compareBtn.dataset.bound) {
         compareBtn.addEventListener('click', openSalaryCompareMode);

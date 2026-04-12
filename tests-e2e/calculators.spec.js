@@ -158,6 +158,94 @@ test.describe('calculators smoke', () => {
     await expect(page.locator('#loan-period')).toHaveValue('25');
   });
 
+  test('share URL includes qSchema for salary', async ({ page }) => {
+    await page.click('[data-screen="salary-screen"]');
+    await page.waitForSelector('#salary-screen.screen.active');
+    await page.fill('#annual-salary', '5000');
+    await page.click('#calculate-salary');
+    await expect(page.locator('#salary-result')).toBeVisible();
+    await page.waitForFunction(() => window.location.search.includes('qSchema='));
+  });
+
+  test('vat general form calculates', async ({ page }) => {
+    await page.click('[data-screen="vat-screen"]');
+    await page.waitForSelector('#vat-screen.screen.active');
+    await page.fill('#vat-amount', '100');
+    await page.locator('#vat-form button[type="submit"]').click();
+    await expect(page.locator('#vat-result')).toBeVisible();
+    await expect(page.locator('#vat-total')).not.toHaveText('-');
+  });
+
+  test('acquisition tax calculates', async ({ page }) => {
+    await page.click('[data-screen="acquisition-tax-screen"]');
+    await page.waitForSelector('#acquisition-tax-screen.screen.active');
+    await page.fill('#acquisition-price', '5');
+    await page.click('#calculate-acquisition');
+    await expect(page.locator('#acquisition-result')).toBeVisible();
+    await expect(page.locator('#acquisition-result')).toContainText('총 세금');
+  });
+
+  test('retirement form calculates', async ({ page }) => {
+    await page.click('[data-screen="retirement-screen"]');
+    await page.waitForSelector('#retirement-screen.screen.active');
+    await page.fill('#join-date', '2020-01-01');
+    await page.fill('#retirement-date', '2024-01-01');
+    await page.fill('#avg-salary', '350');
+    await page.locator('#retirement-form button[type="submit"]').click();
+    await expect(page.locator('#retirement-result')).toBeVisible();
+    await expect(page.locator('#result-total')).not.toHaveText('-');
+  });
+
+  test('savings simple interest calculates', async ({ page }) => {
+    await page.click('[data-screen="savings-screen"]');
+    await page.waitForSelector('#savings-screen.screen.active');
+    await page.fill('#simple-principal', '1000');
+    await page.fill('#simple-rate', '3');
+    await page.fill('#simple-months', '12');
+    await page.locator('#simple-interest-form button[type="submit"]').click();
+    await expect(page.locator('#savings-result')).toBeVisible();
+    await expect(page.locator('#savings-total')).not.toHaveText('-');
+  });
+
+  test('car acquisition tax calculates', async ({ page }) => {
+    await page.click('[data-screen="car-acq-screen"]');
+    await page.waitForSelector('#car-acq-screen.screen.active');
+    await page.fill('#car-price', '3500');
+    await page.locator('#car-acq-form button[type="submit"]').click();
+    await expect(page.locator('#car-acq-result')).toBeVisible();
+    await expect(page.locator('#car-tax-total')).not.toHaveText('-');
+  });
+
+  test('brokerage fee calculates', async ({ page }) => {
+    await page.click('[data-screen="real-estate-screen"]');
+    await page.waitForSelector('#real-estate-screen.screen.active');
+    await page.fill('#property-price', '5');
+    await page.click('#calculate-brokerage-fee');
+    await expect(page.locator('#brokerage-fee-result')).toBeVisible();
+    await expect(page.locator('#brokerage-fee-summary')).toContainText('중개수수료');
+  });
+
+  test('dsr calculates', async ({ page }) => {
+    await page.click('[data-screen="real-estate-screen"]');
+    await page.waitForSelector('#real-estate-screen.screen.active');
+    await page.click('#real-estate-screen .tab-btn[data-tab="dsr"]');
+    await page.waitForSelector('#dsr-tab.tab-content.active');
+    await page.fill('#annual-income', '8000');
+    await page.fill('#dsr-loan-amount', '3');
+    await page.fill('#dsr-interest-rate', '4.5');
+    await page.click('#calculate-dsr');
+    await expect(page.locator('#dsr-result')).toBeVisible();
+    await expect(page.locator('#dsr-result')).toContainText('DSR');
+  });
+
+  test('lotto screen generate completes', async ({ page }) => {
+    await page.click('[data-screen="lotto-screen"]');
+    await page.waitForSelector('#lotto-screen.screen.active');
+    await page.click('#lotto-generate');
+    await expect(page.locator('#lotto-generate')).toBeEnabled({ timeout: 30000 });
+    await expect(page.locator('#lotto-tickets .lotto-ticket')).toHaveCount(10);
+  });
+
   test.skip('financial loan recents save and load works', async ({ page }) => {
     await page.click('[data-screen="loan-screen"]');
     await page.waitForSelector('#loan-screen.screen.active');

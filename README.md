@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA
 
-[![Version](https://img.shields.io/badge/version-4.7.0-blue.svg)](https://github.com/boam79/salary_cal/releases)
+[![Version](https://img.shields.io/badge/version-4.8.0-blue.svg)](https://github.com/boam79/salary_cal/releases)
 [![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
 ---
@@ -39,6 +39,19 @@ python3 -m http.server 8000
 ```
 
 **[Live Demo](https://salary-cal.vercel.app)**
+
+### 새 셸 (React)
+
+- 시나리오 허브 및 라우팅: **`/app/`** (예: `https://salary-cal.vercel.app/app/`)
+- 기존 계산기 UI는 점진 이관 전까지 **`/app/legacy.html`** 로 iframe 로드
+
+```bash
+npm install
+npm run dev -w salary-cal-frontend-app
+# http://127.0.0.1:5180/app/
+```
+
+자세한 내용은 `DOC/frontend-migration-v2.md` 참고.
 
 ---
 
@@ -76,6 +89,27 @@ python3 -m http.server 8000
 ---
 
 ## 📝 최근 업데이트
+
+### v4.8.0 (2026-04-12)
+- ✅ **전면 개편 1단계**: npm workspaces + `packages/calc-core` (도메인 재수출 + Zod 공유 URL 스키마)
+- ✅ **React + Vite** 새 셸: `/app/` 시나리오 허브 + 라우팅, 레거시 계산기는 `legacy.html` iframe으로 점진 이관
+- ✅ **빌드**: `npm run build:app` → `public/app/` + 루트 `public/legacy.html` (전체 화면 링크용)
+- ✅ **Vercel**: `/app/*` SPA rewrite, iframe/CSP 정합 (`frame-ancestors 'self'`, `frame-src 'self'`)
+- ✅ **테스트**: `tests/schemas.test.js`, `npm run test:e2e:app` (React 셸 스모크)
+
+### v4.7.1 (2026-04-12)
+- ✅ **품질**: GitHub Actions CI (`npm test`, `npm run test:e2e`, 서버 `npm audit`)
+- ✅ **품질**: 딥링크/공유 URL `qSchema=1` + 허용 키만 반영, 값 길이·총 쿼리 길이 제한
+- ✅ **품질**: 대출 공유 상태 평탄화(금융/주택 필드 충돌 수정), 연봉 공유 링크 복사·URL 동기화
+- ✅ **품질**: `config/rates.json` 로드 재시도 + 실패 시 하단 재시도 배너
+- ✅ **품질**: `/version.json`으로 프론트 버전 노출
+- ✅ **품질**: `DOC/rates-update-checklist.md` 세율 업데이트 체크리스트
+- ✅ **접근성**: `aria-live` 계산 결과 안내, 설명 토글 `aria-expanded`
+- ✅ **보안(XSS)**: `ErrorLogger.showErrorToUser` DOM API로 교체
+- ✅ **보안**: Vercel 응답 헤더(CSP, HSTS, X-Frame-Options 등)
+- ✅ **보안**: 로또 백엔드 레이트 리밋·JSON 크기 제한·응답 보안 헤더
+- ✅ **보안**: 개발 의존성 `npm audit fix` (Vite 취약점)
+- ✅ **운영**: 뉴스 상세 로그는 `?debug=1` 또는 `localStorage FC_DEBUG=1`일 때만
 
 ### v4.7.0 (2026-04-06)
 - ✅ FEAT-005 설명/근거 UX 고도화
@@ -142,6 +176,6 @@ MIT License
 
 ---
 
-**Last Updated**: 2026-04-06 | **Version**: 4.7.0
+**Last Updated**: 2026-04-12 | **Version**: 4.8.0
 
 Made with ❤️ by [@boam79](https://github.com/boam79)

@@ -3,7 +3,83 @@
  * - Restore screen/input state from URL query
  * - Keep URL query in sync
  * - Build/copy share URL
+ * - qSchema=1: allowlist + length limits (share URL safety)
  */
+
+export const SHARE_SCHEMA_VERSION = 1;
+const MAX_TOTAL_QUERY_CHARS = 2048;
+const MAX_PARAM_VALUE_LEN = 256;
+
+/** Keys allowed in share URLs (flat). `screen` is always allowed. */
+const ALLOWED_SHARE_KEYS = new Set([
+  'screen',
+  'qSchema',
+  'tab',
+  'salaryType',
+  'annualSalary',
+  'workHours',
+  'hourlyWage',
+  'salaryDetailEnabled',
+  'salaryDependents',
+  'salaryNonTaxable',
+  'inheritanceAmount',
+  'giftAmount',
+  'giftRelation',
+  'loanAmount',
+  'interestRate',
+  'loanPeriod',
+  'repaymentType',
+  'housePrice',
+  'ownFunds',
+  'housingAnnualIncome',
+  'housingInterestRate',
+  'housingLoanPeriod',
+  'housingRepaymentType',
+]);
+
+function sanitizeParamValue(raw) {
+  if (raw === undefined || raw === null) return '';
+  let s = String(raw).trim();
+  s = s.replace(/[\r\n\t]/g, ' ');
+  if (s.length > MAX_PARAM_VALUE_LEN) s = s.slice(0, MAX_PARAM_VALUE_LEN);
+  return s;
+}
+
+/**
+ * Flatten nested share state objects for URL (one level of nesting: financial/housing).
+ */
+export function flattenShareStateForUrl(obj) {
+  const out = {};
+  if (!obj || typeof obj !== 'object') return out;
+
+  const mapNestedKey = (parent, innerKey) => {
+    if (parent === 'housing') {
+      if (innerKey === 'annualIncome') return 'housingAnnualIncome';
+      if (innerKey === 'interestRate') return 'housingInterestRate';
+      if (innerKey === 'loanPeriod') return 'housingLoanPeriod';
+      if (innerKey === 'repaymentType') return 'housingRepaymentType';
+    }
+    return innerKey;
+  };
+
+  Object.entries(obj).forEach(([k, v]) => {
+    if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+      Object.entries(v).forEach(([k2, v2]) => {
+        const key = mapNestedKey(k, k2);
+        if (ALLOWED_SHARE_KEYS.has(key)) {
+          const sv = sanitizeParamValue(v2);
+          if (sv !== '') out[key] = sv;
+        }
+      });
+      return;
+    }
+    if (ALLOWED_SHARE_KEYS.has(k)) {
+      const sv = sanitizeParamValue(v);
+      if (sv !== '') out[k] = sv;
+    }
+  });
+  return out;
+}
 
 function safeSetValue(id, value) {
   const el = document.getElementById(id);
@@ -34,6 +110,15 @@ function applyStateForScreen(screen, params) {
     safeSetValue('annual-salary', params.get('annualSalary'));
     safeSetValue('work-hours', params.get('workHours'));
     safeSetValue('hourly-wage', params.get('hourlyWage'));
+
+    const detailEnabled = params.get('salaryDetailEnabled');
+    const detailCb = document.getElementById('salary-detail-enabled');
+    if (detailCb && (detailEnabled === '1' || detailEnabled === 'true')) {
+      detailCb.checked = true;
+      detailCb.dispatchEvent(new Event('change'));
+    }
+    safeSetValue('salary-dependents', params.get('salaryDependents'));
+    safeSetValue('salary-non-taxable', params.get('salaryNonTaxable'));
     return true;
   }
 
@@ -108,13 +193,29 @@ export function scheduleDeepLinkApplyForScreen(screenId) {
 }
 
 export function buildShareUrl(paramsObj) {
+  const flat =
+    paramsObj && typeof paramsObj === 'object' && !Array.isArray(paramsObj)
+      ? flattenShareStateForUrl(paramsObj)
+      : {};
+
   const params = new URLSearchParams();
-  Object.entries(paramsObj || {}).forEach(([k, v]) => {
-    if (v !== undefined && v !== null && String(v) !== '') {
-      params.set(k, String(v));
-    }
+  params.set('qSchema', String(SHARE_SCHEMA_VERSION));
+
+  Object.entries(flat).forEach(([k, v]) => {
+    if (!ALLOWED_SHARE_KEYS.has(k)) return;
+    const sv = sanitizeParamValue(v);
+    if (sv !== '') params.set(k, sv);
   });
-  const query = params.toString();
+
+  let query = params.toString();
+  if (query.length > MAX_TOTAL_QUERY_CHARS) {
+    const screen = params.get('screen') || 'home-screen';
+    const minimal = new URLSearchParams();
+    minimal.set('qSchema', String(SHARE_SCHEMA_VERSION));
+    minimal.set('screen', sanitizeParamValue(screen));
+    query = minimal.toString();
+  }
+
   return `${window.location.origin}${window.location.pathname}${query ? `?${query}` : ''}`;
 }
 
@@ -145,15 +246,32 @@ export async function copyShareUrl(paramsObj) {
 export function updateShareUrl(screenId, state = {}) {
   const next = new URL(window.location.href);
   const params = next.searchParams;
-  params.set('screen', screenId);
-  Object.entries(state || {}).forEach(([k, v]) => {
-    if (v === undefined || v === null || String(v) === '') {
-      params.delete(k);
-      return;
-    }
-    params.set(k, String(v));
+
+  const merged = { ...(state || {}), screen: screenId };
+  const flat = flattenShareStateForUrl(merged);
+
+  const keysToClear = new Set(Array.from(params.keys()));
+  keysToClear.forEach((k) => params.delete(k));
+
+  params.set('screen', sanitizeParamValue(screenId));
+  params.set('qSchema', String(SHARE_SCHEMA_VERSION));
+
+  Object.entries(flat).forEach(([k, v]) => {
+    if (k === 'screen') return;
+    if (!ALLOWED_SHARE_KEYS.has(k)) return;
+    const sv = sanitizeParamValue(v);
+    if (sv !== '') params.set(k, sv);
   });
-  next.search = params.toString();
+
+  let search = params.toString();
+  if (search.length > MAX_TOTAL_QUERY_CHARS) {
+    params.forEach((_, k) => params.delete(k));
+    params.set('screen', sanitizeParamValue(screenId));
+    params.set('qSchema', String(SHARE_SCHEMA_VERSION));
+    search = params.toString();
+  }
+
+  next.search = search ? `?${search}` : '';
   window.history.replaceState({}, '', `${next.pathname}${next.search}`);
 }
 
@@ -162,7 +280,9 @@ export function getShareStateFromUrl(screenId) {
   if (params.get('screen') !== screenId) return null;
   const state = {};
   params.forEach((v, k) => {
-    if (k !== 'screen') state[k] = v;
+    if (k === 'screen' || k === 'qSchema') return;
+    if (!ALLOWED_SHARE_KEYS.has(k)) return;
+    state[k] = sanitizeParamValue(v);
   });
   return state;
 }
@@ -174,11 +294,14 @@ export function setupShareCopyButtons(mapping) {
       if (btn.dataset.bound) return;
       btn.addEventListener('click', async () => {
         const original = btn.textContent;
-        const params = typeof builder === 'function' ? builder() : {};
-        const url = buildShareUrl({
-          screen: document.querySelector('.screen.active')?.id || 'home-screen',
-          ...(params || {}),
-        });
+        const raw = typeof builder === 'function' ? builder() : {};
+        const flat =
+          raw && typeof raw === 'object' && !Array.isArray(raw)
+            ? flattenShareStateForUrl(raw)
+            : {};
+        const screen =
+          document.querySelector('.screen.active')?.id || flat.screen || 'home-screen';
+        const url = buildShareUrl({ ...flat, screen });
         const ok = await copyTextToClipboard(url);
         btn.textContent = ok ? '복사됨!' : '복사 실패';
         setTimeout(() => {
@@ -213,4 +336,3 @@ export function setupSummaryCopyButtons(mapping) {
     });
   });
 }
-

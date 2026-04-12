@@ -12,6 +12,11 @@ class EventManager {
     
     init() {
         this.setupDelegatedEvents();
+        document.querySelectorAll('.explanation-toggle').forEach((t) => {
+            if (!t.hasAttribute('aria-expanded')) {
+                t.setAttribute('aria-expanded', 'false');
+            }
+        });
         console.log('🎯 이벤트 매니저 초기화 완료');
     }
     
@@ -169,9 +174,18 @@ class EventManager {
         console.log(`🔄 탭 전환: ${tabName}`);
     }
     
+    updateCalculationAnnouncement() {
+        const el = document.getElementById('calc-announce');
+        if (!el) return;
+        const screen = document.querySelector('.screen.active');
+        const title = screen?.querySelector('.screen-title')?.textContent?.trim() || '계산';
+        el.textContent = `${title} 결과가 갱신되었습니다.`;
+    }
+
     // 계산 버튼 클릭 처리
     handleCalculateClick(event) {
-        const buttonId = event.target.id;
+        const btn = event.target.closest('button');
+        const buttonId = btn?.id || event.target.id;
         console.log(`🧮 계산 버튼 클릭: ${buttonId}`);
         
         // 계산 함수 매핑
@@ -195,6 +209,7 @@ class EventManager {
         if (calculatorFunction && window[calculatorFunction]) {
             console.log(`✅ 함수 실행: ${calculatorFunction}`);
             window[calculatorFunction]();
+            this.updateCalculationAnnouncement();
         } else {
             console.warn(`⚠️ 계산 함수를 찾을 수 없음: ${calculatorFunction}`);
             console.log(`📋 사용 가능한 함수들: ${Object.keys(window).filter(key => key.startsWith('calculate')).join(', ')}`);
@@ -300,10 +315,12 @@ class EventManager {
                 
                 toggle.textContent = '▲ 계산 과정 숨기기';
                 toggle.classList.add('active');
+                toggle.setAttribute('aria-expanded', 'true');
             } else {
                 explanation.style.maxHeight = '0px';
                 toggle.textContent = '▼ 계산 과정 보기';
                 toggle.classList.remove('active');
+                toggle.setAttribute('aria-expanded', 'false');
             }
             
             console.log(`📖 계산 과정 ${isHidden ? '표시' : '숨김'}`);

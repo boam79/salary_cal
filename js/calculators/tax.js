@@ -46,7 +46,6 @@ function getTaxShareState() {
         inheritanceAmount: document.getElementById('inheritance-amount')?.value || '',
         giftAmount: document.getElementById('gift-amount')?.value || '',
         giftRelation: document.getElementById('gift-relation')?.value || 'spouse',
-        inheritanceHeirType: document.getElementById('inheritance-heir-type')?.value || 'general',
     };
 }
 

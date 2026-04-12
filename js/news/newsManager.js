@@ -5,6 +5,10 @@
 
 class NewsManager {
     constructor() {
+        this.debug =
+            typeof window !== 'undefined' &&
+            (window.localStorage?.getItem('FC_DEBUG') === '1' ||
+                new URLSearchParams(window.location.search).get('debug') === '1');
         this.newsData = [];
         this.filteredNews = [];
         this.currentCategory = 'all';
@@ -24,7 +28,7 @@ class NewsManager {
     
     // 초기화
     async init() {
-        console.log('📰 뉴스 매니저 초기화 중...');
+        if (this.debug) console.log('📰 뉴스 매니저 초기화 중...');
         
         // 필터 탭 이벤트 리스너 설정
         this.setupFilterTabs();
@@ -35,7 +39,7 @@ class NewsManager {
         // 자동 업데이트 타이머 시작
         this.startAutoUpdate();
         
-        console.log('✅ 뉴스 매니저 초기화 완료');
+        if (this.debug) console.log('✅ 뉴스 매니저 초기화 완료');
     }
     
     // 필터 탭 이벤트 리스너 설정
@@ -77,7 +81,7 @@ class NewsManager {
         }
         
         this.renderFilteredNews();
-        console.log(`🔍 카테고리 필터: ${category} (${this.filteredNews.length}개)`);
+        if (this.debug) console.log(`🔍 카테고리 필터: ${category} (${this.filteredNews.length}개)`);
     }
     
     // 필터된 뉴스 렌더링
@@ -148,7 +152,7 @@ class NewsManager {
                 this.filterByCategory(this.currentCategory);
             }
             
-            console.log(`✅ 뉴스 로드 완료: ${news.length}개`);
+            if (this.debug) console.log(`✅ 뉴스 로드 완료: ${news.length}개`);
             
         } catch (error) {
             console.error('❌ 뉴스 로드 실패:', error);
@@ -169,8 +173,10 @@ class NewsManager {
             const data = await response.json();
             
             if (data.success && data.news) {
-                console.log(`📰 뉴스 수신: ${data.count}개`);
-                console.log('📰 뉴스 데이터 샘플:', data.news[0]);
+                if (this.debug) {
+                    console.log(`📰 뉴스 수신: ${data.count}개`);
+                    console.log('📰 뉴스 데이터 샘플:', data.news[0]);
+                }
                 return data.news;
             } else {
                 throw new Error('뉴스 데이터 형식 오류');
@@ -185,7 +191,7 @@ class NewsManager {
             }
             
             // API 실패 시 더미 데이터 반환
-            console.log('⚠️ 더미 데이터 사용');
+            if (this.debug) console.log('⚠️ 더미 데이터 사용');
             return this.getDummyNews();
         }
     }
@@ -340,15 +346,6 @@ class NewsManager {
                </div>`
             : '';
         
-        // 디버깅: 실제 렌더링 데이터 확인
-        console.log('Rendering news card:', {
-            title: news.title,
-            titleLength: news.title ? news.title.length : 0,
-            hasTitle: !!news.title,
-            source: news.source,
-            link: news.link
-        });
-        
         // title이 없으면 에러 로깅
         if (!news.title) {
             console.error('⚠️ 제목이 없는 뉴스:', news);
@@ -397,14 +394,6 @@ class NewsManager {
                 });
             }
         }
-        
-        // 렌더링 후 확인
-        const titleElement = card.querySelector('.news-card-title');
-        console.log('Title element:', {
-            exists: !!titleElement,
-            innerHTML: titleElement ? titleElement.innerHTML : 'null',
-            computedStyle: titleElement ? window.getComputedStyle(titleElement).display : 'null'
-        });
         
         return card;
     }
@@ -510,11 +499,11 @@ class NewsManager {
         }
         
         this.updateTimer = setInterval(() => {
-            console.log('🔄 뉴스 자동 업데이트 중...');
+            if (this.debug) console.log('🔄 뉴스 자동 업데이트 중...');
             this.loadNews();
         }, this.updateInterval);
         
-        console.log(`⏰ 뉴스 자동 업데이트 설정 완료 (${this.updateInterval / 1000}초 간격)`);
+        if (this.debug) console.log(`⏰ 뉴스 자동 업데이트 설정 완료 (${this.updateInterval / 1000}초 간격)`);
     }
     
     // 자동 업데이트 중지
@@ -529,7 +518,7 @@ class NewsManager {
     cleanup() {
         this.stopAutoUpdate();
         this.newsData = [];
-        console.log('🧹 뉴스 매니저 정리 완료');
+        if (this.debug) console.log('🧹 뉴스 매니저 정리 완료');
     }
 }
 
