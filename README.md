@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA
 
-[![Version](https://img.shields.io/badge/version-4.9.0-blue.svg)](https://github.com/boam79/salary_cal/releases)
+[![Version](https://img.shields.io/badge/version-4.9.1-blue.svg)](https://github.com/boam79/salary_cal/releases)
 [![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
 ---
@@ -44,7 +44,7 @@ python3 -m http.server 8000
 
 - 시나리오 허브 및 라우팅: **`/app/`** (예: `https://salary-cal.vercel.app/app/`)
 - 기존 계산기 UI는 점진 이관 전까지 **`/app/legacy.html`** 로 iframe 로드
-- **Vercel**: 루트에서 `npm run build`가 실행되면 `public/app/`이 생성됩니다. (Dashboard의 Build Command를 비워 두거나 `npm run build`로 두세요.)
+- **Vercel**: `npm run build` 후 `public/`에 레거지(`index.html`, `css/`, `js/`)와 React(`app/`)가 함께 들어갑니다. `vercel.json`에 **`outputDirectory: "public"`** 및 **`buildCommand: "npm run build"`** 가 있어 대시보드 설정이 달라도 동일하게 배포됩니다.
 
 ```bash
 npm install
@@ -90,6 +90,9 @@ npm run dev -w salary-cal-frontend-app
 ---
 
 ## 📝 최근 업데이트
+
+### v4.9.1 (2026-04-12)
+- ✅ **Vercel 루트 404 수정**: 빌드 시 레거지 정적 자산을 `public/`으로 복사(`scripts/sync-static-to-public.mjs`), `vercel.json`에 `buildCommand`·`outputDirectory` 명시
 
 ### v4.9.0 (2026-04-12)
 - ✅ **메인(홈) 디자인 개편**: 히어로, 자주 찾는 계산 4타일, 전체 목록(접기), 뉴스 섹션 재배치, `/app/` 헤더 CTA
@@ -182,6 +185,6 @@ MIT License
 
 ---
 
-**Last Updated**: 2026-04-12 | **Version**: 4.9.0
+**Last Updated**: 2026-04-12 | **Version**: 4.9.1
 
 Made with ❤️ by [@boam79](https://github.com/boam79)

@@ -5,6 +5,10 @@
 
 ## 최근 작업 내역
 
+### ✅ 2026-04-12: Vercel 루트 404 (배포 산출물)
+- **원인**: Output이 `public/`만 서빙되는데, 레거지 `index.html`·`css/`·`js/`가 루트에만 있어 `/`가 404.
+- **조치**: `npm run build` 끝에 `sync-static-to-public.mjs`로 `public/`에 복사 + `vercel.json`에 `outputDirectory: "public"`, `buildCommand`, `$schema` 추가.
+
 ### ✅ 2025-11-03: 근로소득공제 및 로또 최적화
 - **근로소득공제 2025년 기준 수정** (500만→600만원)
 - **사람인 계산기 비교 분석** (표준 vs 실용)

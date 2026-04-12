@@ -7,7 +7,7 @@
     "frontend"
   ],
   "scripts": {
-    "build": "npm run build:app",
+    "build": "npm run build:app && node scripts/sync-static-to-public.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:app": "playwright test -c playwright.app.config.js",
