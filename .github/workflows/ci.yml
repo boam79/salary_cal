@@ -24,8 +24,8 @@ jobs:
       - name: Unit & API contract tests
         run: npm test
 
-      - name: Build React app (public/app)
-        run: npm run build:app
+      - name: Build (includes React app → public/app)
+        run: npm run build
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium

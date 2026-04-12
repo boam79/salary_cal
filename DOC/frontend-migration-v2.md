@@ -22,9 +22,10 @@ npm run dev -w salary-cal-frontend-app
 
 ## 배포 (Vercel)
 
-- **Build Command**: `npm run build:app` (저장소 루트에서 실행)
+- **Build Command**: 기본값 `npm run build` (루트 `package.json`의 `build`가 `build:app`을 호출)
+- 별도로 `npm run build`만 실행해도 `public/app/`과 `public/legacy.html`이 생성됩니다.
 - **Output Directory**: 프로젝트 루트 그대로(정적 파일 루트) — 빌드 산출물은 `public/app/`에 생성
-- 빌드 출력: `public/app/` (정적 파일, `.gitignore`로 커밋 제외)
+- 빌드 출력: `public/app/` (정적 파일, `.gitignore`로 커밋 제외 — **배포 시 빌드로 생성**)
 - SPA 라우팅: `vercel.json`의 `/app/:path* → /app/index.html` rewrite
 - `legacy.html`은 `/app/` 아래에서 열리며, 자산 경로는 `/js`, `/css`, `/config` 루트 절대 경로를 사용 (iframe 대응)
 

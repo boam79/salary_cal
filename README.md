@@ -44,6 +44,7 @@ python3 -m http.server 8000
 
 - 시나리오 허브 및 라우팅: **`/app/`** (예: `https://salary-cal.vercel.app/app/`)
 - 기존 계산기 UI는 점진 이관 전까지 **`/app/legacy.html`** 로 iframe 로드
+- **Vercel**: 루트에서 `npm run build`가 실행되면 `public/app/`이 생성됩니다. (Dashboard의 Build Command를 비워 두거나 `npm run build`로 두세요.)
 
 ```bash
 npm install
