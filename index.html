@@ -124,6 +124,7 @@
             </button>
             <h1 class="logo clickable" id="logo-home">📰 종합 생활 정보지</h1>
             <p class="tagline">금융계산기 · 종합뉴스</p>
+            <a class="header-app-cta" href="/app/">새 화면 /app/</a>
         </div>
     </header>
 
@@ -256,11 +257,73 @@
         <div id="calc-announce" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
         <!-- 홈 화면 -->
         <section id="home-screen" class="screen active">
-            <div class="container">
+            <div class="container home-root">
+                <section class="home-hero" aria-labelledby="home-hero-title">
+                    <p class="home-kicker">10종 금융 계산 · 뉴스</p>
+                    <h2 id="home-hero-title" class="home-hero-title">필요한 계산, 여기서 바로</h2>
+                    <p class="home-lead">
+                        자주 쓰는 계산기는 아래 타일에서 바로 열 수 있습니다. 시나리오 중심 화면은
+                        <strong>/app/</strong>에서 이용하세요.
+                    </p>
+                    <div class="home-hero-actions">
+                        <a class="btn btn-primary home-cta-primary" href="/app/">새 작업 화면 열기</a>
+                        <a class="btn btn-secondary home-cta-secondary" href="#home-news">뉴스로 이동</a>
+                    </div>
+                </section>
+
+                <section class="home-quick" aria-labelledby="home-quick-title">
+                    <h3 id="home-quick-title" class="home-section-title">자주 찾는 계산</h3>
+                    <div class="home-quick-grid">
+                        <button type="button" class="nav-item home-quick-tile" data-screen="salary-screen">
+                            <span class="nav-icon" aria-hidden="true">💼</span>
+                            <span class="nav-label">월급/연봉</span>
+                            <span class="home-tile-hint">실수령액</span>
+                        </button>
+                        <button type="button" class="nav-item home-quick-tile" data-screen="loan-screen">
+                            <span class="nav-icon" aria-hidden="true">🏦</span>
+                            <span class="nav-label">대출</span>
+                            <span class="home-tile-hint">상환·비교</span>
+                        </button>
+                        <button type="button" class="nav-item home-quick-tile" data-screen="tax-screen">
+                            <span class="nav-icon" aria-hidden="true">📋</span>
+                            <span class="nav-label">세금</span>
+                            <span class="home-tile-hint">상속·증여</span>
+                        </button>
+                        <button type="button" class="nav-item home-quick-tile" data-screen="real-estate-screen">
+                            <span class="nav-icon" aria-hidden="true">🏢</span>
+                            <span class="nav-label">부동산</span>
+                            <span class="home-tile-hint">DSR·보유세</span>
+                        </button>
+                    </div>
+                </section>
+
+                <section class="home-trust" aria-label="서비스 안내">
+                    <ul class="home-trust-list">
+                        <li>계산 결과는 참고용이며 실제와 다를 수 있습니다.</li>
+                        <li>공유 URL에는 계산기 입력값만 포함됩니다.</li>
+                    </ul>
+                </section>
+
+                <details class="home-all-tools">
+                    <summary class="home-all-tools-summary">전체 계산기 목록</summary>
+                    <div class="home-all-tools-grid">
+                        <button type="button" class="nav-item home-all-tile" data-screen="salary-screen"><span class="nav-icon">💼</span><span class="nav-label">월급/연봉</span></button>
+                        <button type="button" class="nav-item home-all-tile" data-screen="tax-screen"><span class="nav-icon">📋</span><span class="nav-label">세금</span></button>
+                        <button type="button" class="nav-item home-all-tile" data-screen="vat-screen"><span class="nav-icon">🧾</span><span class="nav-label">부가세</span></button>
+                        <button type="button" class="nav-item home-all-tile" data-screen="real-estate-screen"><span class="nav-icon">🏢</span><span class="nav-label">부동산</span></button>
+                        <button type="button" class="nav-item home-all-tile" data-screen="acquisition-tax-screen"><span class="nav-icon">🏛️</span><span class="nav-label">취등록세</span></button>
+                        <button type="button" class="nav-item home-all-tile" data-screen="loan-screen"><span class="nav-icon">🏦</span><span class="nav-label">대출</span></button>
+                        <button type="button" class="nav-item home-all-tile" data-screen="retirement-screen"><span class="nav-icon">🎯</span><span class="nav-label">퇴직금</span></button>
+                        <button type="button" class="nav-item home-all-tile" data-screen="savings-screen"><span class="nav-icon">💰</span><span class="nav-label">적금/예금</span></button>
+                        <button type="button" class="nav-item home-all-tile" data-screen="car-acq-screen"><span class="nav-icon">🚗</span><span class="nav-label">자동차 취등록세</span></button>
+                        <button type="button" class="nav-item home-all-tile" data-screen="lotto-screen"><span class="nav-icon">🎲</span><span class="nav-label">로또 생성기</span></button>
+                    </div>
+                </details>
+
                 <!-- 최신 종합뉴스 섹션 -->
-                <div class="news-section" style="margin-top: var(--spacing-xl);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
-                        <h2 class="section-title">🗞️ 최신 종합뉴스</h2>
+                <div id="home-news" class="news-section home-news">
+                    <div class="news-section-head">
+                        <h2 class="section-title home-news-title">🗞️ 최신 종합뉴스</h2>
                         <div class="news-filter-tabs">
                             <button class="news-filter-tab active" data-category="all">전체</button>
                             <button class="news-filter-tab" data-category="economy">경제</button>
@@ -270,7 +333,7 @@
                             <button class="news-filter-tab" data-category="general">경제 전반</button>
                         </div>
                     </div>
-                    <div class="news-loading" id="news-loading" style="text-align: center; padding: 20px;">
+                    <div class="news-loading" id="news-loading">
                         <p>뉴스 로딩 중...</p>
                     </div>
                     <div class="news-grid" id="news-grid" style="display: none;"></div>

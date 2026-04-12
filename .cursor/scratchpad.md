@@ -172,6 +172,7 @@
 - [x] FEAT-006 연봉 상세 모드 (간편/상세 분리 + 부양가족/비과세 옵션)
 - [x] FEAT-007 세금/부동산 규정 옵션 확장 (증여 비친족 + 보유세 주택 수 옵션)
 - [x] **v4.8 전면 개편 1단계**: npm workspaces + `@salary-cal/calc-core` + React/Vite 셸(`/app/`) + 레거시 iframe 이관 경로
+- [x] **v4.9 메인 디자인 개편**: 루트 홈 히어로·빠른 타일·전체 접기·뉴스 재배치, `/app/` 홈 히어로 정리, 네비 동시 active 수정
 
 ### Executor's Feedback or Assistance Requests (추가)
 - 다음 Executor 단계는 **FEAT-001**부터 1개 태스크씩 진행 권장.

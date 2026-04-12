@@ -266,11 +266,13 @@ class EventManager {
         
         console.log(`🔗 네비게이션 클릭: ${targetScreen}로 이동`);
         
-        // 활성화 상태 변경
+        // 활성화 상태 변경 (동일 화면 링크가 홈/사이드 등 여러 곳에 있을 수 있음)
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
         });
-        navItem.classList.add('active');
+        document.querySelectorAll(`.nav-item[data-screen="${targetScreen}"]`).forEach(item => {
+            item.classList.add('active');
+        });
         
         // 모바일에서 드로어 닫기
         if (window.innerWidth <= 768) {

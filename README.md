@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA
 
-[![Version](https://img.shields.io/badge/version-4.8.0-blue.svg)](https://github.com/boam79/salary_cal/releases)
+[![Version](https://img.shields.io/badge/version-4.9.0-blue.svg)](https://github.com/boam79/salary_cal/releases)
 [![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
 ---
@@ -89,6 +89,11 @@ npm run dev -w salary-cal-frontend-app
 ---
 
 ## 📝 최근 업데이트
+
+### v4.9.0 (2026-04-12)
+- ✅ **메인(홈) 디자인 개편**: 히어로, 자주 찾는 계산 4타일, 전체 목록(접기), 뉴스 섹션 재배치, `/app/` 헤더 CTA
+- ✅ **접근성**: 홈 빠른 실행·전체 목록을 `button`으로 전환, 사이드바와 동시 활성 표시
+- ✅ **`/app/` 홈**: 히어로·시나리오 카드(예상 소요)·기존 홈 링크 정리
 
 ### v4.8.0 (2026-04-12)
 - ✅ **전면 개편 1단계**: npm workspaces + `packages/calc-core` (도메인 재수출 + Zod 공유 URL 스키마)
@@ -176,6 +181,6 @@ MIT License
 
 ---
 
-**Last Updated**: 2026-04-12 | **Version**: 4.8.0
+**Last Updated**: 2026-04-12 | **Version**: 4.9.0
 
 Made with ❤️ by [@boam79](https://github.com/boam79)
