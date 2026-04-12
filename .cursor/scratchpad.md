@@ -171,6 +171,7 @@
 - [x] FEAT-005 설명/근거 보기 UX 고도화 (연봉/세금/부동산 기준 정보 노출)
 - [x] FEAT-006 연봉 상세 모드 (간편/상세 분리 + 부양가족/비과세 옵션)
 - [x] FEAT-007 세금/부동산 규정 옵션 확장 (증여 비친족 + 보유세 주택 수 옵션)
+- [x] **v4.8 전면 개편 1단계**: npm workspaces + `@salary-cal/calc-core` + React/Vite 셸(`/app/`) + 레거시 iframe 이관 경로
 
 ### Executor's Feedback or Assistance Requests (추가)
 - 다음 Executor 단계는 **FEAT-001**부터 1개 태스크씩 진행 권장.
@@ -184,6 +185,7 @@
 - FEAT-005: 기준 정보(기준일/버전)를 연봉/세금/부동산 결과 영역에 표시.
 - FEAT-006: 연봉 계산에 상세 모드 토글 추가(부양가족 수, 비과세 월 수당). 상세 모드 비활성 시 기존 계산과 동일 동작.
 - FEAT-007: 증여세 관계 옵션에 `비친족/타인` 추가, 보유세에 보유 주택 수(1/2/3+) 옵션 추가.
+- 전면 개편(Executor): React+Vite `frontend/`, `packages/calc-core`, `public/app` 빌드, Vercel `/app/*` rewrite, `test:e2e:app` 추가.
 
 ## Lessons Learned
 - 딥링크는 입력값이 비정상이어도 앱이 깨지지 않도록 "존재하는 DOM에만 복원"하는 방어 로직이 중요함.
@@ -193,6 +195,6 @@
 
 ---
 
-**Last Updated**: 2026-04-05  
-**Version**: 4.6.1  
-**Status**: ✅ Production Ready (Quality Hardened, Feature Planning Ready)
+**Last Updated**: 2026-04-12  
+**Version**: 4.8.0  
+**Status**: ✅ Production Ready (React 셸 `/app/` + 레거시 점진 이관 경로)

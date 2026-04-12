@@ -3,7 +3,7 @@
 > 연봉, 세금, 부동산, 대출 등 다양한 금융 계산을 한 곳에서!  
 > ES6 모듈 시스템 기반 현대적인 SPA
 
-[![Version](https://img.shields.io/badge/version-4.7.1-blue.svg)](https://github.com/boam79/salary_cal/releases)
+[![Version](https://img.shields.io/badge/version-4.8.0-blue.svg)](https://github.com/boam79/salary_cal/releases)
 [![Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://salary-cal.vercel.app)
 
 ---
@@ -39,6 +39,19 @@ python3 -m http.server 8000
 ```
 
 **[Live Demo](https://salary-cal.vercel.app)**
+
+### 새 셸 (React)
+
+- 시나리오 허브 및 라우팅: **`/app/`** (예: `https://salary-cal.vercel.app/app/`)
+- 기존 계산기 UI는 점진 이관 전까지 **`/app/legacy.html`** 로 iframe 로드
+
+```bash
+npm install
+npm run dev -w salary-cal-frontend-app
+# http://127.0.0.1:5180/app/
+```
+
+자세한 내용은 `DOC/frontend-migration-v2.md` 참고.
 
 ---
 
@@ -76,6 +89,13 @@ python3 -m http.server 8000
 ---
 
 ## 📝 최근 업데이트
+
+### v4.8.0 (2026-04-12)
+- ✅ **전면 개편 1단계**: npm workspaces + `packages/calc-core` (도메인 재수출 + Zod 공유 URL 스키마)
+- ✅ **React + Vite** 새 셸: `/app/` 시나리오 허브 + 라우팅, 레거시 계산기는 `legacy.html` iframe으로 점진 이관
+- ✅ **빌드**: `npm run build:app` → `public/app/` + 루트 `public/legacy.html` (전체 화면 링크용)
+- ✅ **Vercel**: `/app/*` SPA rewrite, iframe/CSP 정합 (`frame-ancestors 'self'`, `frame-src 'self'`)
+- ✅ **테스트**: `tests/schemas.test.js`, `npm run test:e2e:app` (React 셸 스모크)
 
 ### v4.7.1 (2026-04-12)
 - ✅ **품질**: GitHub Actions CI (`npm test`, `npm run test:e2e`, 서버 `npm audit`)
@@ -156,6 +176,6 @@ MIT License
 
 ---
 
-**Last Updated**: 2026-04-12 | **Version**: 4.7.1
+**Last Updated**: 2026-04-12 | **Version**: 4.8.0
 
 Made with ❤️ by [@boam79](https://github.com/boam79)
